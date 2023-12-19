@@ -1,5 +1,11 @@
 {
     "manifest_version":2,
     "version":"1.0",
-    "name":"Mozilla VPN integration"
+    "name":"Mozilla VPN integration",
+    "author": "Firefox",
+    "applications": {
+      "gecko": {
+        "id": "vpn@mozilla.com"
+      }
+    }
 }
