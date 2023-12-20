@@ -1,0 +1,25 @@
+{
+  "name": "mozilla-vpn-extension",
+  "version": "0.0.0",
+  "description": "The official Mozilla-VPN Firefox integration",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "web-ext build --source-dir src --filename mozilla-vpn.xpi",
+    "start": "web-ext run --verbose --source-dir src",
+    "test": "echo \"Error: no test specified\" && exit 0"
+    
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mozilla-extensions/mozilla-vpn-extension.git"
+  },
+  "author": "Mozilla",
+  "license": "MPL-2.0",
+  "bugs": {
+    "url": "https://github.com/mozilla-extensions/mozilla-vpn-extension/issues"
+  },
+  "homepage": "https://github.com/mozilla-extensions/mozilla-vpn-extension#readme",
+  "devDependencies": {
+    "web-ext": "^7.9.0"
+  }
+}
