@@ -4,7 +4,7 @@
   "description": "The official Mozilla-VPN Firefox integration",
   "main": "src/index.js",
   "scripts": {
-    "build": "web-ext build --source-dir src --filename mozilla-vpn.xpi",
+    "build": "web-ext build --source-dir src --filename mozilla-vpn-extension.xpi",
     "start": "web-ext run --verbose --source-dir src",
     "test": "echo \"Error: no test specified\" && exit 0"
     
