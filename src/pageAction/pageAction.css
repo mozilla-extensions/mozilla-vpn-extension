@@ -1,0 +1,4 @@
+body {
+  min-block-size: 100px;
+  min-inline-size: 100px;
+}

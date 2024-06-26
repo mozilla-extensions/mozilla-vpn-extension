@@ -38,5 +38,19 @@
       "48": "assets/logos/logo-dark.svg"
     },
 
-    "incognito": "spanning"
+    "incognito": "spanning",
+
+    "page_action": {
+      "default_popup": "pageAction/pageActionPopup.html",
+      "default_title": "Page action button (TODO: Localize)",
+      "default_icon": {
+        "19": "assets/logos/logo-light.svg"
+      },
+      "show_matches": ["<all_urls>"]
+    },
+
+    "permissions": [
+      "tabs"
+    ]
+  
 }
