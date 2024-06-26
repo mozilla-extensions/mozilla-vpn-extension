@@ -14,6 +14,14 @@
 
     "homepage_url": "https://vpn.mozilla.org",
 
+    "background": {
+      "persistent": true,
+      "scripts": [
+        "background/main.js"
+      ],
+      "type": "module"
+    },
+
     "browser_action": {
       "default_area": "navbar",
       "default_icon": "assets/logos/logo-dark.svg",
