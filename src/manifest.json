@@ -50,7 +50,8 @@
     },
 
     "permissions": [
-      "tabs"
+      "<all_urls>",
+      "proxy"
     ]
   
 }

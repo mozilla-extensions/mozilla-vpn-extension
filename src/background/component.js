@@ -7,5 +7,9 @@ export class Component {
 
   constructor(receiver) {
     this.#receiver = receiver;
+    receiver.registerObserver(this);
   }
+
+  // In case we need to overwrite
+  async init() {}
 }
