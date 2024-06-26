@@ -4,6 +4,7 @@
 
 import {Logger} from "./logger.js";
 import {RequestHandler} from "./requestHandler.js";
+import {TabHandler} from "./tabHandler.js";
 
 const log = Logger.logger("Main");
 
@@ -13,6 +14,7 @@ class Main {
 
     this.logger = new Logger(this);
     this.requestHandlder = new RequestHandler(this);
+    this.tabHandler = new TabHandler(this);
   }
 
   async init() {
