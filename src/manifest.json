@@ -33,7 +33,6 @@
         "size": 32
       }]
     },
-
     "icons": {
       "48": "assets/logos/logo-dark.svg"
     },
@@ -47,6 +46,8 @@
 
     "permissions": [
       "<all_urls>",
+      "nativeMessaging",
+      "storage",
       "proxy",
       "tabs"
     ]

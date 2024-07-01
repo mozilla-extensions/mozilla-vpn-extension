@@ -5,17 +5,17 @@
 import {Logger} from "./logger.js";
 import {RequestHandler} from "./requestHandler.js";
 import {TabHandler} from "./tabHandler.js";
+import {VPNController} from "./vpnController.js";
 
 const log = Logger.logger("Main");
 
 class Main {
-  constructor() {
-    this.observers = new Set();
+  observers = new Set();
+  vpnController = new VPNController(this);
+  logger = new Logger(this);
+  requestHandlder = new RequestHandler(this);
+  tabHandler = new TabHandler(this);
 
-    this.logger = new Logger(this);
-    this.requestHandlder = new RequestHandler(this);
-    this.tabHandler = new TabHandler(this);
-  }
 
   async init() {
     log("Hello from the background script!");
@@ -33,3 +33,4 @@ class Main {
 
 const main = new Main();
 main.init();
+globalThis["main"]=main
