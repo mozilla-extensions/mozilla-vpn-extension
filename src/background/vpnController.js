@@ -106,7 +106,7 @@ class StateVPNEnabled extends VPNState {
   /**
    * 
    * @param {VPNState} other - 
-   * @param {*} loophole 
+   * @param {string|boolean} loophole - False if loophole is not supported, 
    */
   constructor(other, aloophole){
     super(other);
