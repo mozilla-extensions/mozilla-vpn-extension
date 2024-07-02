@@ -6,6 +6,7 @@ import {Component} from './component.js';
 
 let self;
 
+
 export class Logger extends Component {
   constructor(receiver) {
     super(receiver);
@@ -21,7 +22,7 @@ export class Logger extends Component {
   }
 
   #logInternal(category, msg, rest) {
-    const options = {
+    const dateTimeFormat = new Intl.DateTimeFormat("en-US", {
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
@@ -29,9 +30,7 @@ export class Logger extends Component {
       minute: "numeric",
       second: "numeric",
       hour12: false,
-    };
-
-    const dateTimeFormat = new Intl.DateTimeFormat("en-US", options).format;
+    }).format;
 
     const now = dateTimeFormat(Date.now());
     const r = rest.map(r => JSON.stringify(r)).join(", ");

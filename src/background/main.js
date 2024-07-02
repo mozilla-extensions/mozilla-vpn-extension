@@ -5,7 +5,7 @@
 import {Logger} from "./logger.js";
 import {RequestHandler} from "./requestHandler.js";
 import {TabHandler} from "./tabHandler.js";
-import {VPNController} from "./vpnController.js";
+import { VPNController } from "./vpncontroller/index.js";
 
 const log = Logger.logger("Main");
 
@@ -13,7 +13,7 @@ class Main {
   observers = new Set();
   vpnController = new VPNController(this);
   logger = new Logger(this);
-  requestHandlder = new RequestHandler(this);
+  requestHandlder = new RequestHandler(this, this.vpnController);
   tabHandler = new TabHandler(this);
 
 

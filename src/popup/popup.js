@@ -9,7 +9,7 @@
 
 
 
-const port  = chrome.runtime.connect({
+const port  = globalThis.chrome.runtime.connect({
   name: "vpncontroller"
 });
 
