@@ -1,0 +1,34 @@
+import { describe, expect, test } from "@jest/globals";
+import { StateVPNDisabled, StateVPNEnabled, VPNState, StateVPNUnavailable } from "../../../../src/background/vpncontroller/states"
+
+describe('VPN State Machine', () => {
+  const STATE_CONSTRUCTORS = [StateVPNDisabled, StateVPNEnabled, VPNState, StateVPNUnavailable]
+
+  test("Can Create all States",()=>{
+    const result = STATE_CONSTRUCTORS.map(state => new state());
+    expect(result.length).toBe(STATE_CONSTRUCTORS.length);
+  })
+  
+  test("Can Create a State from another keeping data",()=>{
+    const stateA = new VPNState();
+    // Servers is persistent, so if we call new State(oldState) 
+    stateA.servers.push({cities: [], code: "de", name:"GERMONY"});
+
+    const endstate = STATE_CONSTRUCTORS.reduce((state, nextstate)=> new nextstate(state), stateA);
+    expect(stateA.servers[0].name).toBe(stateA.servers[0].name);
+    expect(endstate.servers[0].code).toBe(endstate.servers[0].code);
+  })
+
+  test("The Proxy Field is Set in 'Enabled' and Removed on Other states",()=>{
+    const testState = new StateVPNEnabled();
+    // Servers is persistent, so if we call new State(oldState) 
+    testState.loophole = "aaa";
+
+    expect(new StateVPNEnabled(testState).loophole).toBe(testState.loophole);
+    expect(new StateVPNDisabled(testState).loophole).toBe(false);
+    expect(new StateVPNUnavailable(testState).loophole).toBe(false);
+    expect(new VPNState(testState).loophole).toBe(false);
+  })
+
+
+});

@@ -111,7 +111,9 @@ export class StateVPNEnabled extends VPNState {
      */
     constructor(other, aloophole) {
         super(other);
-        this.loophole = other.loophole;
+        if(other){
+            this.loophole = other.loophole;
+        }
         if (aloophole) {
             this.loophole = aloophole;
         }
