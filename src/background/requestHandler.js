@@ -12,12 +12,10 @@ let self;
 export class RequestHandler extends Component {
   constructor(receiver) {
     super(receiver);
-
-    self = this;
     
   }
 
-  init() {
+  async init() {
     log("Initiating RequestHandler");
 
     browser.proxy.onRequest.addListener(

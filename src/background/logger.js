@@ -15,12 +15,12 @@ export class Logger extends Component {
   static logger(category) {
     return (msg, ...rest) => {
       if (self) {
-        self.logInternal(category, msg, rest);
+        self.#logInternal(category, msg, rest);
       }
     };
   }
 
-  logInternal(category, msg, rest) {
+  #logInternal(category, msg, rest) {
     const options = {
       year: "numeric",
       month: "2-digit",
