@@ -30,5 +30,5 @@ const port  = globalThis.chrome.runtime.connect({
 
 
 port.onMessage.addListener(msg =>{
-  document.querySelector("#log").innerHTML = JSON.stringify(msg);
+  document.querySelector("#log").textContent = JSON.stringify(msg);
 });
