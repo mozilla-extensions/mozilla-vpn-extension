@@ -1,0 +1,25 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+   License, v. 2.0. If a copy of the MPL was not distributed with this
+   file, You can obtain one at http://mozilla.org/MPL/2.0/. 
+*/
+
+:root {
+  --panel-bg-color: #fff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --panel-bg-color: #42414d;
+  }
+}
+
+html {
+  min-block-size: 200px;
+  min-inline-size: 200px;
+}
+
+body {
+  block-size: 100%;
+  inline-size: 100%;
+  background-color: var(--panel-bg-color);
+}
