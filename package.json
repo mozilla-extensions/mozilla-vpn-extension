@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "description": "The official Mozilla-VPN Firefox integration",
   "main": "src/index.js",
-  "type": "module",
   "scripts": {
     "typecheck": "tsc --noEmit",
     "build": "web-ext build --source-dir src --filename mozilla-vpn-extension.xpi",
