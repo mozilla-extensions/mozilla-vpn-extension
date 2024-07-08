@@ -1,2 +1,6 @@
 node_modules
 web-ext-artifacts
+dist/*
+
+# Mac OS X
+.DS_Store
