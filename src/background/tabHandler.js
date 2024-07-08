@@ -8,7 +8,11 @@ import {Logger} from "./logger.js";
 const log = Logger.logger("TabHandler");
 
 export class TabHandler extends Component {  
-  init() {
+  constructor(receiver) {
+    super(receiver);
+  }
+
+  async init() {
     log("Initializing TabHandler");
     browser.tabs.onUpdated.addListener((a,b) => this.maybeShowIcon(a,b)); 
     browser.tabs.onActivated.addListener((a,b) => this.maybeShowIcon(a,b));

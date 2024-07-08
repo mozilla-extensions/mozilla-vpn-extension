@@ -4,20 +4,33 @@
 
 import {Component} from "./component.js";
 import {Logger} from "./logger.js";
+import {VPNController, VPNState} from "./vpncontroller/index.js";
 
 const log = Logger.logger("RequestHandler");
 
 let self;
 
 export class RequestHandler extends Component {
-  constructor(receiver) {
+  /**
+   * 
+   * @param {*} receiver 
+   * @param {VPNController} controller 
+   */
+  constructor(receiver, controller) {
     super(receiver);
+    this.controller = controller;
+    self = this;
     
   }
+
+  /** @type {VPNState | undefined} */
+  controllerState;
 
   async init() {
     log("Initiating RequestHandler");
 
+    this.controller.subscribe(s => this.controllerState = s);
+  
     browser.proxy.onRequest.addListener(
       this.interceptRequests,
       {urls: ['<all_urls>']}
@@ -32,6 +45,11 @@ export class RequestHandler extends Component {
     }
   }
 
+  /**
+   * 
+   * @param { RequestDetails } requestInfo 
+   * @returns 
+   */
   async interceptRequests(requestInfo) {
     let {url, originUrl} = requestInfo;
 

@@ -6,3 +6,14 @@
 (() => {
   console.log("Hello from the popup script");
 })();
+
+
+
+const port  = globalThis.chrome.runtime.connect({
+  name: "vpncontroller"
+});
+
+
+port.onMessage.addListener(msg =>{
+  document.querySelector("#log").innerHTML = JSON.stringify(msg);
+});
