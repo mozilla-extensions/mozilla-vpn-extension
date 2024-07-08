@@ -152,7 +152,6 @@ export class VPNController extends Component {
 
     // Handle responses from MozillaVPN client
     async handleResponse(response) {
-        console.log(response)
         if (!response.t) {
             // The VPN Client always sends a ".t : string" 
             // to determing the message type. 
@@ -168,7 +167,33 @@ export class VPNController extends Component {
                 this.#setState(newState);
                 break;
             case "disabled_apps":
-                // Todo: what do we do here?
+                // Todo: THIS IS HACKY
+                // We need to find out if the excluded firefox 
+                const app_paths = [
+                    ["Firefox Nightly", "firefox.exe"],
+                    ["Firefox", "firefox.exe"],
+                    ["Firefox Developer Edition", "firefox.exe"],
+                ]
+                const intersects = (a, b) => {
+                    return a.filter(Set.prototype.has, new Set(b)).length == 0;
+                }
+
+                let apps = response["disabled_apps"];
+                apps ??= [];
+                const isFirefoxExcluded = apps.some((path) => {
+                    const path_components = path.split("[\\/]"); // Split \\ and / 
+                    return app_paths.some(searchPath => {
+                        return intersects(path_components, searchPath);
+                    });
+                });
+                if (isFirefoxExcluded) {
+                    // @ts-ignore 
+                    this.#setState(new this.#mState.constructor({
+                        ...this.#mState,
+                        isExcluded: true,
+                    }));
+                    return;
+                }
                 break;
             case "status":
                 const status = response.status;
@@ -194,7 +219,7 @@ export class VPNController extends Component {
     async handleBridgeResponse(response) {
         // We can only get 2 types of messages right now: client-down/up
         if (response.status && response.status === "vpn-client-down") {
-            if (this.#mState.installed) {
+            if (this.#mState.alive) {
                 this.#setState(new StateVPNUnavailable(this.#mState));
             }
             return;
@@ -204,7 +229,8 @@ export class VPNController extends Component {
             queueMicrotask(() => {
                 this.postToApp("status");
                 this.postToApp("servers");
-
+                this.postToApp("disabled_apps");
+                
             });
             return;
         }

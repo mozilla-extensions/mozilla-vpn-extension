@@ -5,14 +5,13 @@
 // @ts-check
 
 const MOZILLA_VPN_SERVERS_KEY = "mozillaVpnServers";
-const MOZILLA_VPN_HIDDEN_TOUTS_LIST_KEY = "mozillaVpnHiddenToutsList";
 
 /**
  * Commands we know we can send 
  * to the vpn
  */
 export const REQUEST_TYPES = [
-    "activate",
+    "activate", // activate for Firefox
     "servers",
     "disabled_apps",
     "status"
@@ -23,10 +22,12 @@ export const REQUEST_TYPES = [
 export class VPNState {
     // Name of the current state
     state = "";
-    // If the Native Message adapter is installed
-    installed = false;
+    // If the Native Message adapter is alive
+    alive = false;
     // True if the VPN is enabled.
     connected = false;
+    // True if firefox is split-tunneled
+    isExcluded = false;
     /**
      * A socks:// url to connect to
      * to bypass the vpn. 
@@ -44,8 +45,14 @@ export class VPNState {
      * @param {VPNState?} other
      */
     constructor(other) {
-        if (other) {
+        if (!other) {
+            return;
+        }
+        if(other.servers){
             this.servers = [...other.servers];
+        }
+        if(other.isExcluded != null){
+            this.isExcluded = other.isExcluded;
         }
     }
 
@@ -55,13 +62,13 @@ export class VPNState {
     * 
     * @param {VPNState} state - The state to replicate
     * @param {browser.storage.StorageArea} storage - The storage area to look for
+    * @param {String} key - The key to put the state in
     * @returns {Promise<VPNState>} - Returns a copy of the state, or the same in case of missing data.
     */
-    static async fromStorage(state = new StateVPNUnavailable(null), storage = browser.storage.local) {
+    static async fromStorage(state = new StateVPNUnavailable(null), storage = browser.storage.local, key = MOZILLA_VPN_SERVERS_KEY) {
         const { mozillaVpnServers } = await storage.get(MOZILLA_VPN_SERVERS_KEY);
         if (typeof (mozillaVpnServers) === "undefined") {
             await storage.set({ [MOZILLA_VPN_SERVERS_KEY]: [] });
-            await storage.set({ [MOZILLA_VPN_HIDDEN_TOUTS_LIST_KEY]: [] });
             return state;
         }
         // @ts-ignore
@@ -69,11 +76,13 @@ export class VPNState {
             servers: mozillaVpnServers
         });
     }
-    // Puts a state's data into storage, to make sure we can recreate it next time using 
-    // fromStorage()
-    static async putIntoStorage(state = new StateVPNUnavailable(null), storage = browser.storage.local) {
+    /**  Puts a state's data into storage, to make sure we can recreate it next time using 
+    * @param {VPNState} state - The state to replicate
+    * @param {browser.storage.StorageArea} storage - The storage area to look for
+    */
+    static putIntoStorage(state = new StateVPNUnavailable(null), storage = browser.storage.local, key = MOZILLA_VPN_SERVERS_KEY) {
         // @ts-ignore
-        storage.set({ [MOZILLA_VPN_SERVERS_KEY]: state.servers });
+        storage.set({ [key]: state.servers });
     }
 }
 
@@ -84,7 +93,7 @@ export class VPNState {
  */
 export class StateVPNUnavailable extends VPNState {
     state = "Unavailable";
-    installed = false;
+    alive = false;
     connected = false;
 }
 
@@ -94,7 +103,7 @@ export class StateVPNUnavailable extends VPNState {
  */
 export class StateVPNDisabled extends VPNState {
     state = "Disabled";
-    installed = true;
+    alive = true;
     connected = false;
 }
 
@@ -120,7 +129,7 @@ export class StateVPNEnabled extends VPNState {
     }
 
     state = "Enabled"
-    installed = true;
+    alive = true;
     connected = true;
 }
 

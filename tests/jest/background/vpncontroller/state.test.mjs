@@ -13,10 +13,12 @@ describe('VPN State Machine', () => {
     const stateA = new VPNState();
     // Servers is persistent, so if we call new State(oldState) 
     stateA.servers.push({cities: [], code: "de", name:"GERMONY"});
+    stateA.isExcluded = true;
 
     const endstate = STATE_CONSTRUCTORS.reduce((state, nextstate)=> new nextstate(state), stateA);
-    expect(stateA.servers[0].name).toBe(stateA.servers[0].name);
-    expect(endstate.servers[0].code).toBe(endstate.servers[0].code);
+    expect(endstate.servers[0].name).toBe(stateA.servers[0].name);
+    expect(endstate.servers[0].code).toBe(stateA.servers[0].code);
+    expect(endstate.isExcluded).toBe(stateA.isExcluded);
   })
 
   test("The Proxy Field is Set in 'Enabled' and Removed on Other states",()=>{
