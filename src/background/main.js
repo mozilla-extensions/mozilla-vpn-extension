@@ -14,7 +14,7 @@ class Main {
   vpnController = new VPNController(this);
   logger = new Logger(this);
   requestHandlder = new RequestHandler(this, this.vpnController);
-  tabHandler = new TabHandler(this);
+  UIHandler = new UIHandler(this);
 
   async init() {
     log("Hello from the background script!");
