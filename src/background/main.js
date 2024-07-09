@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { Logger } from "./logger.js";
+import { ProxyHandler } from "./proxyHandler.js";
 import { RequestHandler } from "./requestHandler.js";
 import { TabHandler } from "./tabHandler.js";
 import { VPNController } from "./vpncontroller/index.js";
@@ -10,20 +11,66 @@ import { VPNController } from "./vpncontroller/index.js";
 const log = Logger.logger("Main");
 
 class Main {
+  #handlingEvent = true;
+  #pendingEvents = [];
+
   observers = new Set();
   vpnController = new VPNController(this);
   logger = new Logger(this);
-  requestHandlder = new RequestHandler(this, this.vpnController);
-  UIHandler = new UIHandler(this);
+  proxyHandler = new ProxyHandler(this);
+  requestHandler = new RequestHandler(this, this.vpnController);
+  TabHandler = new TabHandler(this);
 
-  async init() {
-    log("Hello from the background script!");
+   async init() {
+     log("Hello from the background script!");
+ 
+     for (let observer of this.observers) {
+       await observer.init();
+     }
 
-    for (let observer of this.observers) {
-      await observer.init();
+     this.#handlingEvent = false;
+     this.#processPendingEvents();
+   }
+ 
+  // In order to avoid race conditions amongst multiple events 
+  // we process them 1 by 1. If we are already handling an
+  // event, we wait until it is concluded.
+  async handleEvent(type, data) {
+    log(`handling event ${type}`);
+
+    if (this.#handlingEvent) {
+      log(`Queuing event ${type}`);
+      await new Promise(resolve => this.#pendingEvents.push(resolve));
+      log(`Event ${type} resumed`);
+    }
+
+    this.#handlingEvent = true;
+
+    const returnValues = [];
+
+    for (const observer of this.observers) {
+      try {
+        const result = observer.handleEvent(type, data);
+        if (result !== undefined) {
+          returnValues.push(result);
+        }
+      } catch (e) {}
+    }
+
+    this.#handlingEvent = false;
+    this.#processPendingEvents();
+
+    return returnValues;
+  }
+
+  #processPendingEvents() {
+    if (this.#pendingEvents.length) {
+      log(`Processing the first of ${this.#pendingEvents.length} events`);
+      this.#pendingEvents.shift()();
     }
   }
 
+ 
   registerObserver(observer) {
     this.observers.add(observer);
   }

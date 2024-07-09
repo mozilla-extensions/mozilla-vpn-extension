@@ -4,12 +4,15 @@
 
 import { Component } from "./component.js";
 import { Logger } from "./logger.js";
+import { Utils } from "./utils.js";
 import { VPNController, VPNState } from "./vpncontroller/index.js";
 
 const log = Logger.logger("RequestHandler");
 
-let self;
-
+/**
+ * RequestHandler is responsible for intercepting, inspecting,
+ * and determining whether a Request should be proxied.
+ */
 export class RequestHandler extends Component {
   /**
    *
@@ -19,7 +22,6 @@ export class RequestHandler extends Component {
   constructor(receiver, controller) {
     super(receiver);
     this.controller = controller;
-    self = this;
   }
 
   /** @type {VPNState | undefined} */
@@ -35,14 +37,6 @@ export class RequestHandler extends Component {
     });
   }
 
-  createUrl(urlString) {
-    try {
-      return new URL(urlString);
-    } catch (e) {
-      return null;
-    }
-  }
-
   /**
    *
    * @param { RequestDetails } requestInfo
@@ -53,13 +47,15 @@ export class RequestHandler extends Component {
 
     for (let urlString of [url, originUrl]) {
       if (urlString) {
-        // Determine what to do with the request and
-        // maybe return [{...siteContext.proxyInfo}];
-        log(`Observing req from ${self.createUrl(urlString)}`);
+        const parsedHostname = await Utils.getFormattedHostname(urlString);
+        const siteContext = await Utils.getContextForOrigin(parsedHostname);
+        if (siteContext) {
+          return [siteContext.proxyInfo];
+        }
       }
     }
 
-    // No custom proxy for site, don't do anything with the req
+    // No custom proxy for the site, return direct connection
     return { direct: true };
   }
 }
