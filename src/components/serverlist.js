@@ -80,7 +80,7 @@ export class ServerList extends LitElement {
 }
 
 render() {
-  return serverList(this.serverList, this.#getCountryListItem.bind(this));
+  return countrylistHolder(this.serverList, this.#getCountryListItem.bind(this));
 }
 
   static styles = css`  
@@ -301,7 +301,7 @@ export const countryListItem = (
  * @param {Array<ServerCountry>} servers 
  * @param {(countryListItemTemplate)=>any} countryListItemTemplate - A template returning a countrylist
  */
-export const serverList = (serverCountryList, countryListItemTemplate) => {
+export const countrylistHolder = (serverCountryList, countryListItemTemplate) => {
   const listItems = serverCountryList.map(countryListItemTemplate);
 
   return html`
