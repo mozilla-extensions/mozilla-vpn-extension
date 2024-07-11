@@ -5,10 +5,9 @@
 
 :root {
   --panel-bg-color: #fff;
-
   --window-width: 352px;
   --window-height: 448px;
-  
+  --text-color-primary: white;
 
 }
 

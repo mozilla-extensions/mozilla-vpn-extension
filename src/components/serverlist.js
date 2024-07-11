@@ -1,5 +1,5 @@
 
-import { html, css, LitElement } from "../vendor/lit-all.min.js"
+import { html, css, LitElement, classMap, styleMap } from "../vendor/lit-all.min.js"
 
 import { ServerCity } from '../background/vpncontroller/states.js'
 
@@ -83,59 +83,18 @@ render() {
   return serverList(this.serverList, this.#getCountryListItem.bind(this));
 }
 
-  static styles = css`
-  .moz-vpn-logo,
-  .moz-vpn-logotype {
-    color: var(--text-color-primary);
-    background-image: var(--logoMozillaVpn);
-    background-repeat: no-repeat;
-    background-size: 24px;
-    background-position: left center;
-    font-family: var(--fontMetropolis);
-    font-size: 15px;
-    line-height: 24px;
-    padding-inline-start: 28px;
-    position: relative;
-    padding-inline-end: 32px;
+  static styles = css`  
+  #moz-vpn-server-list{
+    padding: 0;
   }
-  
+
   #moz-vpn-server-list-panel {
     block-size: var(--panelSize);
     max-block-size: var(--panelSize);
     min-block-size: var(--panelSize);
     overflow-x: hidden;
     overflow-y: hidden;
-  }
-  
-  .proxy-panel-title {
-    line-height: var(--rowHeight);
-    block-size: var(--rowHeight);
-    border-block-end: 1px solid var(--panel-separator-color);
-    position: fixed;
-    z-index: 1;
-    background-color: var(--bgColor);
-    transition: box-shadow 0.5s ease;
-  }
-  
-  .moz-vpn-server-list {
-    padding-block-start: 4px;
-    font-size: 15px;
-    color: var(--grey50);
-    position: absolute;
-    inset-block-start: var(--rowHeight);
-    inset-inline-start: 0;
-    inset-inline-end: 0;
-    overflow: scroll;
-    overflow-x: hidden;
-    overscroll-behavior: none;
-    block-size: calc(var(--panelSize) - var(--rowHeight));
-    min-block-size: calc(var(--panelSize) - var(--rowHeight));
-  }
-  
-  #moz-vpn-return {
-    z-index: 2;
-  }
-  
+  }  
   .server-list-item {
     display: flex;
     flex-direction: column;
@@ -161,6 +120,8 @@ render() {
   
   .server-city-list-item,
   .server-city-list-visibility-btn {
+    display: flex; 
+    flex-direction: row;
     block-size: 40px;
     border-radius: 4px;
     margin-block-start: 4px;
@@ -197,7 +158,6 @@ render() {
     background-image: url("../assets/img/arrow-toggle.svg");
     background-position: center center;
     background-repeat: no-repeat;
-    block-size: 24px;
     margin-inline-start: 8px;
     pointer-events: none;
     transform: rotate(-90deg);
@@ -309,25 +269,28 @@ export const countryListItem = (
   cityTemplate) => {
 
   // Only render the City list if we're visible
-  let cities = ""
-  if (isCityListVisibile) {
-    cities = serverCountry.cities.map(cityTemplate);
-  }
+  let cities = serverCountry.cities.map(cityTemplate)
+
   const onclick = (e)=>{
     e.preventDefault();
     toggleCityListVisibility(serverCountry)
   }
 
+  const listClasses = { expanded: isCityListVisibile };
+  const listStyles = {
+      height : isCityListVisibile ? serverCountry.cities.length * 48 + "px" : "0px"
+  }
+
   return html`
-     <li class="server-list-item" data-country-code="${serverCountry.code}"  @click=${onclick}>
-      <button class="flx-row server-city-list-visibility-btn controller">
+     <li class="server-list-item  ${classMap(listClasses)}" data-country-code="${serverCountry.code}"  @click=${onclick}>
+      <button class="server-city-list-visibility-btn controller ">
         <div class="toggle"></div>
         <img class="server-country-flag" 
             src=${"../assets/flags/" + serverCountry.code.toUpperCase() + ".png"} 
             alt="Flag of ${serverCountry.name}" />
         <p class="server-country-name">${serverCountry.name}</p>
       </button>
-      <ul class="server-city-list">
+      <ul class="server-city-list " style="${styleMap(listStyles)}">
         ${cities}
       </ul>
     </li>
