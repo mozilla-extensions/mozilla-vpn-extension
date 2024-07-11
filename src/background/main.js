@@ -34,3 +34,6 @@ class Main {
 const main = new Main();
 main.init();
 globalThis["main"]=main
+
+// Just do this for debugging 
+// chrome.browserAction.openPopup();

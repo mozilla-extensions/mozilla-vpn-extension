@@ -8,7 +8,7 @@ const defaultConfig = {
   run: {
     firefox: "nightly",
     browserConsole: true,
-    startUrl: ["about:debugging"],
+    startUrl: ["about:debugging#/runtime/this-firefox"],
   },
 };
 
