@@ -15,10 +15,10 @@ export const Utils = {
   /**
    * Retrieves the context for a specific origin from storage.
    * @param {string} origin - The origin to retrieve the context for.
-   * @returns {Promise<object>} - The context for the origin.
+   * @param {Map<string, object>} siteContexts - A map containing contexts for various origins.
+   * @returns {object|null} - The context for the origin, or null if not found.
    */
-  async getContextForOrigin(origin) {
-    const {siteContexts} = await this.getSiteContexts();
+  getContextForOrigin(origin, siteContexts) {
     return siteContexts.get(origin);
   },
 
