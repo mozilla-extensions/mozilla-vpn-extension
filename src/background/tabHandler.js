@@ -84,7 +84,7 @@ export class TabHandler extends Component {
 
     // Let's send the initial data.
     port.onMessage.addListener(async message => {
-      log(`Message received from the popup: ${message}`);
+      log(`Message received from the popup: ${message.type}`);
       this.sendMessage(message.type, message.data);
     });
 
