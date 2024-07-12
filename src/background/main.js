@@ -19,7 +19,7 @@ class Main {
   logger = new Logger(this);
   proxyHandler = new ProxyHandler(this);
   requestHandler = new RequestHandler(this, this.vpnController);
-  TabHandler = new TabHandler(this);
+  TabHandler = new TabHandler(this, this.vpnController);
 
    async init() {
      log("Hello from the background script!");

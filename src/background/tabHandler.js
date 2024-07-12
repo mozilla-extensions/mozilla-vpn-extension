@@ -5,10 +5,10 @@
 import { Component } from "./component.js";
 import { Logger } from "./logger.js";
 import  {Utils } from "./utils.js";
+import { VPNController, VPNState } from "./vpncontroller/index.js";
 
 
 const log = Logger.logger("UI");
-let self;
 
 /**
  * Here we have a WIP UIHandler class which collectes and
@@ -19,17 +19,29 @@ let self;
 export class TabHandler extends Component {
   #currentPort;
   #currentHostname;
-  #servers
   #siteContexts
   #currentContext
 
-  constructor(receiver) {
+  /**
+   * 
+   * @param {*} receiver 
+   * @param {VPNController} controller 
+   */
+  constructor(receiver, controller) {
     super(receiver);
-    self = this;
+    this.controller = controller; 
   }
 
+  /** @type {VPNState | undefined} */
+  controllerState;
+ 
   async init() {
-    log("Initializing UIHandler");
+    log("Initializing TabHandler");
+
+    this.controller.subscribe(s => {
+      this.controllerState = s;
+      this.maybeShowIcon();
+    });
 
     browser.tabs.onUpdated.addListener((tabId) => this.maybeShowIcon(tabId)); 
     browser.tabs.onActivated.addListener((activeInfo) => this.handleActiveTabChange(activeInfo));
@@ -38,11 +50,10 @@ export class TabHandler extends Component {
       log(`Connecting to ${port.name}`);
       await this.popupConnected(port);
     });
-    const mozillaVpnServers = await Utils.getServers();
-    this.#servers = mozillaVpnServers;
-
     const {siteContexts} = await Utils.getSiteContexts();
     this.#siteContexts = siteContexts;
+
+    this.maybeShowIcon();
   }
 
   async handleActiveTabChange(activeInfo) {
@@ -50,31 +61,34 @@ export class TabHandler extends Component {
   }
 
   async handleEvent(type, data) {
+    if (type === "state-changed") {
+      this.handleStateChange();
+    }
     if (type === "site-contexts-updated") {
 
       const {siteContexts}  = await Utils.getSiteContexts();
       this.#siteContexts = siteContexts;
-      this.#currentContext = await Utils.getContextForOrigin(this.#currentHostname);
+      this.#currentContext = Utils.getContextForOrigin(this.#currentHostname, siteContexts);
 
       return await this.sendDataToCurrentPopup();
     }
   }
 
-  async maybeShowIcon(tabId) {
+  async maybeShowIcon() {
     const currentTab = await Utils.getCurrentTab();
 
     this.#currentHostname = await Utils.getFormattedHostname(currentTab.url);
-    this.#currentContext = await Utils.getContextForOrigin(this.#currentHostname);
+    this.#currentContext = Utils.getContextForOrigin(this.#currentHostname, this.#siteContexts);
 
-    // if (this.#currentContext) {
+    if (this.controllerState.state === "Enabled") {
       // TODO replace with flags
       browser.pageAction.setIcon({
         path: "../assets/logos/logo-light.svg",
-        tabId
+        tabId: currentTab.id
       });
-      browser.pageAction.show(tabId);
-    // }
-    return;
+      return browser.pageAction.show(currentTab.id);
+    }
+    return browser.pageAction.hide(currentTab.id);
   }
 
   async popupConnected(port) {
@@ -82,7 +96,6 @@ export class TabHandler extends Component {
 
     this.#currentPort = port;
 
-    // Let's send the initial data.
     port.onMessage.addListener(async message => {
       log(`Message received from the popup: ${message.type}`);
       this.sendMessage(message.type, message.data);
@@ -97,17 +110,11 @@ export class TabHandler extends Component {
   }
   
   async sendDataToCurrentPopup() {
-    const {siteContexts} = await Utils.getSiteContexts();
-    this.#siteContexts =siteContexts
-
-
-    this.#servers = await Utils.getServers();
-
-    return self.#currentPort.postMessage({
+    return this.#currentPort.postMessage({
       type: 'tabInfo',
       currentHostname: this.#currentHostname,
       siteContexts: this.#siteContexts,
-      servers: this.#servers,
+      servers: this.controllerState.servers,
       currentContext: this.#currentContext
     });
   }
