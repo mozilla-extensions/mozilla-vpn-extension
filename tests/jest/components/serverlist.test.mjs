@@ -148,7 +148,7 @@ describe("Serverlist Templates", () => {
       "assets/flags/" + testCountry.code.toUpperCase() + ".png"
     );
     // There should be no "expanded things"
-    expect(element.querySelectorAll(".expanded").length).toBe(0);
+    expect(element.querySelectorAll(".opened").length).toBe(0);
 
     // Now render it again with isOpen = true
     render(
@@ -163,7 +163,7 @@ describe("Serverlist Templates", () => {
       element
     );
     // There should be no "expanded things"
-    expect(element.querySelectorAll(".expanded").length).not.toBe(0);
+    expect(element.querySelectorAll(".opened").length).not.toBe(0);
   });
 
   test("countryListItem fires callback on click", async () => {
