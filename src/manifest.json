@@ -1,55 +1,48 @@
 {
-    "manifest_version": 2,
-    "version": "1.0",
-    "author": "Mozilla",
-    "name": "Mozilla VPN Web Extension (TODO Localize)",
-    "description": "Mozilla VPN",
+  "manifest_version": 2,
+  "version": "1.0",
+  "author": "Mozilla",
+  "name": "Mozilla VPN Web Extension (TODO Localize)",
+  "description": "Mozilla VPN",
 
-    "browser_specific_settings": {
-      "gecko": {
-        "id": "vpn@mozilla.com",
-        "strict_min_version": "112.0.0"
-      }
-    },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "vpn@mozilla.com",
+      "strict_min_version": "112.0.0"
+    }
+  },
 
-    "homepage_url": "https://vpn.mozilla.org",
+  "homepage_url": "https://vpn.mozilla.org",
 
-    "background": {
-      "persistent": true,
-      "scripts": [
-        "background/main.js"
-      ],
-      "type": "module"
-    },
+  "background": {
+    "persistent": true,
+    "scripts": ["background/main.js"],
+    "type": "module"
+  },
 
-    "browser_action": {
-      "default_area": "navbar",
-      "default_icon": "assets/logos/logo-dark.svg",
-      "default_popup": "popup/popup.html",
-      "default_title": "Mozilla VPN",
-      "theme_icons": [{
+  "browser_action": {
+    "default_area": "navbar",
+    "default_icon": "assets/logos/logo-dark.svg",
+    "default_popup": "popup/popup.html",
+    "default_title": "Mozilla VPN",
+    "theme_icons": [
+      {
         "dark": "assets/logos/logo-dark.svg",
         "light": "assets/logos/logo-light.svg",
         "size": 32
-      }]
-    },
-    "icons": {
-      "48": "assets/logos/logo-dark.svg"
-    },
-
-    "incognito": "spanning",
-
-    "page_action": {
-      "default_popup": "pageAction/pageActionPopup.html",
-      "default_title": "Page action button (TODO: Localize)"
-    },
-
-    "permissions": [
-      "<all_urls>",
-      "nativeMessaging",
-      "storage",
-      "proxy",
-      "tabs"
+      }
     ]
-  
+  },
+  "icons": {
+    "48": "assets/logos/logo-dark.svg"
+  },
+
+  "incognito": "spanning",
+
+  "page_action": {
+    "default_popup": "pageAction/pageActionPopup.html",
+    "default_title": "Page action button (TODO: Localize)"
+  },
+
+  "permissions": ["<all_urls>", "nativeMessaging", "storage", "proxy", "tabs"]
 }

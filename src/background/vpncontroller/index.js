@@ -3,12 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 export {
-    VPNState,
-    StateVPNEnabled,
-    StateVPNUnavailable,
-    StateVPNDisabled,
-    REQUEST_TYPES,
-} from './states.js';
-export { 
-    VPNController 
-} from './vpncontroller.js'
+  VPNState,
+  StateVPNEnabled,
+  StateVPNUnavailable,
+  StateVPNDisabled,
+  REQUEST_TYPES,
+} from "./states.js";
+export { VPNController } from "./vpncontroller.js";
