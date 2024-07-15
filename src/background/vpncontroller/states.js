@@ -136,7 +136,7 @@ export class StateVPNEnabled extends VPNState {
 
 // Defining the Nested Serverlist
 // so people don't have to dig around <any>
-class Server {
+export class Server {
     hostname="";
     ipv4_gateway="";
     ipv6_gateway="";
@@ -145,7 +145,7 @@ class Server {
     weight= 0;
   }
   
-  class ServerCity {
+export class ServerCity {
     code="";
     lat= 0;
     long= 0;
@@ -153,7 +153,7 @@ class Server {
     /** @type {Array <Server>} */
     servers= [];
   }
-  class ServerCountry {
+export class ServerCountry {
      /** @type {Array <ServerCity>} */
     cities= [];
     code="";

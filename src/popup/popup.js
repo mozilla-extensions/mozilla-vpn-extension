@@ -2,33 +2,25 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import {html, render} from "../vendor/lit-all.min.js"
+/**
+* @typedef {import("../background/vpncontroller/states.js").VPNState} VPNState
+* @typedef {import("../components/serverlist.js").ServerList} ServerListElement
 
-const template = (time) => html`
-  <pre>${time}<pre>
-`
+*/
 
-const renderTime = ()=>{
-    const now = new Date()
-    render(template(
-      `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`
-    ), document.body);
-}
-
-window.setInterval(renderTime,1000);
-renderTime();
-
-(() => {
-  console.log("Hello from the popup script");
-})();
-
-
-
-const port  = globalThis.chrome.runtime.connect({
-  name: "vpncontroller"
+/** @type {ServerListElement} */
+const serverListElement = document.querySelector("server-list");
+serverListElement.addEventListener("selectedCityChanged", (e) => {
+  console.log(`City changed to ${e.detail.city.name}`);
 });
 
-
-port.onMessage.addListener(msg =>{
-  document.querySelector("#log").textContent = JSON.stringify(msg);
+const controllerPort = globalThis.chrome.runtime.connect({
+  name: "vpncontroller",
 });
+
+/** @param {VPNState} state */
+const onNewState = (state) => {
+  console.log(state);
+  serverListElement.serverList = state.servers;
+};
+controllerPort.onMessage.addListener(onNewState);

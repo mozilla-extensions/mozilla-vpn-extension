@@ -5,6 +5,9 @@
 
 :root {
   --panel-bg-color: #fff;
+  --window-width: 352px;
+  --window-height: 448px;
+  --text-color-primary: white;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -13,13 +16,8 @@
   }
 }
 
-html {
-  min-block-size: 200px;
-  min-inline-size: 200px;
-}
-
 body {
-  block-size: 100%;
-  inline-size: 100%;
+  width: var(--window-width);
+  height: var(--window-height);
   background-color: var(--panel-bg-color);
 }
