@@ -1,32 +1,34 @@
-import {Component} from "./component.js";
-import {constants} from "./constants.js";
-import {Logger} from "./logger.js";
+import { Component } from "./component.js";
+import { constants } from "./constants.js";
+import { Logger } from "./logger.js";
 
 const log = Logger.logger("Telemetry");
 
 const TELEMETRY_CATEGORY = "vpn.extension";
-// TODO: Add 
-const TELEMETRY_EVENTS = {
-
-};
-// TODO: Add 
-const TELEMETRY_SCALARS = {
-
-};
+// TODO: Add
+const TELEMETRY_EVENTS = {};
+// TODO: Add
+const TELEMETRY_SCALARS = {};
 
 export class Telemetry extends Component {
   constructor(receiver) {
     super(receiver);
-    browser.runtime.onInstalled.addListener(async details => this.onInstalled(details));
+    browser.runtime.onInstalled.addListener(async (details) =>
+      this.onInstalled(details)
+    );
     log("Registering telemetry events");
 
-    browser.telemetry.registerEvents(TELEMETRY_CATEGORY, TELEMETRY_EVENTS).catch(e => {
-      console.error("Failed to register telemetry events!", e);
-    });
+    browser.telemetry
+      .registerEvents(TELEMETRY_CATEGORY, TELEMETRY_EVENTS)
+      .catch((e) => {
+        console.error("Failed to register telemetry events!", e);
+      });
 
-    browser.telemetry.registerScalars(TELEMETRY_CATEGORY, TELEMETRY_SCALARS).catch(e => {
-      console.error("Failed to register telemetry scalars!", e);
-    });
+    browser.telemetry
+      .registerScalars(TELEMETRY_CATEGORY, TELEMETRY_SCALARS)
+      .catch((e) => {
+        console.error("Failed to register telemetry scalars!", e);
+      });
 
     this.version = "";
   }
@@ -61,19 +63,23 @@ export class Telemetry extends Component {
 
     const extraValues = {
       version: this.version,
-      ...extra
+      ...extra,
     };
 
-    browser.telemetry.recordEvent(TELEMETRY_CATEGORY, category, event, value, extraValues).catch(e => {
-      console.error("Telemetry.recordEvent failed", e);
-    });
+    browser.telemetry
+      .recordEvent(TELEMETRY_CATEGORY, category, event, value, extraValues)
+      .catch((e) => {
+        console.error("Telemetry.recordEvent failed", e);
+      });
   }
 
   syncAddScalar(scalarName, value) {
     log(`Sending telemetry scalar: ${scalarName} - ${value}`);
 
-    browser.telemetry.scalarAdd(TELEMETRY_CATEGORY + "." + scalarName, value).catch(e => {
-      console.error("Telemetry.scalarAdd failed", e);
-    });
+    browser.telemetry
+      .scalarAdd(TELEMETRY_CATEGORY + "." + scalarName, value)
+      .catch((e) => {
+        console.error("Telemetry.scalarAdd failed", e);
+      });
   }
 }
