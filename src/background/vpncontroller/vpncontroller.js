@@ -186,8 +186,8 @@ export class VPNController extends Component {
           });
         });
         if (isFirefoxExcluded) {
-          // @ts-ignore
           this.#setState(
+            // @ts-ignore
             new this.#mState.constructor({
               ...this.#mState,
               isExcluded: true,
