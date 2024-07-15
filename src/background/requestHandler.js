@@ -28,7 +28,7 @@ export class RequestHandler extends Component {
   async init() {
     log("Initiating RequestHandler");
 
-    this.controller.subscribe((s) => (this.controllerState = s));
+    this.controller.state.subscribe((s) => (this.controllerState = s));
 
     browser.proxy.onRequest.addListener(this.interceptRequests, {
       urls: ["<all_urls>"],

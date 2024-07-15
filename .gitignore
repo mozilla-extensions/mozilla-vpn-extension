@@ -1,6 +1,6 @@
 node_modules
 web-ext-artifacts
 dist/*
-
+coverage/
 # Mac OS X
 .DS_Store
