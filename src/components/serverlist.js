@@ -23,7 +23,7 @@ import { ServerCity } from "../background/vpncontroller/states.js";
  *
  * The Following Properties can be r/w but the component will modify them based on interactions.
  * @property {ServerCity} selectedCity - The current selected City
- * @property {ServerCountryList} openedCountries - Countries that currently are "opened"
+ * @property {ServerCountryList} openedCountries - Countries who's city-list is currently opened. 
  *
  * @fires ServerList#selectedCityChanged - Fires if selectedCity was changed due to a Click.
  *
@@ -179,7 +179,7 @@ export class ServerList extends LitElement {
       inline-size: 24px;
     }
 
-    .expanded .toggle {
+    .opened .toggle {
       transform: rotate(0deg);
     }
 
@@ -194,7 +194,7 @@ export class ServerList extends LitElement {
       visibility: hidden;
     }
 
-    .expanded .server-city-list {
+    .opened .server-city-list {
       opacity: 1;
       visibility: visible;
     }
@@ -260,7 +260,6 @@ export const cityItem = (city, selectedCity, selectCity) => {
           data-country-code="${city.code}"
           data-city-name="${city.name}"
         />
-        <div class="server-radio-control"></div>
         <span class="server-city-name">${city.name}</span>
       </label>
     </li>
@@ -269,7 +268,7 @@ export const cityItem = (city, selectedCity, selectCity) => {
 
 /**
  * @param {ServerCountry} serverCountry - The Current country
- * @param {boolean} isCityListVisibile - Should the List be Expanded?
+ * @param {boolean} isCityListVisibile - Should the Citylist be opened?
  * @param {(ServerCountry)=>void} toggleCityListVisibility - A callback when the list is clicked, serverCountry is the argument
  * @param {(ServerCity)=>any} cityTemplate - A Template able to Render a a given City
  */
@@ -287,7 +286,7 @@ export const countryListItem = (
     toggleCityListVisibility(serverCountry);
   };
 
-  const listClasses = { expanded: isCityListVisibile };
+  const listClasses = { opened: isCityListVisibile };
   const listStyles = {
     height: isCityListVisibile
       ? serverCountry.cities.length * 48 + "px"
@@ -300,7 +299,7 @@ export const countryListItem = (
       data-country-code="${serverCountry.code}"
       @click=${onclick}
     >
-      <button class="server-city-list-visibility-btn controller ">
+      <button class="server-city-list-visibility-btn ">
         <div class="toggle"></div>
         <img
           class="server-country-flag"
@@ -327,11 +326,8 @@ export const countrylistHolder = (
   const listItems = serverCountryList.map(countryListItemTemplate);
 
   return html`
-    <div
-      class="hide panel moz-vpn-server-list-panel"
-      id="moz-vpn-server-list-panel"
-    >
-      <ul id="moz-vpn-server-list" class="moz-vpn-server-list">
+    <div id="moz-vpn-server-list-panel">
+      <ul id="moz-vpn-server-list">
         ${listItems}
       </ul>
     </div>
