@@ -5,7 +5,10 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "lint": "addons-linter --privileged src/",
+    "lint": "concurrently npm:prettier npm:typecheck",
+    "format": "prettier . --write",
+    "prettier": "prettier . --check",
+    "addonslinter": "addons-linter --privileged src/",
     "typecheck": "tsc --noEmit",
     "build": "web-ext build --source-dir src --filename mozilla-vpn-extension.xpi",
     "start": "web-ext run --verbose --source-dir src",
@@ -24,10 +27,15 @@
   "devDependencies": {
     "@jest/globals": "^29.7.0",
     "addons-linter": "^6.31.1",
+    "concurrently": "^8.2.2",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
+    "prettier": "3.3.3",
     "typescript": "^5.5.2",
     "web-ext": "^8.2.0",
     "web-ext-types": "github:synecdokey/web-ext-types"
+  },
+  "prettier": {
+    "trailingComma": "es5"
   }
 }

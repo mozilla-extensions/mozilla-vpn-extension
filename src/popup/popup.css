@@ -8,7 +8,6 @@
   --window-width: 352px;
   --window-height: 448px;
   --text-color-primary: white;
-
 }
 
 @media (prefers-color-scheme: dark) {

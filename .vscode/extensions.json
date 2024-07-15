@@ -1,7 +1,8 @@
 {
-    "recommendations": [
-        "lllllllqw.jsdoc",
-        "runem.lit-plugin",
-        "dbaeumer.vscode-eslint",
-    ],
-  }
+  "recommendations": [
+    "lllllllqw.jsdoc",
+    "runem.lit-plugin",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+  ]
+}

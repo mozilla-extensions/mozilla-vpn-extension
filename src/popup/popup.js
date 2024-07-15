@@ -9,21 +9,18 @@
 */
 
 /** @type {ServerListElement} */
-const serverListElement = document.querySelector("server-list")
-serverListElement.addEventListener("selectedCityChanged", (e)=>{
+const serverListElement = document.querySelector("server-list");
+serverListElement.addEventListener("selectedCityChanged", (e) => {
   console.log(`City changed to ${e.detail.city.name}`);
-})
+});
 
-const controllerPort  = globalThis.chrome.runtime.connect({
-    name: "vpncontroller"
+const controllerPort = globalThis.chrome.runtime.connect({
+  name: "vpncontroller",
 });
 
 /** @param {VPNState} state */
-const onNewState = (state) =>{
-    console.log(state)
-    serverListElement.serverList = state.servers;
-
-
-  
+const onNewState = (state) => {
+  console.log(state);
+  serverListElement.serverList = state.servers;
 };
 controllerPort.onMessage.addListener(onNewState);

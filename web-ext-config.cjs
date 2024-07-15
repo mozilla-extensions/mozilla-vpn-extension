@@ -1,7 +1,7 @@
 const defaultConfig = {
   sourceDir: "./src/",
   artifactsDir: "./dist/",
-  ignoreFiles: [".DS_Store" ],
+  ignoreFiles: [".DS_Store"],
   build: {
     overwriteDest: true,
   },
