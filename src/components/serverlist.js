@@ -23,7 +23,7 @@ import { ServerCity } from "../background/vpncontroller/states.js";
  *
  * The Following Properties can be r/w but the component will modify them based on interactions.
  * @property {ServerCity} selectedCity - The current selected City
- * @property {ServerCountryList} openedCountries - Countries who's city-list is currently opened. 
+ * @property {ServerCountryList} openedCountries - Countries who's city-list is currently opened.
  *
  * @fires ServerList#selectedCityChanged - Fires if selectedCity was changed due to a Click.
  *

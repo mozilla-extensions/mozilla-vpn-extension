@@ -1,28 +1,25 @@
 {
-    "compilerOptions": {
-        "allowJs": true,
-        "baseUrl": "./",
-        "checkJs": true,
-        "noEmit": true,
-        "module": "esnext",
-        "target": "esnext",
-        "strict": true,
-        "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true,
-        // "strict" implies this, but you'll want to enable it when you're
-        // ready: it's a huge reason your project will start complaining
-        "noImplicitAny": false,
-        // You have to explicitly set @types to get DefinitelyTyped type definitions
-        "paths": {
-            "*": [ "src/*"]
-        },
-        "typeRoots": [
-            "node_modules/@types",
-            "node_modules/web-ext-types",
-        ]
+  "compilerOptions": {
+    "allowJs": true,
+    "baseUrl": "./",
+    "checkJs": true,
+    "noEmit": true,
+    "module": "esnext",
+    "target": "esnext",
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    // "strict" implies this, but you'll want to enable it when you're
+    // ready: it's a huge reason your project will start complaining
+    "noImplicitAny": false,
+    // You have to explicitly set @types to get DefinitelyTyped type definitions
+    "paths": {
+      "*": ["src/*"]
     },
-    "include": [
-        // include the JS files you'd like to check here
-        "src/background/vpncontroller/index.js"
-    ],
+    "typeRoots": ["node_modules/@types", "node_modules/web-ext-types"]
+  },
+  "include": [
+    // include the JS files you'd like to check here
+    "src/background/vpncontroller/index.js"
+  ]
 }
