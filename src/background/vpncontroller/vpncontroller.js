@@ -6,6 +6,8 @@
 import { Component } from "../component.js";
 import { Logger } from "../logger.js";
 
+import { property } from "../../utils/property.js";
+
 import {
   VPNState,
   StateVPNEnabled,
@@ -24,41 +26,9 @@ const log = Logger.logger("TabHandler");
  * and send Messages to obtain info
  */
 export class VPNController extends Component {
-  /**
-   * Creates a subscription to recieve updates when the state changes
-   * @param {(state: VPNState) => void} callback
-   * @returns {Function} - a function to call on cancellation
-   */
-  subscribe(callback) {
-    const listener = {
-      postMessage: callback,
-    };
-    this.#contentScriptPorts.push(listener);
-    queueMicrotask(() => {
-      callback(this.state);
-    });
-    return () => {
-      this.#contentScriptPorts.splice(
-        this.#contentScriptPorts.indexOf(listener),
-        1
-      );
-    };
-  }
-
   get state() {
-    return this.#mState;
+    return this.#mState.readOnly;
   }
-  /**
-   * Freezes a state object, then adopts it.
-   * @param {VPNState} state
-   */
-  #setState(state) {
-    Object.freeze(state);
-    this.#mState = state;
-    this.#contentScriptPorts.forEach((port) => port.postMessage(state));
-    log(`State -> ${state.state}`);
-  }
-
   async initNativeMessaging() {
     log("initNativeMessaging");
     if (this.#port && this.#port.error === null) {
@@ -84,16 +54,16 @@ export class VPNController extends Component {
       // invalid proxy connection.
       this.#port.onDisconnect.addListener(() => {
         this.#increaseIsolationKey();
-        this.#setState(new StateVPNUnavailable(this.#mState));
+        this.#mState.value = new StateVPNUnavailable(this.#mState.value);
       });
     } catch (e) {
       log(e);
-      this.#setState(new StateVPNUnavailable(this.#mState));
+      this.#mState.value = new StateVPNUnavailable(this.#mState.value);
     }
   }
 
   async init() {
-    this.#setState(await VPNState.fromStorage());
+    this.#mState.value = await VPNState.fromStorage();
     this.initNativeMessaging();
 
     globalThis.chrome.runtime.onConnect.addListener((port) => {
@@ -109,13 +79,14 @@ export class VPNController extends Component {
   #onContentScriptConnected(cs) {
     // Queue up a status response
     queueMicrotask(() => {
-      cs.postMessage(this.state);
+      cs.postMessage(this.#mState.value);
     });
-    // Register it for updates
-    this.#contentScriptPorts.push(cs);
+    const unsubscribe = this.#mState.subscribe((value) => {
+      cs.postMessage(value);
+    });
     // Remove it when disconnected
     cs.onDisconnect.addListener(() => {
-      this.#contentScriptPorts.splice(this.#contentScriptPorts.indexOf(cs), 1);
+      unsubscribe();
     });
     // If it sends a valid message for the client
     // forward it
@@ -126,8 +97,6 @@ export class VPNController extends Component {
       }
     });
   }
-  #contentScriptPorts = [];
-
   /**
    * Sends a message to the client
    * @param { string } command - Command to Send
@@ -142,7 +111,7 @@ export class VPNController extends Component {
       log(e);
       // @ts-ignore
       if (e.toString() === "Attempt to postMessage on disconnected port") {
-        this.#setState(new StateVPNUnavailable(this.#mState));
+        this.#mState.value = new StateVPNUnavailable(this.#mState.value);
       }
     }
   }
@@ -159,11 +128,11 @@ export class VPNController extends Component {
     switch (response.t) {
       case "servers":
         // @ts-ignore
-        const newState = new this.#mState.constructor({
+        const newState = new this.#mState.value.constructor({
           servers: response.servers.countries,
         });
         VPNState.putIntoStorage(newState);
-        this.#setState(newState);
+        this.#mState.value = newState;
         break;
       case "disabled_apps":
         // Todo: THIS IS HACKY
@@ -186,13 +155,12 @@ export class VPNController extends Component {
           });
         });
         if (isFirefoxExcluded) {
-          this.#setState(
+          this.#mState.value =
             // @ts-ignore
-            new this.#mState.constructor({
+            new this.#mState.value.constructor({
               ...this.#mState,
               isExcluded: true,
-            })
-          );
+            });
           return;
         }
         break;
@@ -200,8 +168,9 @@ export class VPNController extends Component {
         const status = response.status;
         const controllerState = status.vpn;
         if (controllerState === "StateOn") {
-          this.#setState(
-            new StateVPNEnabled(this.#mState, status.localProxy?.url)
+          this.#mState.value = new StateVPNEnabled(
+            this.#mState.value,
+            status.localProxy?.url
           );
           return;
         }
@@ -209,7 +178,7 @@ export class VPNController extends Component {
           controllerState === "StateOff" ||
           controllerState === "StateDisconnecting"
         ) {
-          this.#setState(new StateVPNDisabled(this.#mState));
+          this.#mState.value = new StateVPNDisabled(this.#mState.value);
           return;
         }
         // Let's increase the network key isolation at any vpn status change.
@@ -225,8 +194,8 @@ export class VPNController extends Component {
   async handleBridgeResponse(response) {
     // We can only get 2 types of messages right now: client-down/up
     if (response.status && response.status === "vpn-client-down") {
-      if (this.#mState.alive) {
-        this.#setState(new StateVPNUnavailable(this.#mState));
+      if (this.#mState.value.alive) {
+        this.#mState.value = new StateVPNUnavailable(this.#mState.value);
       }
       return;
     }
@@ -262,6 +231,6 @@ export class VPNController extends Component {
   /** @type {browser.runtime.Port?} */
   #port = null;
   #isolationKey = 0;
-  /** @type {VPNState} */
-  #mState = new StateVPNUnavailable(null);
+
+  #mState = property(new VPNState(null));
 }
