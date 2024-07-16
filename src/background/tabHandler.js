@@ -4,7 +4,7 @@
 
 import { Component } from "./component.js";
 import { Logger } from "./logger.js";
-import  {Utils } from "./utils.js";
+import { Utils } from "./utils.js";
 import { VPNController, VPNState } from "./vpncontroller/index.js";
 
 
@@ -38,7 +38,7 @@ export class TabHandler extends Component {
   async init() {
     log("Initializing TabHandler");
 
-    this.controller.subscribe(s => {
+    this.controller.state.subscribe(s => {
       this.controllerState = s;
       this.maybeShowIcon();
     });

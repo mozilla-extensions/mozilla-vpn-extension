@@ -34,7 +34,7 @@ export class RequestHandler extends Component {
     const { siteContexts } = await Utils.getSiteContexts();
     this.#siteContexts = siteContexts;
 
-    this.controller.subscribe(s => {
+    this.controller.state.subscribe(s => {
       this.controllerState = s;
       this.addOrRemoveRequestListener();
     });
@@ -89,7 +89,8 @@ export class RequestHandler extends Component {
     for (let urlString of [url, originUrl]) {
       if (urlString) {
         const parsedHostname = await Utils.getFormattedHostname(urlString);
-        const siteContext = await Utils.getContextForOrigin(parsedHostname);
+        const siteContext = await Utils.getContextForOrigin(parsedHostname, self.#siteContexts);
+
         if (siteContext) {
           return [siteContext.proxyInfo];
         }

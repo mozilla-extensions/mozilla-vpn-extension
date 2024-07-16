@@ -23,7 +23,7 @@
   "browser_action": {
     "default_area": "navbar",
     "default_icon": "assets/logos/logo-dark.svg",
-    "default_popup": "popup/popup.html",
+    "default_popup": "ui/popup/popup.html",
     "default_title": "Mozilla VPN",
     "theme_icons": [
       {
@@ -40,7 +40,7 @@
   "incognito": "spanning",
 
   "page_action": {
-    "default_popup": "pageAction/pageActionPopup.html",
+    "default_popup": "ui/pageAction/pageActionPopup.html",
     "default_title": "Page action button (TODO: Localize)"
   },
 
