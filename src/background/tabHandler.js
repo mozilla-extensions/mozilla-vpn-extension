@@ -8,7 +8,7 @@ import { Utils } from "./utils.js";
 import { VPNController, VPNState } from "./vpncontroller/index.js";
 
 
-const log = Logger.logger("UI");
+const log = Logger.logger("TabHandler");
 
 /**
  * Here we have a WIP UIHandler class which collectes and
@@ -29,7 +29,7 @@ export class TabHandler extends Component {
    */
   constructor(receiver, controller) {
     super(receiver);
-    this.controller = controller; 
+    this.controller = controller;
   }
 
   /** @type {VPNState | undefined} */
@@ -38,39 +38,37 @@ export class TabHandler extends Component {
   async init() {
     log("Initializing TabHandler");
 
+    const {siteContexts} = await Utils.getSiteContexts();
+    this.#siteContexts = siteContexts;
+
     this.controller.state.subscribe(s => {
       this.controllerState = s;
       this.maybeShowIcon();
     });
 
-    browser.tabs.onUpdated.addListener((tabId) => this.maybeShowIcon(tabId)); 
-    browser.tabs.onActivated.addListener((activeInfo) => this.handleActiveTabChange(activeInfo));
+    browser.tabs.onUpdated.addListener(() => this.maybeShowIcon()); 
+    browser.tabs.onActivated.addListener(() => this.handleActiveTabChange());
     
     browser.runtime.onConnect.addListener(async port => {
       log(`Connecting to ${port.name}`);
-      await this.popupConnected(port);
+      await this.portConnected(port);
     });
-    const {siteContexts} = await Utils.getSiteContexts();
-    this.#siteContexts = siteContexts;
 
     this.maybeShowIcon();
   }
 
-  async handleActiveTabChange(activeInfo) {
-    return await this.maybeShowIcon(activeInfo.id);
+  async handleActiveTabChange() {
+    return await this.maybeShowIcon();
   }
 
   async handleEvent(type, data) {
-    if (type === "state-changed") {
-      this.handleStateChange();
-    }
     if (type === "site-contexts-updated") {
 
       const {siteContexts}  = await Utils.getSiteContexts();
       this.#siteContexts = siteContexts;
       this.#currentContext = Utils.getContextForOrigin(this.#currentHostname, siteContexts);
 
-      return await this.sendDataToCurrentPopup();
+      return this.sendDataToCurrentPopup();
     }
   }
 
@@ -91,7 +89,7 @@ export class TabHandler extends Component {
     return browser.pageAction.hide(currentTab.id);
   }
 
-  async popupConnected(port) {
+  portConnected(port) {
     log(`Popup connected. Current port: ${port.name}`);
 
     this.#currentPort = port;
@@ -105,11 +103,13 @@ export class TabHandler extends Component {
       log(`Disconnecting from ${port.name}`);
       this.#currentPort = null;
     });
-  
-    return await this.sendDataToCurrentPopup();
+
+    if (port.name === "pageAction") {
+      return this.sendDataToCurrentPopup();
+    }
   }
   
-  async sendDataToCurrentPopup() {
+  sendDataToCurrentPopup() {
     return this.#currentPort.postMessage({
       type: 'tabInfo',
       currentHostname: this.#currentHostname,

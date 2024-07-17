@@ -10,7 +10,7 @@ class PageActionPopup {
     self = this;
     
     this.#port = browser.runtime.connect({
-      name: "popup"
+      name: "pageAction"
     });
 
     this.#port.onMessage.addListener(async msg => {
@@ -29,8 +29,6 @@ class PageActionPopup {
   }
   
   async renderUI(currentHostname, siteContexts, serverList, currentContext) {
-    console.log("Serverlist", serverList);
-
     // Set origin labels
     document.querySelectorAll(".origin").forEach(el => {
       el.textContent = currentHostname;

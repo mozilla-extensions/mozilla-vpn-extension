@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 window.SITE_CONTEXTS_STORAGE_KEY = "siteContexts";
-window.MOZILLA_VPN_SERVERS_KEY =  "mozillaVpnServers";
 
 
 /**
@@ -45,37 +44,23 @@ export const Utils = {
       url = decodeURIComponent(encodedUrl);
     }
     
-    let hostname = this.getHostname(url);
+    const getHostname = () => {
+      try {
+        const urlObj = new URL(url);
+        return urlObj.hostname;
+      } catch (e) {
+        log(`Error getting hostname for ${url}`);
+        return null;
+      }
+    };
+  
+    let hostname = getHostname();
 
     // Use the entire URL if hostname is not valid (like about:debugging)
     if (!hostname || hostname === "") {
-      hostname = url;
+      return url;
     }
     return hostname;
-  },
-
-  /**
-   * Extracts the hostname from a given URL.
-   * @param {string} url - The URL to extract the hostname from.
-   * @returns {string|null} - The extracted hostname or null if invalid.
-   */
-  getHostname(url) {
-    const urlObj = new URL(url);
-    if (urlObj && urlObj.hostname) {
-      return urlObj.hostname;
-    }
-    return null;
-  },
-
-  /**
-   * Retrieves the list of Mozilla VPN servers from storage.
-   * @returns {Promise<object[]>} - The list of Mozilla VPN servers.
-   */
-  async getServers() {
-    const {mozillaVpnServers} = await browser.storage.local.get([MOZILLA_VPN_SERVERS_KEY]);
-    if (mozillaVpnServers) {
-      return mozillaVpnServers;
-    }
   },
 
   async getSiteContexts() {

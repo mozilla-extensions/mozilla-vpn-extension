@@ -15,6 +15,7 @@ let self;
  */
 export class RequestHandler extends Component {
   #siteContexts;
+
   /**
    *
    * @param {*} receiver
@@ -23,7 +24,7 @@ export class RequestHandler extends Component {
   constructor(receiver, controller) {
     super(receiver);
     this.controller = controller;
-    self=this;
+    self = this;
   }
 
   /** @type {VPNState | undefined} */
@@ -92,7 +93,7 @@ export class RequestHandler extends Component {
         const siteContext = await Utils.getContextForOrigin(parsedHostname, self.#siteContexts);
 
         if (siteContext) {
-          return [siteContext.proxyInfo];
+          return [...siteContext.proxyInfo];
         }
       }
     }

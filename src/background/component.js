@@ -21,7 +21,7 @@ export class Component {
   async handleEvent() {}
 
   // Returns an async response from the main
-  sendMessage(type, data = null) {
+  sendMessage(type, data) {
     return this.#receiver.handleEvent(type, data);
   }
 }
