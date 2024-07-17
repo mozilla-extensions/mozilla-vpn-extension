@@ -29,6 +29,17 @@ describe("Utils", () => {
     mockSet.mockClear();
   });
 
+  describe("getSiteContextsStorageKey", () => {
+    const result = Utils.getSiteContextsStorageKey();
+    expect(result).toBe("siteContexts");
+    /* 
+      If you've failed this test it is because you've changed the value of
+      the siteContexts storage key. If this extension has already 
+      shipped to the masses, Have A Think™ about how changing this storage key
+      will affect existing users.
+    */
+  });
+
   describe("getFormattedHostName", () => {
     test("Returns a formatted hostname when given a url", () => {
       const result = Utils.getFormattedHostname("www.mozilla.org");
