@@ -2,14 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-window.SITE_CONTEXTS_STORAGE_KEY = "siteContexts";
-
 
 /**
  * Here you'll find utility functions for managing 
  * site contexts and handling various tasks. 
  */
 export const Utils = {
+  getSiteContextsStorageKey() {
+   return "siteContexts";
+  },
 
   /**
    * Retrieves the context for a specific origin from storage.
@@ -49,7 +50,6 @@ export const Utils = {
         const urlObj = new URL(url);
         return urlObj.hostname;
       } catch (e) {
-        log(`Error getting hostname for ${url}`);
         return null;
       }
     };
@@ -64,10 +64,10 @@ export const Utils = {
   },
 
   async getSiteContexts() {
-    let siteContexts = await browser.storage.local.get([SITE_CONTEXTS_STORAGE_KEY]);
+    let siteContexts = await browser.storage.local.get([this.getSiteContextsStorageKey()]);
     if (!siteContexts || Object.keys(siteContexts).length === 0) {
-      await browser.storage.local.set({ [SITE_CONTEXTS_STORAGE_KEY]: new Map() });
-      siteContexts = await browser.storage.local.get([SITE_CONTEXTS_STORAGE_KEY]);
+      await browser.storage.local.set({ [this.getSiteContextsStorageKey()]: new Map() });
+      siteContexts = await browser.storage.local.get([this.getSiteContextsStorageKey()]);
     }
     return siteContexts; 
   },

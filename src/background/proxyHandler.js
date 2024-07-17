@@ -155,7 +155,7 @@ export class ProxyHandler extends Component {
    */
   async #setSiteContexts(siteContexts) {
     try {
-      await browser.storage.local.set({ [SITE_CONTEXTS_STORAGE_KEY]: siteContexts });
+      await browser.storage.local.set({ [Utils.getSiteContextsStorageKey()]: siteContexts });
       return this.sendMessage("site-contexts-updated");
     } catch (error) {
       log(`Error setting site contexts: ${error.message}`);
