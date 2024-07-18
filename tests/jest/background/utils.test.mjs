@@ -2,8 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed wtesth this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
- import { describe, expect, test, jest } from "@jest/globals";
- import { Utils } from "../../../src/background/utils";
+import { describe, expect, test, jest } from "@jest/globals";
+import { Utils } from "../../../src/background/utils";
 
 // Mock the browser API
 const mockQuery = jest.fn();
