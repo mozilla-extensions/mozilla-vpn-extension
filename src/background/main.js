@@ -21,18 +21,18 @@ class Main {
   requestHandler = new RequestHandler(this, this.vpnController);
   tabHandler = new TabHandler(this, this.vpnController);
 
-   async init() {
-     log("Hello from the background script!");
- 
-     for (let observer of this.observers) {
-       await observer.init();
-     }
+  async init() {
+    log("Hello from the background script!");
 
-     this.#handlingEvent = false;
-     this.#processPendingEvents();
-   }
- 
-  // In order to avoid race conditions amongst multiple events 
+    for (let observer of this.observers) {
+      await observer.init();
+    }
+
+    this.#handlingEvent = false;
+    this.#processPendingEvents();
+  }
+
+  // In order to avoid race conditions amongst multiple events
   // we process them 1 by 1. If we are already handling an
   // event, we wait until it is concluded.
   async handleEvent(type, data) {
@@ -40,7 +40,7 @@ class Main {
 
     if (this.#handlingEvent) {
       log(`Queuing event ${type}`);
-      await new Promise(resolve => this.#pendingEvents.push(resolve));
+      await new Promise((resolve) => this.#pendingEvents.push(resolve));
       log(`Event ${type} resumed`);
     }
 
@@ -70,7 +70,6 @@ class Main {
     }
   }
 
- 
   registerObserver(observer) {
     this.observers.add(observer);
   }

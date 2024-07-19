@@ -6,14 +6,14 @@ class PageActionPopup {
   #port;
   self;
 
-  async init() { 
+  async init() {
     self = this;
-    
+
     this.#port = browser.runtime.connect({
-      name: "pageAction"
+      name: "pageAction",
     });
 
-    this.#port.onMessage.addListener(async msg => {
+    this.#port.onMessage.addListener(async (msg) => {
       if (msg.type === "tabInfo") {
         const { currentHostname, siteContexts, servers, currentContext } = msg;
         this.renderUI(currentHostname, siteContexts, servers, currentContext);
@@ -24,26 +24,25 @@ class PageActionPopup {
   async sendMessage(type, data = {}) {
     return this.#port.postMessage({
       type,
-      data
-    })
+      data,
+    });
   }
-  
+
   async renderUI(currentHostname, siteContexts, serverList, currentContext) {
     // Set origin labels
-    document.querySelectorAll(".origin").forEach(el => {
+    document.querySelectorAll(".origin").forEach((el) => {
       el.textContent = currentHostname;
     });
-
 
     // Reset button...
     const resetBtn = document.getElementById("removeContext");
 
-    const handleResetButtonClicks = async() => {
+    const handleResetButtonClicks = async () => {
       if (resetBtn.disabled) {
         return;
       }
       await self.sendMessage("remove-context", {
-        origin: currentHostname
+        origin: currentHostname,
       });
       self.forceReloadActiveTab();
     };
@@ -53,19 +52,18 @@ class PageActionPopup {
 
     resetBtn.disabled = !currentContext;
 
-
     // Site exclusion checkbox...
     const checkbox = document.getElementById("exclude-origin");
     checkbox.checked = currentContext && currentContext.excluded;
 
-    const handleCheckboxChanges = async(e) => {
+    const handleCheckboxChanges = async (e) => {
       if (checkbox.checked) {
         await self.sendMessage("exclude-origin", {
-          origin: currentHostname
+          origin: currentHostname,
         });
       } else {
         await self.sendMessage("remove-context", {
-          origin: currentHostname
+          origin: currentHostname,
         });
       }
 
@@ -75,50 +73,51 @@ class PageActionPopup {
     checkbox.removeEventListener("change", handleCheckboxChanges);
     checkbox.addEventListener("change", handleCheckboxChanges);
 
-    
     // Server selection dropdown...
     const serverSelector = document.getElementById("servers");
-    
+
     // Don't re-render the server list if already drawn
     if (!self.elemIsAlreadyDrawn(serverSelector)) {
       serverList.forEach((server) => {
-        const country = document.createElement('optgroup');
+        const country = document.createElement("optgroup");
         country.label = server.name;
         server.cities.forEach((city) => {
-          const option = document.createElement('option');
+          const option = document.createElement("option");
           option.value = city.name;
           option.textContent = city.name;
           option.dataset.countryCode = server.code;
           option.dataset.cityName = city.name;
-          
+
           country.appendChild(option);
         });
         serverSelector.appendChild(country);
       });
     }
 
-    const handleServerChanges = async(e) => {
+    const handleServerChanges = async (e) => {
       const selectedServer = e.explicitOriginalTarget.selectedOptions[0];
       await self.sendMessage("add-context", {
         origin: currentHostname,
         countryCode: selectedServer.dataset.countryCode,
-        cityName: selectedServer.dataset.cityName
+        cityName: selectedServer.dataset.cityName,
       });
-      
+
       self.forceReloadActiveTab();
-    }
+    };
 
     serverSelector.removeEventListener("change", handleServerChanges);
     serverSelector.addEventListener("change", handleServerChanges);
 
     const siteIsExcludedOrHasNoCustomLocation = () => {
-      return (!currentContext || currentContext.excluded);
-    }
+      return !currentContext || currentContext.excluded;
+    };
 
     if (siteIsExcludedOrHasNoCustomLocation()) {
-      const pickLocationOption = serverSelector.querySelector('[value=pick-location]');
+      const pickLocationOption = serverSelector.querySelector(
+        "[value=pick-location]"
+      );
       if (!pickLocationOption) {
-        const option = document.createElement('option');
+        const option = document.createElement("option");
         option.value = "pick-location";
         option.textContent = "Pick a location for this site";
         serverSelector.insertBefore(option, serverSelector.firstChild);
@@ -128,20 +127,20 @@ class PageActionPopup {
       serverSelector.value = currentContext.cityName;
     }
 
-
     // List of sites with special proxy settings...
     const siteContextsList = document.getElementById("siteContextsList");
     if (siteContextsList) {
       if (self.elemIsAlreadyDrawn(siteContextsList)) {
-        // Flush previous siteContexts list 
+        // Flush previous siteContexts list
         // if we are updating the UI
         self.removeChildren(siteContextsList);
       }
-      siteContexts.forEach(site => {
-        const siteEl = document.createElement('li');
-        siteEl.textContent = site.origin
+      siteContexts.forEach((site) => {
+        const siteEl = document.createElement("li");
+        siteEl.textContent = site.origin;
         siteContextsList.appendChild(siteEl);
-        siteEl.classList = currentContext && (site.origin == currentHostname) ? ["current"] : [];
+        siteEl.classList =
+          currentContext && site.origin == currentHostname ? ["current"] : [];
       });
     }
   }
@@ -160,12 +159,13 @@ class PageActionPopup {
   }
 
   removeChildren(parentEl) {
-    while(parentEl.firstChild) {
+    while (parentEl.firstChild) {
       parentEl.firstChild.remove();
     }
   }
 }
 
-
 const popup = new PageActionPopup();
-document.addEventListener("DOMContentLoaded", () => { popup.init() });
+document.addEventListener("DOMContentLoaded", () => {
+  popup.init();
+});

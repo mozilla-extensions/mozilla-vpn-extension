@@ -2,14 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-
 /**
- * Here you'll find utility functions for managing 
- * site contexts and handling various tasks. 
+ * Here you'll find utility functions for managing
+ * site contexts and handling various tasks.
  */
 export const Utils = {
   getSiteContextsStorageKey() {
-   return "siteContexts";
+    return "siteContexts";
   },
 
   /**
@@ -27,7 +26,10 @@ export const Utils = {
    * @returns {Promise<browser.tabs.Tab>} - The current active tab.
    */
   async getCurrentTab() {
-    let currentTab = await browser.tabs.query({currentWindow: true, active: true});
+    let currentTab = await browser.tabs.query({
+      currentWindow: true,
+      active: true,
+    });
     return currentTab[0];
   },
 
@@ -39,12 +41,12 @@ export const Utils = {
   getFormattedHostname(url) {
     // Handle sites being viewed in reader mode
     // TODO... other prefixes(?)
-    const readerPrefix = 'about:reader?url=';
+    const readerPrefix = "about:reader?url=";
     if (url.startsWith(readerPrefix)) {
       const encodedUrl = url.slice(readerPrefix.length);
       url = decodeURIComponent(encodedUrl);
     }
-    
+
     const getHostname = () => {
       try {
         const urlObj = new URL(url);
@@ -53,7 +55,7 @@ export const Utils = {
         return null;
       }
     };
-  
+
     let hostname = getHostname();
 
     // Use the entire URL if hostname is not valid (like about:debugging)
@@ -64,11 +66,17 @@ export const Utils = {
   },
 
   async getSiteContexts() {
-    let siteContexts = await browser.storage.local.get([this.getSiteContextsStorageKey()]);
+    let siteContexts = await browser.storage.local.get([
+      this.getSiteContextsStorageKey(),
+    ]);
     if (!siteContexts || Object.keys(siteContexts).length === 0) {
-      await browser.storage.local.set({ [this.getSiteContextsStorageKey()]: new Map() });
-      siteContexts = await browser.storage.local.get([this.getSiteContextsStorageKey()]);
+      await browser.storage.local.set({
+        [this.getSiteContextsStorageKey()]: new Map(),
+      });
+      siteContexts = await browser.storage.local.get([
+        this.getSiteContextsStorageKey(),
+      ]);
     }
-    return siteContexts; 
+    return siteContexts;
   },
-}
+};

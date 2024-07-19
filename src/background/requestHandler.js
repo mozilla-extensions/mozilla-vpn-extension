@@ -35,7 +35,7 @@ export class RequestHandler extends Component {
     const { siteContexts } = await Utils.getSiteContexts();
     this.#siteContexts = siteContexts;
 
-    this.controller.state.subscribe(s => {
+    this.controller.state.subscribe((s) => {
       this.controllerState = s;
       this.addOrRemoveRequestListener();
     });
@@ -44,10 +44,9 @@ export class RequestHandler extends Component {
   addRequestListener() {
     log("Adding request listener");
 
-    browser.proxy.onRequest.addListener(
-      this.interceptRequests,
-      { urls: ['<all_urls>'] }
-    );
+    browser.proxy.onRequest.addListener(this.interceptRequests, {
+      urls: ["<all_urls>"],
+    });
   }
 
   async addOrRemoveRequestListener() {
@@ -57,11 +56,11 @@ export class RequestHandler extends Component {
       return this.removeRequestListener();
     }
 
-    switch(s) {
+    switch (s) {
       case "Enabled":
         this.addRequestListener();
         break;
-      case "Disabled": 
+      case "Disabled":
         this.removeRequestListener();
         break;
       case "Unavailable":
@@ -70,8 +69,8 @@ export class RequestHandler extends Component {
     }
   }
 
-  async handleEvent(type, data=null) {
-    switch(type) {
+  async handleEvent(type, data = null) {
+    switch (type) {
       case "site-contexts-updated":
         const { siteContexts } = await Utils.getSiteContexts();
         self.#siteContexts = siteContexts;
@@ -90,7 +89,10 @@ export class RequestHandler extends Component {
     for (let urlString of [url, originUrl]) {
       if (urlString) {
         const parsedHostname = await Utils.getFormattedHostname(urlString);
-        const siteContext = await Utils.getContextForOrigin(parsedHostname, self.#siteContexts);
+        const siteContext = await Utils.getContextForOrigin(
+          parsedHostname,
+          self.#siteContexts
+        );
 
         if (siteContext) {
           return [...siteContext.proxyInfo];

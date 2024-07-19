@@ -46,20 +46,22 @@ describe("Utils", () => {
       expect(result).toBe("www.mozilla.org");
     });
     test("Removes reader prefixes from the url", () => {
-      const result = Utils.getFormattedHostname("about:reader?url=https://firefox.com");
+      const result = Utils.getFormattedHostname(
+        "about:reader?url=https://firefox.com"
+      );
       expect(result).toBe("firefox.com");
     });
     test("Returns the string if the string is not a valid url", () => {
       const result = Utils.getFormattedHostname("about:debugging");
       expect(result).toBe("about:debugging");
-    })
+    });
   });
 
   describe("getCurrentTab", () => {
     test("Returns the current active tab", async () => {
-      const mockTab = { 
+      const mockTab = {
         id: 1,
-        url: "https://example.com"
+        url: "https://example.com",
       };
       mockQuery.mockResolvedValue([mockTab]);
       const currentTab = await Utils.getCurrentTab();
@@ -70,13 +72,13 @@ describe("Utils", () => {
   describe("getContextForOrigin", () => {
     test("Returns the context for a given origin", () => {
       const origins = new Map();
-      origins.set("firefox.com", {foo: "bar"});
+      origins.set("firefox.com", { foo: "bar" });
       const result = Utils.getContextForOrigin("firefox.com", origins);
       expect(result.foo).toBe("bar");
     });
     test("Returns undefined if there is no context for the origin", () => {
       const origins = new Map();
-      origins.set("firefox.com", {foo: "bar"});
+      origins.set("firefox.com", { foo: "bar" });
       const result = Utils.getContextForOrigin("mozilla.org", origins);
       expect(result).toBeUndefined();
     });

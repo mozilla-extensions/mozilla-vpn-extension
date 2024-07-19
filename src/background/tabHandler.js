@@ -7,7 +7,6 @@ import { Logger } from "./logger.js";
 import { Utils } from "./utils.js";
 import { VPNController, VPNState } from "./vpncontroller/index.js";
 
-
 const log = Logger.logger("TabHandler");
 
 /**
@@ -19,13 +18,13 @@ const log = Logger.logger("TabHandler");
 export class TabHandler extends Component {
   #currentPort;
   #currentHostname;
-  #siteContexts
-  #currentContext
+  #siteContexts;
+  #currentContext;
 
   /**
-   * 
-   * @param {*} receiver 
-   * @param {VPNController} controller 
+   *
+   * @param {*} receiver
+   * @param {VPNController} controller
    */
   constructor(receiver, controller) {
     super(receiver);
@@ -34,22 +33,22 @@ export class TabHandler extends Component {
 
   /** @type {VPNState | undefined} */
   controllerState;
- 
+
   async init() {
     log("Initializing TabHandler");
 
-    const {siteContexts} = await Utils.getSiteContexts();
+    const { siteContexts } = await Utils.getSiteContexts();
     this.#siteContexts = siteContexts;
 
-    this.controller.state.subscribe(s => {
+    this.controller.state.subscribe((s) => {
       this.controllerState = s;
       this.maybeShowIcon();
     });
 
-    browser.tabs.onUpdated.addListener(() => this.maybeShowIcon()); 
+    browser.tabs.onUpdated.addListener(() => this.maybeShowIcon());
     browser.tabs.onActivated.addListener(() => this.handleActiveTabChange());
-    
-    browser.runtime.onConnect.addListener(async port => {
+
+    browser.runtime.onConnect.addListener(async (port) => {
       log(`Connecting to ${port.name}`);
       await this.portConnected(port);
     });
@@ -63,10 +62,12 @@ export class TabHandler extends Component {
 
   async handleEvent(type, data) {
     if (type === "site-contexts-updated") {
-
-      const {siteContexts}  = await Utils.getSiteContexts();
+      const { siteContexts } = await Utils.getSiteContexts();
       this.#siteContexts = siteContexts;
-      this.#currentContext = Utils.getContextForOrigin(this.#currentHostname, siteContexts);
+      this.#currentContext = Utils.getContextForOrigin(
+        this.#currentHostname,
+        siteContexts
+      );
 
       return this.sendDataToCurrentPopup();
     }
@@ -76,13 +77,16 @@ export class TabHandler extends Component {
     const currentTab = await Utils.getCurrentTab();
 
     this.#currentHostname = await Utils.getFormattedHostname(currentTab.url);
-    this.#currentContext = Utils.getContextForOrigin(this.#currentHostname, this.#siteContexts);
+    this.#currentContext = Utils.getContextForOrigin(
+      this.#currentHostname,
+      this.#siteContexts
+    );
 
     if (this.controllerState.state === "Enabled") {
       // TODO replace with flags
       browser.pageAction.setIcon({
         path: "../assets/logos/logo-light.svg",
-        tabId: currentTab.id
+        tabId: currentTab.id,
       });
       return browser.pageAction.show(currentTab.id);
     }
@@ -94,7 +98,7 @@ export class TabHandler extends Component {
 
     this.#currentPort = port;
 
-    port.onMessage.addListener(async message => {
+    port.onMessage.addListener(async (message) => {
       log(`Message received from the popup: ${message.type}`);
       this.sendMessage(message.type, message.data);
     });
@@ -108,14 +112,14 @@ export class TabHandler extends Component {
       return this.sendDataToCurrentPopup();
     }
   }
-  
+
   sendDataToCurrentPopup() {
     return this.#currentPort.postMessage({
-      type: 'tabInfo',
+      type: "tabInfo",
       currentHostname: this.#currentHostname,
       siteContexts: this.#siteContexts,
       servers: this.controllerState.servers,
-      currentContext: this.#currentContext
+      currentContext: this.#currentContext,
     });
   }
 }

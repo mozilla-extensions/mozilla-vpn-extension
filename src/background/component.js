@@ -3,8 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 /**
- * The Component class serves as a base class 
- * for other classes that need to interact with 
+ * The Component class serves as a base class
+ * for other classes that need to interact with
  * a central event handling mechanism.
  */
 export class Component {
@@ -17,7 +17,7 @@ export class Component {
 
   // In case we need to overwrite
   async init() {}
-  
+
   async handleEvent() {}
 
   // Returns an async response from the main
