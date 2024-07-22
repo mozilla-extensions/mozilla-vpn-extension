@@ -13,9 +13,9 @@ import { ProxyUtils } from "./proxyUtils.js";
 const log = Logger.logger("ProxyHandler");
 
 /**
-* This class manages tasks related to creating and storing
-* proxy information for specific origins (siteContexts).
-*/
+ * This class manages tasks related to creating and storing
+ * proxy information for specific origins (siteContexts).
+ */
 export class ProxyHandler extends Component {
   constructor(receiver, controller) {
     super(receiver);
@@ -48,10 +48,10 @@ export class ProxyHandler extends Component {
   }
 
   /**
-  * Creates a SiteContext for an origin and adds
-  * local socks proxy values for proxyInfo
-  * @param {string} origin - The origin to exclude.
-  */
+   * Creates a SiteContext for an origin and adds
+   * local socks proxy values for proxyInfo
+   * @param {string} origin - The origin to exclude.
+   */
   async #excludeOrigin(origin) {
     const excluded = true;
     // TODO: Replace with real local proxy info ✨
@@ -81,10 +81,10 @@ export class ProxyHandler extends Component {
   }
 
   /**
-  * Handles events sent from the UI.
-  * @param {string} type - The event type.
-  * @param {Object} data - The event data.
-  */
+   * Handles events sent from the UI.
+   * @param {string} type - The event type.
+   * @param {Object} data - The event data.
+   */
   handleEvent(type, data) {
     switch (type) {
       case "add-context":
@@ -100,9 +100,9 @@ export class ProxyHandler extends Component {
   }
 
   /**
-  * Removes the SiteContext of the provided origin
-  * @param {string} origin - The origin to exclude.
-  */
+   * Removes the SiteContext of the provided origin
+   * @param {string} origin - The origin to exclude.
+   */
   async #removeContextForOrigin(origin) {
     const siteContexts = this.#mSiteContexts.value;
     siteContexts.delete(origin);
@@ -110,14 +110,14 @@ export class ProxyHandler extends Component {
   }
 
   /**
-  * Takes in an Object containing an origin, cityName, and countryCode.
-  * Creates an array of proxyInfo objects for the location and attaches it
-  * to the origin in a new SiteContext.
-  * @param {Object} info - An object containing an origin, countryCode, and cityName.
-  * @param {string} info.origin
-  * @param {string} info.countryCode
-  * @param {string} info.cityName
-  */
+   * Takes in an Object containing an origin, cityName, and countryCode.
+   * Creates an array of proxyInfo objects for the location and attaches it
+   * to the origin in a new SiteContext.
+   * @param {Object} info - An object containing an origin, countryCode, and cityName.
+   * @param {string} info.origin
+   * @param {string} info.countryCode
+   * @param {string} info.cityName
+   */
   async #setContextForOrigin(info) {
     const proxyInfo = await ProxyUtils.getProxies(
       info.countryCode,
@@ -129,9 +129,9 @@ export class ProxyHandler extends Component {
   }
 
   /**
-  * Stores the updated siteContexts map.
-  * @param {Map} siteContexts - The site contexts map to store be stored.
-  */
+   * Stores the updated siteContexts map.
+   * @param {Map} siteContexts - The site contexts map to store be stored.
+   */
   async #setSiteContexts(siteContexts) {
     try {
       await browser.storage.local.set({
@@ -143,4 +143,3 @@ export class ProxyHandler extends Component {
     }
   }
 }
-
