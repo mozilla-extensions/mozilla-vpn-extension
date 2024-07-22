@@ -4,7 +4,7 @@
 
 /**
 * @typedef {import("../background/vpncontroller/states.js").VPNState} VPNState
-* @typedef {import("../components/serverlist.js").ServerList} ServerListElement
+* @typedef {import("../../components/serverlist").ServerList} ServerListElement
 
 */
 
