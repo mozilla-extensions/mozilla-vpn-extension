@@ -7,20 +7,6 @@
  * site contexts and handling various tasks.
  */
 export const Utils = {
-  getSiteContextsStorageKey() {
-    return "siteContexts";
-  },
-
-  /**
-   * Retrieves the context for a specific origin from storage.
-   * @param {string} origin - The origin to retrieve the context for.
-   * @param {Map<string, object>} siteContexts - A map containing contexts for various origins.
-   * @returns {object|null} - The context for the origin, or null if not found.
-   */
-  getContextForOrigin(origin, siteContexts) {
-    return siteContexts.get(origin);
-  },
-
   /**
    * Retrieves the currently active tab.
    * @returns {Promise<browser.tabs.Tab>} - The current active tab.
@@ -63,20 +49,5 @@ export const Utils = {
       return url;
     }
     return hostname;
-  },
-
-  async getSiteContexts() {
-    let siteContexts = await browser.storage.local.get([
-      this.getSiteContextsStorageKey(),
-    ]);
-    if (!siteContexts || Object.keys(siteContexts).length === 0) {
-      await browser.storage.local.set({
-        [this.getSiteContextsStorageKey()]: new Map(),
-      });
-      siteContexts = await browser.storage.local.get([
-        this.getSiteContextsStorageKey(),
-      ]);
-    }
-    return siteContexts;
   },
 };

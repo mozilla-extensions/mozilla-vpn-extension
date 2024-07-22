@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { Logger } from "./logger.js";
-import { ProxyHandler } from "./proxyHandler.js";
+import { ProxyHandler } from "./proxyHandler/index.js";
 import { RequestHandler } from "./requestHandler.js";
 import { TabHandler } from "./tabHandler.js";
 import { VPNController } from "./vpncontroller/index.js";
@@ -18,8 +18,12 @@ class Main {
   vpnController = new VPNController(this);
   logger = new Logger(this);
   proxyHandler = new ProxyHandler(this, this.vpnController);
-  requestHandler = new RequestHandler(this, this.vpnController);
-  tabHandler = new TabHandler(this, this.vpnController);
+  requestHandler = new RequestHandler(
+    this,
+    this.vpnController,
+    this.proxyHandler
+  );
+  tabHandler = new TabHandler(this, this.vpnController, this.proxyHandler);
 
   async init() {
     log("Hello from the background script!");
