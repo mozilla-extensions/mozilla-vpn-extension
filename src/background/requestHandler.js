@@ -4,13 +4,18 @@
 
 import { Component } from "./component.js";
 import { Logger } from "./logger.js";
+import { Utils } from "./utils.js";
 import { VPNController, VPNState } from "./vpncontroller/index.js";
 
 const log = Logger.logger("RequestHandler");
-
 let self;
-
+/**
+ * RequestHandler is responsible for intercepting, inspecting,
+ * and determining whether a Request should be proxied.
+ */
 export class RequestHandler extends Component {
+  #siteContexts;
+
   /**
    *
    * @param {*} receiver
@@ -27,19 +32,49 @@ export class RequestHandler extends Component {
 
   async init() {
     log("Initiating RequestHandler");
+    const { siteContexts } = await Utils.getSiteContexts();
+    this.#siteContexts = siteContexts;
 
-    this.controller.state.subscribe((s) => (this.controllerState = s));
+    this.controller.state.subscribe((s) => {
+      this.controllerState = s;
+      this.addOrRemoveRequestListener();
+    });
+  }
+
+  addRequestListener() {
+    log("Adding request listener");
 
     browser.proxy.onRequest.addListener(this.interceptRequests, {
       urls: ["<all_urls>"],
     });
   }
 
-  createUrl(urlString) {
-    try {
-      return new URL(urlString);
-    } catch (e) {
-      return null;
+  async addOrRemoveRequestListener() {
+    const { siteContexts } = await Utils.getSiteContexts();
+    const s = this.controllerState.state;
+    if (siteContexts.size === 0) {
+      return this.removeRequestListener();
+    }
+
+    switch (s) {
+      case "Enabled":
+        this.addRequestListener();
+        break;
+      case "Disabled":
+        this.removeRequestListener();
+        break;
+      case "Unavailable":
+        this.removeRequestListener();
+        break;
+    }
+  }
+
+  async handleEvent(type, data = null) {
+    switch (type) {
+      case "site-contexts-updated":
+        const { siteContexts } = await Utils.getSiteContexts();
+        self.#siteContexts = siteContexts;
+        this.addOrRemoveRequestListener();
     }
   }
 
@@ -53,13 +88,24 @@ export class RequestHandler extends Component {
 
     for (let urlString of [url, originUrl]) {
       if (urlString) {
-        // Determine what to do with the request and
-        // maybe return [{...siteContext.proxyInfo}];
-        log(`Observing req from ${self.createUrl(urlString)}`);
+        const parsedHostname = await Utils.getFormattedHostname(urlString);
+        const siteContext = await Utils.getContextForOrigin(
+          parsedHostname,
+          self.#siteContexts
+        );
+
+        if (siteContext) {
+          return [...siteContext.proxyInfo];
+        }
       }
     }
 
-    // No custom proxy for site, don't do anything with the req
+    // No custom proxy for the site, return direct connection
     return { direct: true };
+  }
+
+  removeRequestListener() {
+    log("Removing request listener");
+    return browser.proxy.onRequest.removeListener(this.interceptRequests);
   }
 }
