@@ -29,17 +29,6 @@ describe("Utils", () => {
     mockSet.mockClear();
   });
 
-  describe("getSiteContextsStorageKey", () => {
-    const result = Utils.getSiteContextsStorageKey();
-    expect(result).toBe("siteContexts");
-    /* 
-      If you've failed this test it is because you've changed the value of
-      the siteContexts storage key. If this extension has already 
-      shipped to the masses, Have A Think™ about how changing this storage key
-      will affect existing users.
-    */
-  });
-
   describe("getFormattedHostName", () => {
     test("Returns a formatted hostname when given a url", () => {
       const result = Utils.getFormattedHostname("www.mozilla.org");
@@ -66,21 +55,6 @@ describe("Utils", () => {
       mockQuery.mockResolvedValue([mockTab]);
       const currentTab = await Utils.getCurrentTab();
       expect(currentTab).toEqual(mockTab);
-    });
-  });
-
-  describe("getContextForOrigin", () => {
-    test("Returns the context for a given origin", () => {
-      const origins = new Map();
-      origins.set("firefox.com", { foo: "bar" });
-      const result = Utils.getContextForOrigin("firefox.com", origins);
-      expect(result.foo).toBe("bar");
-    });
-    test("Returns undefined if there is no context for the origin", () => {
-      const origins = new Map();
-      origins.set("firefox.com", { foo: "bar" });
-      const result = Utils.getContextForOrigin("mozilla.org", origins);
-      expect(result).toBeUndefined();
     });
   });
 });

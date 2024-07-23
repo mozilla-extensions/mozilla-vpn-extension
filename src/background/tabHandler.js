@@ -16,33 +16,39 @@ const log = Logger.logger("TabHandler");
  * associated context (proxy info) if it exists.
  */
 export class TabHandler extends Component {
-  #currentPort;
-  #currentHostname;
-  #siteContexts;
-  #currentContext;
+  currentPort;
 
   /**
    *
    * @param {*} receiver
    * @param {VPNController} controller
    */
-  constructor(receiver, controller) {
+  constructor(receiver, controller, proxyHandler) {
     super(receiver);
     this.controller = controller;
+    this.proxyHandler = proxyHandler;
   }
 
   /** @type {VPNState | undefined} */
   controllerState;
 
+  siteContexts;
+  currentHostname;
+  currentContext;
+
   async init() {
     log("Initializing TabHandler");
-
-    const { siteContexts } = await Utils.getSiteContexts();
-    this.#siteContexts = siteContexts;
-
     this.controller.state.subscribe((s) => {
       this.controllerState = s;
       this.maybeShowIcon();
+    });
+
+    this.proxyHandler.siteContexts.subscribe((siteContexts) => {
+      this.siteContexts = siteContexts;
+      this.maybeShowIcon;
+      if (this.currentPort) {
+        this.sendDataToCurrentPopup();
+      }
     });
 
     browser.tabs.onUpdated.addListener(() => this.maybeShowIcon());
@@ -60,27 +66,10 @@ export class TabHandler extends Component {
     return await this.maybeShowIcon();
   }
 
-  async handleEvent(type, data) {
-    if (type === "site-contexts-updated") {
-      const { siteContexts } = await Utils.getSiteContexts();
-      this.#siteContexts = siteContexts;
-      this.#currentContext = Utils.getContextForOrigin(
-        this.#currentHostname,
-        siteContexts
-      );
-
-      return this.sendDataToCurrentPopup();
-    }
-  }
-
   async maybeShowIcon() {
     const currentTab = await Utils.getCurrentTab();
-
-    this.#currentHostname = await Utils.getFormattedHostname(currentTab.url);
-    this.#currentContext = Utils.getContextForOrigin(
-      this.#currentHostname,
-      this.#siteContexts
-    );
+    this.currentHostname = await Utils.getFormattedHostname(currentTab.url);
+    this.currentContext = this.siteContexts.get(this.currentHostname);
 
     if (this.controllerState.state === "Enabled") {
       // TODO replace with flags
@@ -95,8 +84,7 @@ export class TabHandler extends Component {
 
   portConnected(port) {
     log(`Popup connected. Current port: ${port.name}`);
-
-    this.#currentPort = port;
+    this.currentPort = port;
 
     port.onMessage.addListener(async (message) => {
       log(`Message received from the popup: ${message.type}`);
@@ -104,8 +92,7 @@ export class TabHandler extends Component {
     });
 
     port.onDisconnect.addListener(() => {
-      log(`Disconnecting from ${port.name}`);
-      this.#currentPort = null;
+      this.currentPort = null;
     });
 
     if (port.name === "pageAction") {
@@ -114,12 +101,12 @@ export class TabHandler extends Component {
   }
 
   sendDataToCurrentPopup() {
-    return this.#currentPort.postMessage({
+    return this.currentPort.postMessage({
       type: "tabInfo",
-      currentHostname: this.#currentHostname,
-      siteContexts: this.#siteContexts,
+      currentHostname: this.currentHostname,
+      siteContexts: this.siteContexts,
       servers: this.controllerState.servers,
-      currentContext: this.#currentContext,
+      currentContext: this.currentContext,
     });
   }
 }

@@ -14,30 +14,36 @@ let self;
  * and determining whether a Request should be proxied.
  */
 export class RequestHandler extends Component {
-  #siteContexts;
-
   /**
    *
    * @param {*} receiver
    * @param {VPNController} controller
    */
-  constructor(receiver, controller) {
+  constructor(receiver, controller, proxyHandler) {
     super(receiver);
     this.controller = controller;
+    this.proxyHandler = proxyHandler;
     self = this;
   }
 
   /** @type {VPNState | undefined} */
   controllerState;
+  siteContexts;
 
   async init() {
     log("Initiating RequestHandler");
-    const { siteContexts } = await Utils.getSiteContexts();
-    this.#siteContexts = siteContexts;
 
     this.controller.state.subscribe((s) => {
       this.controllerState = s;
       this.addOrRemoveRequestListener();
+    });
+
+    this.proxyHandler.siteContexts.subscribe((siteContexts) => {
+      this.siteContexts = siteContexts;
+      if (this.siteContexts.size === 0) {
+        return this.removeRequestListener();
+      }
+      return this.addOrRemoveRequestListener();
     });
   }
 
@@ -50,11 +56,7 @@ export class RequestHandler extends Component {
   }
 
   async addOrRemoveRequestListener() {
-    const { siteContexts } = await Utils.getSiteContexts();
     const s = this.controllerState.state;
-    if (siteContexts.size === 0) {
-      return this.removeRequestListener();
-    }
 
     switch (s) {
       case "Enabled":
@@ -63,18 +65,7 @@ export class RequestHandler extends Component {
       case "Disabled":
         this.removeRequestListener();
         break;
-      case "Unavailable":
-        this.removeRequestListener();
-        break;
-    }
-  }
-
-  async handleEvent(type, data = null) {
-    switch (type) {
-      case "site-contexts-updated":
-        const { siteContexts } = await Utils.getSiteContexts();
-        self.#siteContexts = siteContexts;
-        this.addOrRemoveRequestListener();
+      // TODO what is the right behavior on "Unavailable"?
     }
   }
 
@@ -89,12 +80,9 @@ export class RequestHandler extends Component {
     for (let urlString of [url, originUrl]) {
       if (urlString) {
         const parsedHostname = await Utils.getFormattedHostname(urlString);
-        const siteContext = await Utils.getContextForOrigin(
-          parsedHostname,
-          self.#siteContexts
-        );
-
+        const siteContext = self.siteContexts.get(parsedHostname);
         if (siteContext) {
+          log("Intercepting web request. Redirect to local proxy.");
           return [...siteContext.proxyInfo];
         }
       }
