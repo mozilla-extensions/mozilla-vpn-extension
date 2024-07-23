@@ -169,7 +169,7 @@ export class ServerList extends LitElement {
     }
 
     .toggle {
-      background-image: url("../assets/img/arrow-toggle.svg");
+      background-image: url("../../assets/img/arrow-toggle.svg");
       background-position: center center;
       background-repeat: no-repeat;
       margin-inline-start: 8px;
@@ -303,7 +303,7 @@ export const countryListItem = (
         <div class="toggle"></div>
         <img
           class="server-country-flag"
-          src=${"../assets/flags/" + serverCountry.code.toUpperCase() + ".png"}
+          src=${"../../assets/flags/" + serverCountry.code.toUpperCase() + ".png"}
           alt="Flag of ${serverCountry.name}"
         />
         <p class="server-country-name">${serverCountry.name}</p>

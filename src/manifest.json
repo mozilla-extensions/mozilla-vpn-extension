@@ -23,7 +23,7 @@
   "browser_action": {
     "default_area": "navbar",
     "default_icon": "assets/logos/logo-dark.svg",
-    "default_popup": "ui/popup/popup.html",
+    "default_popup": "ui/browserAction/popup.html",
     "default_title": "Mozilla VPN",
     "theme_icons": [
       {
