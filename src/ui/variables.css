@@ -15,7 +15,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --panel-bg-color: #42414d;
+    --panel-bg-color: #2b2a33;
     --text-color-primary: white;
   }
 }
