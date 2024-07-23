@@ -15,6 +15,7 @@ export const REQUEST_TYPES = [
   "servers",
   "disabled_apps",
   "status",
+  "deactivate",
 ];
 
 export class VPNState {

@@ -45,7 +45,6 @@ export class VPNCard extends LitElement {
     this.dispatchEvent(new CustomEvent("toggle"));
   }
   render() {
-    console.log("reeender");
     const boxClasses = {
       box: true,
       on: this.enabled,
