@@ -9,12 +9,22 @@
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" href="popup.css" />
+    <link rel="stylesheet" href="../variables.css" />
     <script src="popup.js" type="module"></script>
 
     <script src="./../../components/serverlist.js" type="module"></script>
+    <script src="./../../components/vpncard.js" type="module"></script>
+
     <title>Mozilla VPN</title>
   </head>
   <body>
-    <server-list id="list"></server-list>
+    <stack-view>
+      <main>
+        <vpn-card></vpn-card>
+        <hr />
+        <p>Current location</p>
+        <button>Toronto</button>
+      </main>
+    </stack-view>
   </body>
 </html>

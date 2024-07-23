@@ -66,7 +66,6 @@ export class StackView extends LitElement {
     this.baseStyleElement(element);
     element.style.transition = `all 0s`;
     element.style.transform = `translateX(${rect.width}px)`;
-
     // Mount it into the component and wait to render
     this.viewStack = [...this.viewStack, element];
     this.requestUpdate();

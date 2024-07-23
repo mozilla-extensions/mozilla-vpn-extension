@@ -1,0 +1,32 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+   License, v. 2.0. If a copy of the MPL was not distributed with this
+   file, You can obtain one at http://mozilla.org/MPL/2.0/. 
+*/
+
+:root {
+  --window-width: 352px;
+  --window-height: 448px;
+  --font-family: "Segoe UI";
+  --color-enabled: #3fe1b0;
+
+  --main-card-background: #321c64;
+  --main-card-text-color: white;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --panel-bg-color: #42414d;
+    --text-color-primary: white;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    /**
+        Note this color is not from our figma but the 
+        firefox "light" theme, otherwise it looks wierd
+        **/
+    --panel-bg-color: #f9f9fb;
+    --text-color-primary: #3d3d3d;
+  }
+}

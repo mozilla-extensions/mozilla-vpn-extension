@@ -2,25 +2,42 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import { MainCard } from "../../components/maincard.js";
+
 /**
-* @typedef {import("../background/vpncontroller/states.js").VPNState} VPNState
-* @typedef {import("../../components/serverlist.js").ServerList} ServerListElement
+ * @typedef {import("../background/vpncontroller/states.js").VPNState} VPNState
+ * @typedef {import("../../components/serverlist.js").ServerList} ServerListElement
+ */
 
-*/
-
-/** @type {ServerListElement} */
-const serverListElement = document.querySelector("server-list");
-serverListElement.addEventListener("selectedCityChanged", (e) => {
-  console.log(`City changed to ${e.detail.city.name}`);
-});
+let enabled = false;
 
 const controllerPort = globalThis.chrome.runtime.connect({
   name: "vpncontroller",
 });
+/** @param {VPNState} state */
+const applyToMainPanel = (state) => {
+  const panel = document.querySelector("main-panel");
+  if (!panel) {
+    console.error("Main panel not found?!");
+    return;
+  }
+  const panelState = MainPanel.propertiesFrom(state);
+  panel.enabled = panelState.enabled;
+  enabled = panelState.enabled;
+  panel.connectedSince = panelState.connectedSince;
+};
 
 /** @param {VPNState} state */
 const onNewState = (state) => {
   console.log(state);
-  serverListElement.serverList = state.servers;
+  applyToMainPanel(state);
 };
 controllerPort.onMessage.addListener(onNewState);
+
+document.querySelector("main-panel").addEventListener("toggle", () => {
+  if (enabled) {
+    controllerPort.postMessage("deactivate");
+  } else {
+    controllerPort.postMessage("activate");
+  }
+});
