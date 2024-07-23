@@ -39,7 +39,7 @@ export class StackView extends LitElement {
 
   connectedCallback() {
     /**
-     * When we connect to the DOM "collect"
+     * When we connect to the DOM we "collect"
      * all children and drop them into our stack
      * so you can initialize the element with
      * <stack-view>
