@@ -4,6 +4,8 @@
 
 import { VPNCard } from "../../components/vpncard.js";
 
+import { html, render } from "../../vendor/lit-all.min.js";
+
 /**
  * @typedef {import("../../background/vpncontroller/states.js").VPNState} VPNState
  * @typedef {import("../../components/serverlist.js").ServerList} ServerListElement
@@ -48,15 +50,30 @@ document.querySelector("vpn-card").addEventListener("toggle", () => {
 
 // When clicking the "location" button, create a serverlist
 // and pop it into the stackview
-document.querySelector("button").addEventListener("click", () => {
+document.querySelector("#selectLocation").addEventListener("click", () => {
   const sv = document.querySelector("stack-view");
-  const serverlistElement = document.createElement("server-list");
-  serverlistElement.serverList = currentState.servers;
-  serverlistElement.addEventListener("selectedCityChanged", (e) => {
-    const city = e.detail.city;
-    console.log(city);
+
+  const closeView = () => {
     sv.pop();
-    document.querySelector("button").innerText = city.name;
-  });
-  sv.push(serverlistElement);
+  };
+
+  const viewElement = document.createElement("section");
+  render(
+    html`
+      <vpn-titlebar title="Select Location">
+        <img
+          slot="left"
+          src="../../assets/img/arrow-icon-left.svg"
+          @click=${closeView}
+        />
+      </vpn-titlebar>
+      <server-list
+        .serverList=${currentState.servers}
+        @selectedCityChanged=${closeView}
+      >
+      </server-list>
+    `,
+    viewElement
+  );
+  sv.push(viewElement);
 });

@@ -15,16 +15,20 @@
     <script src="./../../components/stackview.js" type="module"></script>
     <script src="./../../components/serverlist.js" type="module"></script>
     <script src="./../../components/vpncard.js" type="module"></script>
+    <script src="./../../components/titlebar.js" type="module"></script>
 
     <title>Mozilla VPN</title>
   </head>
   <body>
     <stack-view>
       <main>
+        <vpn-titlebar title="Mozilla VPN">
+          <img slot="right" src="../../assets/img/settings-cog.svg" />
+        </vpn-titlebar>
         <vpn-card></vpn-card>
         <hr />
         <p>Current location</p>
-        <button>Toronto</button>
+        <button id="selectLocation">Toronto</button>
       </main>
     </stack-view>
   </body>
