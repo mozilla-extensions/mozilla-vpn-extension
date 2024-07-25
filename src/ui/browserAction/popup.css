@@ -3,19 +3,6 @@
    file, You can obtain one at http://mozilla.org/MPL/2.0/. 
 */
 
-:root {
-  --panel-bg-color: #fff;
-  --window-width: 352px;
-  --window-height: 448px;
-  --text-color-primary: white;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --panel-bg-color: #42414d;
-  }
-}
-
 body {
   width: var(--window-width);
   height: var(--window-height);

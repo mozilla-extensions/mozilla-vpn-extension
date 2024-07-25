@@ -66,7 +66,9 @@ export class VPNController extends Component {
     this.#mState.value = await VPNState.fromStorage();
     this.initNativeMessaging();
 
-    globalThis.chrome.runtime.onConnect.addListener((port) => {
+    //browser.runtime.onConnect
+    globalThis.browser.runtime.onConnect.addListener((port) => {
+      console.log("new content script connected");
       if (port.name === "vpncontroller") {
         this.#onContentScriptConnected(port);
       }
@@ -77,6 +79,7 @@ export class VPNController extends Component {
    * @param {browser.runtime.Port} cs
    */
   #onContentScriptConnected(cs) {
+    console.log("new content script connected");
     // Queue up a status response
     queueMicrotask(() => {
       cs.postMessage(this.#mState.value);
@@ -94,6 +97,10 @@ export class VPNController extends Component {
       log(message);
       if (REQUEST_TYPES.includes(message.toString())) {
         this.postToApp(message.toString());
+      } else {
+        console.error(
+          `Attempt to request Illegal Command to VPN: ${message.toString()}`
+        );
       }
     });
   }
