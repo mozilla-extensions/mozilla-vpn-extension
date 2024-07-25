@@ -5,6 +5,7 @@ import {
   classMap,
   styleMap,
 } from "../vendor/lit-all.min.js";
+import { resetSizing } from "./utils.js";
 
 import { ServerCity } from "../background/vpncontroller/states.js";
 
@@ -98,9 +99,7 @@ export class ServerList extends LitElement {
   }
 
   static styles = css`
-    #moz-vpn-server-list {
-      padding: 0;
-    }
+    ${resetSizing}
 
     #moz-vpn-server-list-panel {
       block-size: var(--panelSize);

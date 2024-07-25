@@ -10,6 +10,8 @@ import {
   styleMap,
 } from "../vendor/lit-all.min.js";
 
+import { resetSizing } from "./utils.js";
+
 /**
  * @typedef {import("../background/vpncontroller/states.js").VPNState} VPNState
  */
@@ -94,6 +96,8 @@ export class VPNCard extends LitElement {
   }
 
   static styles = css`
+    ${resetSizing}
+
     :host {
       font-size: 1rem;
       font-family: var(--font-family);
@@ -129,8 +133,6 @@ export class VPNCard extends LitElement {
       font-weight: 700;
     }
     p {
-      padding: 0;
-      margin: 0;
       font-size: 14px;
       line-height: 21px;
       font-weight: 400;
