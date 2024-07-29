@@ -6,6 +6,7 @@ import { Logger } from "./logger.js";
 import { ProxyHandler } from "./proxyHandler/index.js";
 import { RequestHandler } from "./requestHandler.js";
 import { TabHandler } from "./tabHandler.js";
+import { ToolbarIconHandler } from "./toolbarIconHandler.js";
 import { VPNController } from "./vpncontroller/index.js";
 
 const log = Logger.logger("Main");
@@ -24,6 +25,7 @@ class Main {
     this.proxyHandler
   );
   tabHandler = new TabHandler(this, this.vpnController, this.proxyHandler);
+  toolbarIconHandler = new ToolbarIconHandler(this, this.vpnController);
 
   async init() {
     log("Hello from the background script!");
