@@ -41,6 +41,9 @@ export class TabHandler extends Component {
     this.controller.state.subscribe((s) => {
       this.controllerState = s;
       this.maybeShowIcon();
+      if (this.currentPort && this.currentPort.name === "pageAction") {
+        this.sendDataToCurrentPopup();
+      }
     });
 
     this.proxyHandler.siteContexts.subscribe((siteContexts) => {
@@ -52,7 +55,7 @@ export class TabHandler extends Component {
     });
 
     browser.tabs.onUpdated.addListener(() => this.maybeShowIcon());
-    browser.tabs.onActivated.addListener(() => this.handleActiveTabChange());
+    browser.tabs.onActivated.addListener(() => this.maybeShowIcon());
 
     browser.runtime.onConnect.addListener(async (port) => {
       log(`Connecting to ${port.name}`);
@@ -60,10 +63,6 @@ export class TabHandler extends Component {
     });
 
     this.maybeShowIcon();
-  }
-
-  async handleActiveTabChange() {
-    return await this.maybeShowIcon();
   }
 
   async maybeShowIcon() {
@@ -83,13 +82,7 @@ export class TabHandler extends Component {
   }
 
   portConnected(port) {
-    log(`Popup connected. Current port: ${port.name}`);
     this.currentPort = port;
-
-    port.onMessage.addListener(async (message) => {
-      log(`Message received from the popup: ${message.type}`);
-      this.sendMessage(message.type, message.data);
-    });
 
     port.onDisconnect.addListener(() => {
       this.currentPort = null;
