@@ -96,7 +96,6 @@ export class VPNCard extends LitElement {
             ${timeString}
           </div>
           <button class="pill" @click=${this.#toggle}></button>
-          <hr />
         </main>
         ${this.enabled ? VPNCard.footer(this.cityName, this.countryFlag) : null}
       </div>
@@ -105,11 +104,11 @@ export class VPNCard extends LitElement {
 
   static footer(name, countryFlag) {
     return html`
-      <aside>
-        <img src="/../../assets/flags/${countryFlag}" />
+      <footer>
+        <img src="../../assets/flags/${countryFlag}.png" width="24" height="24" />
         <p>${name}</p>
         <span> In Use </span>
-      </aside>
+      </footer>
     `;
   }
 
@@ -122,7 +121,6 @@ export class VPNCard extends LitElement {
       --default-padding: 16px;
     }
     .box {
-      padding: var(--default-padding);
       border-radius: 8px;
       background: lch(from var(--panel-bg-color) calc(l + 5) c h);
       display: flex;
@@ -133,10 +131,29 @@ export class VPNCard extends LitElement {
     .box.on {
       background: var(--main-card-background);
     }
-    main {
+    main, footer {
       display: flex;
       align-items: center;
+      width: 100%;
+      justify-content: baseline;
+    }
+    main{
       justify-content: space-between;
+      padding: var(--default-padding);
+    }
+    footer{
+      justify-content: flex-start;
+      width: 100%;
+      border-top: 1px solid var(--border-color);
+      padding: 10px var(--default-padding);
+    }
+    footer p{
+      color: var(--text-color-primary);
+      font-size: 14px;
+    }
+    footer span{
+      font-size: 11px;
+      font-weight: bold;
     }
 
     .box * {
@@ -190,6 +207,16 @@ export class VPNCard extends LitElement {
       top: 3px;
       left: 24px;
     }
+
+    span {
+      margin: 0px 10px;
+      color: var(--text-color-primary);
+      padding: 6px 10px;
+      background: var(--main-card--pill-background);
+      opacity: 0.9;
+      border-radius: 6px;
+    }
+
   `;
 
   /**
@@ -200,8 +227,8 @@ export class VPNCard extends LitElement {
   static propertiesFrom(vpnState) {
     return {
       enabled: vpnState.connected,
-      name: vpnState.exitServerCity?.name,
-      flag: vpnState.exitServerCountry?.code,
+      cityName: vpnState.exitServerCity?.name,
+      countryFlag: vpnState.exitServerCountry?.code,
       connectedSince: Date.now(), // TODO: We actually dont send this from the client
     };
   }
@@ -214,7 +241,7 @@ export class VPNCard extends LitElement {
     const bag = VPNCard.propertiesFrom(vpnState);
     this.enabled = bag.enabled;
     this.cityName = bag.cityName;
-    this.countryFlag = bag.flag;
+    this.countryFlag = bag.countryFlag;
     this.connectedSince = bag.connectedSince;
   }
 }
