@@ -20,12 +20,17 @@ export class VPNCard extends LitElement {
   static properties = {
     enabled: { type: Boolean },
     connectedSince: { type: Date },
+    cityName: { type: String },
+    countryFlag: { type: String },
   };
 
   constructor() {
     super();
     this.enabled = false;
     this.connectedSince = Date.now();
+
+    this.cityName = "";
+    this.countryFlag = "";
   }
   #intervalHandle = null;
 
@@ -57,7 +62,6 @@ export class VPNCard extends LitElement {
 
     function formatSingle(value) {
       if (value === 0) return "00";
-
       return (value < 10 ? "0" : "") + value;
     }
     function formatTime(milliSeconds) {
@@ -84,14 +88,28 @@ export class VPNCard extends LitElement {
 
     return html`
       <div class="${classMap(boxClasses)}">
-        <img src=${shieldURL} />
-        <div class="infobox">
-          <h1>VPN is ${this.enabled ? "On" : "Off"}</h1>
-          <p>${subLine}</p>
-          ${timeString}
-        </div>
-        <button class="pill" @click=${this.#toggle}></button>
+        <main>
+          <img src=${shieldURL} />
+          <div class="infobox">
+            <h1>VPN is ${this.enabled ? "On" : "Off"}</h1>
+            <p>${subLine}</p>
+            ${timeString}
+          </div>
+          <button class="pill" @click=${this.#toggle}></button>
+          <hr />
+        </main>
+        ${this.enabled ? VPNCard.footer(this.cityName, this.countryFlag) : null}
       </div>
+    `;
+  }
+
+  static footer(name, countryFlag) {
+    return html`
+      <aside>
+        <img src="/../../assets/flags/${countryFlag}" />
+        <p>${name}</p>
+        <span> In Use </span>
+      </aside>
     `;
   }
 
@@ -108,11 +126,17 @@ export class VPNCard extends LitElement {
       border-radius: 8px;
       background: lch(from var(--panel-bg-color) calc(l + 5) c h);
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
+      flex-direction: column;
     }
     .box.on {
       background: var(--main-card-background);
+    }
+    main {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
     .box * {
@@ -176,8 +200,22 @@ export class VPNCard extends LitElement {
   static propertiesFrom(vpnState) {
     return {
       enabled: vpnState.connected,
+      name: vpnState.exitServerCity?.name,
+      flag: vpnState.exitServerCountry?.code,
       connectedSince: Date.now(), // TODO: We actually dont send this from the client
     };
+  }
+  /**
+   * Returns the Properties this element should have based on a VPN State
+   * @param {VPNState} vpnState
+   * @returns {void}
+   */
+  apply(vpnState) {
+    const bag = VPNCard.propertiesFrom(vpnState);
+    this.enabled = bag.enabled;
+    this.cityName = bag.cityName;
+    this.countryFlag = bag.flag;
+    this.connectedSince = bag.connectedSince;
   }
 }
 customElements.define("vpn-card", VPNCard);

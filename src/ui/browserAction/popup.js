@@ -23,10 +23,7 @@ const applyToMainPanel = (state) => {
     console.error("Main panel not found?!");
     return;
   }
-  const panelState = VPNCard.propertiesFrom(state);
-  panel.enabled = panelState.enabled;
-  enabled = panelState.enabled;
-  panel.connectedSince = panelState.connectedSince;
+  panel.apply(state);
 };
 
 /** @type {VPNState} */
