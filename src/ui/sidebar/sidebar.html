@@ -1,0 +1,45 @@
+<!-- 
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/. 
+-->
+
+<!-- Placeholder garbage UI for local debugging purposes only -->
+<!doctype html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <!-- <link rel="stylesheet" href="../variables.css" /> -->
+    <link rel="stylesheet" href="./sidebar.css" />
+    <script src="./sidebar.js" type="module"></script>
+    <title>Mozilla VPN</title>
+  </head>
+  <body>
+    <div class="tabInfo">
+      <h5>Client status:</h5>
+      <span id="client-status-indicator"></span>
+    </div>
+    
+    <div class="tabInfo">
+      <h5>Current origin:</h5>
+      <span class="origin"></span>
+      <div class="flex">
+        <div class="checkbox-wrapper">
+          <input type="checkbox" id="exclude-origin" />
+          <span>Exclude <span class="origin"></span></span>
+        </div>
+
+        <select id="servers"></select>
+        <button id="removeContext">Reset!</button>
+      </div>
+    </div>
+
+    <div class="tabInfo">
+      <h5>Site preferences:</h5>
+      <ol id="siteContextsList"></ol>
+      <button id="resetAll">Reset All</button>
+    </div>
+
+
+  </body>
+</html>

@@ -1,0 +1,128 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+   License, v. 2.0. If a copy of the MPL was not distributed with this
+   file, You can obtain one at http://mozilla.org/MPL/2.0/. 
+*/
+
+body {
+  font-size: 1rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  margin: 0;
+  background-color: black;
+  color: white;
+  inline-size: 100vw;
+  block-size: 100vh;
+}
+
+#client-status-indicator {
+  display: flex;
+  align-items: center;
+}
+
+#client-status-indicator::before {
+  width: .75rem;
+  height: .75rem;
+  content: "";
+  margin-inline-end: .5rem;
+  border-radius: 100%;
+}
+
+[data-status="Enabled"]::before {
+  background-color: #3FE1B0;
+}
+
+[data-status="Disabled"]::before {
+  background-color: #FF4F5E;
+}
+
+[data-status="Unavailable"]::before {
+  background-color: #0060DF;
+}
+
+ol {
+  padding-inline: 1.5rem;
+}
+
+ol li {
+  margin-block-start: .5rem;
+}
+
+span,
+ol li {
+  font-size: 0.85rem;
+}
+
+.tabInfo {
+  padding: 1rem;
+}
+
+.tabInfo:nth-child(2) {
+  background-color: rgba(255,255,255,.1);
+  margin-block-start: 2rem;
+  padding-block-end: 2rem;
+}
+
+button {
+  block-size: 3rem;
+  background-color: rgba(255,255,255, 0);
+  border: 3px solid orange;
+  inline-size: 100%;
+  text-align: center;
+  color: rgba(255,255,255,1);
+  transition: background-color 0.2s ease;
+  border-radius: 8px;
+}
+
+button#resetAll {
+  border: 3px solid hotpink;
+}
+
+button:hover {
+  background-color: rgba(255,255,255,.1);
+}
+
+button:active {
+  background-color: rbga(255,255,255,.4);
+}
+
+button:disabled {
+  background: repeating-linear-gradient(-45deg, #3fe1b036 0 20px, #b235d5 20px 40px);
+  cursor: not-allowed;
+  opacity: 0.9;
+}
+
+.flex {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.current {
+  background-image: linear-gradient(to right, #b1ff3f8f, #007cff7d);
+  color: white;
+}
+
+.flex > * {
+  margin: auto auto 1rem auto;
+}
+
+h5 {
+  margin-block-end: 0.5rem;
+  margin-block-start: 2rem;
+  color: orange;
+}
+
+select {
+  inline-size: 100%;
+  margin-block-end: 1rem;
+  block-size: 2rem;
+}
+
+.checkbox-wrapper {
+  margin-block-start: 2rem;
+  width: 100%;
+}
+
+input {
+  margin-inline-end: 0.5rem;
+}

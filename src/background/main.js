@@ -5,6 +5,7 @@
 import { Logger } from "./logger.js";
 import { ProxyHandler } from "./proxyHandler/index.js";
 import { RequestHandler } from "./requestHandler.js";
+import { SidebarHandler } from "./sidebarHandler.js";
 import { TabHandler } from "./tabHandler.js";
 import { ToolbarIconHandler } from "./toolbarIconHandler.js";
 import { VPNController } from "./vpncontroller/index.js";
@@ -24,6 +25,7 @@ class Main {
     this.vpnController,
     this.proxyHandler
   );
+  sidebarHandler = new SidebarHandler(this, this.vpnController, this.proxyHandler);
   tabHandler = new TabHandler(this, this.vpnController, this.proxyHandler);
   toolbarIconHandler = new ToolbarIconHandler(this, this.vpnController);
 

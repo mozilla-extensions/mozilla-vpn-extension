@@ -101,6 +101,9 @@ export class ProxyHandler extends Component {
       case "exclude-origin":
         log(`Excluding origin: ${data.origin}`);
         return this.#excludeOrigin(data.origin);
+      case "reset-all":
+        log(`Resetting all site contexts`);
+        return this.#resetAllContexts();
     }
   }
 
@@ -116,11 +119,18 @@ export class ProxyHandler extends Component {
     });
   }
 
+  async #resetAllContexts() {
+    const siteContexts = await this.#mSiteContexts.value;
+    siteContexts.clear();
+    console.log(siteContexts, "CLEARED");
+    this.#setSiteContexts(siteContexts);
+  }
+
   /**
    * Removes the SiteContext of the provided origin
    * @param {string} origin - The origin to exclude.
    */
-  async #removeContextForOrigin(origin) {
+  #removeContextForOrigin(origin) {
     const siteContexts = this.#mSiteContexts.value;
     siteContexts.delete(origin);
     return this.#setSiteContexts(siteContexts);

@@ -44,5 +44,12 @@
     "default_title": "Page action button (TODO: Localize)"
   },
 
-  "permissions": ["<all_urls>", "nativeMessaging", "storage", "proxy", "tabs"]
+  "permissions": ["<all_urls>", "nativeMessaging", "storage", "proxy", "tabs"],
+
+  "sidebar_action": {
+    "default_title": "Debug Sidebar",
+    "default_panel": "ui/sidebar/sidebar.html",
+    "default_icon": "assets/logos/browserAction/logo-dark-unavilable.svg"
+  }
+  
 }
