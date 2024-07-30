@@ -5,7 +5,7 @@ import {
   classMap,
   styleMap,
 } from "../vendor/lit-all.min.js";
-import { resetSizing } from "./utils.js";
+import { resetSizing } from "./styles.js";
 
 import { ServerCity } from "../background/vpncontroller/states.js";
 

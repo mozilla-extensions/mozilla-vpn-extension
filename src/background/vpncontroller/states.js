@@ -130,7 +130,7 @@ export class StateVPNEnabled extends VPNState {
    * @param {ServerCity | undefined} exitServerCity - the Exit City
    * @param {ServerCountry | undefined} exitServerCity - the Exit City
    */
-  constructor(other, aloophole, exitServerCity, exitServerCountry) {   
+  constructor(other, aloophole, exitServerCity, exitServerCountry) {
     super(other);
     if (other) {
       this.loophole = other.loophole;

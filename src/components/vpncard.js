@@ -10,7 +10,7 @@ import {
   styleMap,
 } from "../vendor/lit-all.min.js";
 
-import { resetSizing } from "./utils.js";
+import { resetSizing } from "./styles.js";
 
 /**
  * @typedef {import("../background/vpncontroller/states.js").VPNState} VPNState
@@ -105,7 +105,11 @@ export class VPNCard extends LitElement {
   static footer(name, countryFlag) {
     return html`
       <footer>
-        <img src="../../assets/flags/${countryFlag}.png" width="24" height="24" />
+        <img
+          src="../../assets/flags/${countryFlag}.png"
+          width="24"
+          height="24"
+        />
         <p>${name}</p>
         <span> In Use </span>
       </footer>
@@ -131,27 +135,28 @@ export class VPNCard extends LitElement {
     .box.on {
       background: var(--main-card-background);
     }
-    main, footer {
+    main,
+    footer {
       display: flex;
       align-items: center;
       width: 100%;
       justify-content: baseline;
     }
-    main{
+    main {
       justify-content: space-between;
       padding: var(--default-padding);
     }
-    footer{
+    footer {
       justify-content: flex-start;
       width: 100%;
       border-top: 1px solid var(--border-color);
       padding: 10px var(--default-padding);
     }
-    footer p{
+    footer p {
       color: var(--text-color-primary);
       font-size: 14px;
     }
-    footer span{
+    footer span {
       font-size: 11px;
       font-weight: bold;
     }
@@ -216,7 +221,6 @@ export class VPNCard extends LitElement {
       opacity: 0.9;
       border-radius: 6px;
     }
-
   `;
 
   /**

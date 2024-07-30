@@ -4,18 +4,7 @@
 */
 
 body {
-  width: var(--window-width);
-  height: var(--window-height);
   background-color: var(--panel-bg-color);
-
   padding: 0;
   margin: 0;
-}
-
-section {
-  background-color: var(--panel-bg-color);
-}
-
-main {
-  padding: var(--padding-default);
 }

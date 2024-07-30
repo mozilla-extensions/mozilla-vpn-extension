@@ -10,28 +10,11 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" href="popup.css" />
     <link rel="stylesheet" href="../variables.css" />
-    <script src="popup.js" type="module"></script>
 
-    <script src="./../../components/stackview.js" type="module"></script>
-    <script src="./../../components/serverlist.js" type="module"></script>
-    <script src="./../../components/vpncard.js" type="module"></script>
-    <script src="./../../components/titlebar.js" type="module"></script>
-
+    <script src="./popupPage.js" type="module"></script>
     <title>Mozilla VPN</title>
   </head>
   <body>
-    <stack-view>
-      <section>
-        <vpn-titlebar title="Mozilla VPN">
-          <img slot="right" src="../../assets/img/settings-cog.svg" />
-        </vpn-titlebar>
-        <main>
-          <vpn-card></vpn-card>
-          <hr />
-          <p>Current location</p>
-          <button id="selectLocation">Toronto</button>
-        </main>
-      </section>
-    </stack-view>
+    <popup-browseraction> </popup-browseraction>
   </body>
 </html>

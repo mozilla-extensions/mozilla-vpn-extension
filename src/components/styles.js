@@ -81,3 +81,33 @@ export const resetSizing = css`
     padding: 0;
   }
 `;
+
+export const fontSizing = css`
+  * {
+    font-family: var(--font-family);
+  }
+  h1 {
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 27px;
+  }
+  h2 {
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
+  }
+  h3 {
+    font-weight: normal;
+    font-size: 16px;
+  }
+  p,
+  em,
+  span {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 21px;
+  }
+  .bold {
+    font-weight: 600;
+  }
+`;
