@@ -20,23 +20,23 @@ body {
 }
 
 #client-status-indicator::before {
-  width: .75rem;
-  height: .75rem;
+  width: 0.75rem;
+  height: 0.75rem;
   content: "";
-  margin-inline-end: .5rem;
+  margin-inline-end: 0.5rem;
   border-radius: 100%;
 }
 
 [data-status="Enabled"]::before {
-  background-color: #3FE1B0;
+  background-color: #3fe1b0;
 }
 
 [data-status="Disabled"]::before {
-  background-color: #FF4F5E;
+  background-color: #ff4f5e;
 }
 
 [data-status="Unavailable"]::before {
-  background-color: #0060DF;
+  background-color: #0060df;
 }
 
 ol {
@@ -44,7 +44,7 @@ ol {
 }
 
 ol li {
-  margin-block-start: .5rem;
+  margin-block-start: 0.5rem;
 }
 
 span,
@@ -57,18 +57,18 @@ ol li {
 }
 
 .tabInfo:nth-child(2) {
-  background-color: rgba(255,255,255,.1);
+  background-color: rgba(255, 255, 255, 0.1);
   margin-block-start: 2rem;
   padding-block-end: 2rem;
 }
 
 button {
   block-size: 3rem;
-  background-color: rgba(255,255,255, 0);
+  background-color: rgba(255, 255, 255, 0);
   border: 3px solid orange;
   inline-size: 100%;
   text-align: center;
-  color: rgba(255,255,255,1);
+  color: rgba(255, 255, 255, 1);
   transition: background-color 0.2s ease;
   border-radius: 8px;
 }
@@ -78,15 +78,19 @@ button#resetAll {
 }
 
 button:hover {
-  background-color: rgba(255,255,255,.1);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 button:active {
-  background-color: rbga(255,255,255,.4);
+  background-color: rbga(255, 255, 255, 0.4);
 }
 
 button:disabled {
-  background: repeating-linear-gradient(-45deg, #3fe1b036 0 20px, #b235d5 20px 40px);
+  background: repeating-linear-gradient(
+    -45deg,
+    #3fe1b036 0 20px,
+    #b235d5 20px 40px
+  );
   cursor: not-allowed;
   opacity: 0.9;
 }

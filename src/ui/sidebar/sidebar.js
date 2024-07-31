@@ -2,15 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
- class SidebarPopup {
+class SidebarPopup {
   #port;
   self;
   #resetButton;
   #resetAllButton;
   #currentHostname;
   #serverSelector;
-  #excludeCheckbox
-  #clientStatusIndicator
+  #excludeCheckbox;
+  #clientStatusIndicator;
 
   async init() {
     self = this;
@@ -22,14 +22,26 @@
 
       this.#port.onMessage.addListener(async (msg) => {
         if (msg.type === "tabInfo") {
-          const { currentHostname, siteContexts, servers, currentContext, clientState } = msg;
-          this.renderUI(currentHostname, siteContexts, servers, currentContext, clientState);
+          const {
+            currentHostname,
+            siteContexts,
+            servers,
+            currentContext,
+            clientState,
+          } = msg;
+          this.renderUI(
+            currentHostname,
+            siteContexts,
+            servers,
+            currentContext,
+            clientState
+          );
         }
         if (msg.type === "clientStatus") {
-          this.renderClientStatusUI(msg.currentClientState)
+          this.renderClientStatusUI(msg.currentClientState);
         }
       });
-    }
+    };
 
     initPort();
 
@@ -37,8 +49,9 @@
     this.#resetAllButton = document.getElementById("resetAll");
     this.#serverSelector = document.getElementById("servers");
     this.#excludeCheckbox = document.getElementById("exclude-origin");
-    this.#clientStatusIndicator = document.getElementById("client-status-indicator");
-
+    this.#clientStatusIndicator = document.getElementById(
+      "client-status-indicator"
+    );
 
     const handleResetButtonClicks = async () => {
       if (this.#resetButton.disabled) {
@@ -75,16 +88,20 @@
       self.forceReloadActiveTab();
     };
 
-    const handleResetAllBtn = async() => {
+    const handleResetAllBtn = async () => {
       await self.sendMessage("reset-all");
-    }
-
+    };
 
     /* Request update from background on tab and window changes */
-    browser.windows.onFocusChanged.addListener(() => {this.sendMessage("get-tab", {})});
-    browser.tabs.onUpdated.addListener(() => {this.sendMessage("get-tab", {})})
-    browser.tabs.onActivated.addListener(() => {this.sendMessage("get-tab", {})});
-
+    browser.windows.onFocusChanged.addListener(() => {
+      this.sendMessage("get-tab", {});
+    });
+    browser.tabs.onUpdated.addListener(() => {
+      this.sendMessage("get-tab", {});
+    });
+    browser.tabs.onActivated.addListener(() => {
+      this.sendMessage("get-tab", {});
+    });
 
     /* Add event listeners to UI elements */
     this.#resetButton.removeEventListener("click", handleResetButtonClicks);
@@ -98,7 +115,6 @@
 
     this.#excludeCheckbox.removeEventListener("change", handleCheckboxChanges);
     this.#excludeCheckbox.addEventListener("change", handleCheckboxChanges);
-    
   }
 
   async sendMessage(type, data = {}) {
@@ -108,7 +124,13 @@
     });
   }
 
-  async renderUI(currentHostname, siteContexts, serverList, currentContext, clientState) {
+  async renderUI(
+    currentHostname,
+    siteContexts,
+    serverList,
+    currentContext,
+    clientState
+  ) {
     this.#currentHostname = currentHostname;
     this.#clientStatusIndicator.textContent = clientState;
     this.#clientStatusIndicator.dataset.status = clientState;
@@ -155,7 +177,10 @@
         const option = document.createElement("option");
         option.value = "pick-location";
         option.textContent = "Pick a location for this site";
-        this.#serverSelector.insertBefore(option, this.#serverSelector.firstChild);
+        this.#serverSelector.insertBefore(
+          option,
+          this.#serverSelector.firstChild
+        );
       }
       this.#serverSelector.value = "pick-location";
     } else {
@@ -164,7 +189,7 @@
 
     // List of sites with special proxy settings...
     const siteContextsList = document.getElementById("siteContextsList");
-    this.#resetAllButton.disabled = (siteContexts.size == 0)
+    this.#resetAllButton.disabled = siteContexts.size == 0;
     if (siteContextsList) {
       if (self.elemIsAlreadyDrawn(siteContextsList)) {
         // Flush previous siteContexts list
