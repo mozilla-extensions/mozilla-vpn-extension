@@ -172,12 +172,13 @@ export class VPNController extends Component {
         }
         break;
       case "status":
-        const status = response.status;
-        const controllerState = status.vpn;
+        const controllerState = response.status
+          ? response.status.vpn
+          : response.vpn;
         if (controllerState === "StateOn") {
           this.#mState.value = new StateVPNEnabled(
             this.#mState.value,
-            status.localProxy?.url
+            response.localProxy?.url
           );
           return;
         }
