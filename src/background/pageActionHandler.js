@@ -10,12 +10,13 @@ import { VPNController, VPNState } from "./vpncontroller/index.js";
 const log = Logger.logger("TabHandler");
 
 /**
- * Here we have a WIP UIHandler class which collectes and
- * provides various bits of state needed by the UI to show
- * the origin of the current active tab and any
- * associated context (proxy info) if it exists.
+ * PageActionHandler watches for tab
+ * changes, checks if the currentTab url is associated
+ * with a siteContext and dynamically shows/hides the
+ * appropriate icon. PageActionHandler also sends this
+ * info to the pageActionPopup.
  */
-export class TabHandler extends Component {
+export class PageActionHandler extends Component {
   currentPort;
 
   /**
@@ -38,46 +39,58 @@ export class TabHandler extends Component {
 
   async init() {
     log("Initializing TabHandler");
+
+    // TODO use extension state instead of controller state
     this.controller.state.subscribe((s) => {
       this.controllerState = s;
-      this.maybeShowIcon();
-      if (this.currentPort && this.currentPort.name === "pageAction") {
-        this.sendDataToCurrentPopup();
-      }
+      this.sendDataToPageActionPopup();
     });
 
     this.proxyHandler.siteContexts.subscribe((siteContexts) => {
+      log("Subscribing to proxyHandler");
       this.siteContexts = siteContexts;
-      this.maybeShowIcon;
-      if (this.currentPort) {
-        this.sendDataToCurrentPopup();
-      }
+      this.maybeShowFlagIcon;
+      this.sendDataToPageActionPopup();
     });
 
-    browser.tabs.onUpdated.addListener(() => this.maybeShowIcon());
-    browser.tabs.onActivated.addListener(() => this.maybeShowIcon());
+    browser.tabs.onUpdated.addListener(() => this.maybeShowFlagIcon());
+    browser.tabs.onActivated.addListener(() => this.maybeShowFlagIcon());
 
     browser.runtime.onConnect.addListener(async (port) => {
-      log(`Connecting to ${port.name}`);
       await this.portConnected(port);
     });
 
-    this.maybeShowIcon();
+    this.maybeShowFlagIcon();
   }
 
-  async maybeShowIcon() {
+  async maybeShowFlagIcon() {
     const currentTab = await Utils.getCurrentTab();
+    if (this.controllerState.state !== "Enabled") {
+      return browser.pageAction.hide(currentTab.id);
+    }
+
     this.currentHostname = await Utils.getFormattedHostname(currentTab.url);
     this.currentContext = this.siteContexts.get(this.currentHostname);
 
-    if (this.controllerState.state === "Enabled") {
-      // TODO replace with flags
+    if (this.currentContext.excluded) {
+      // PageAction icons are automagically updated by the
+      // browser in response to theme changes so we don't
+      // don't need to specify theme specific icons here.
       browser.pageAction.setIcon({
-        path: "../assets/logos/logo-light.svg",
+        path: `../assets/logos/logo-dark-excluded.svg`,
         tabId: currentTab.id,
       });
       return browser.pageAction.show(currentTab.id);
     }
+
+    if (this.currentContext.countryCode) {
+      browser.pageAction.setIcon({
+        path: `../assets/flags/${this.currentContext.countryCode}.png`,
+        tabId: currentTab.id,
+      });
+      return browser.pageAction.show(currentTab.id);
+    }
+
     return browser.pageAction.hide(currentTab.id);
   }
 
@@ -89,16 +102,17 @@ export class TabHandler extends Component {
     });
 
     if (port.name === "pageAction") {
-      return this.sendDataToCurrentPopup();
+      return this.sendDataToPageActionPopup();
     }
   }
 
-  sendDataToCurrentPopup() {
+  sendDataToPageActionPopup() {
+    if (!this.currentPort || this.currentPort.name !== "pageAction") {
+      return;
+    }
     return this.currentPort.postMessage({
-      type: "tabInfo",
+      type: "pageActionInfo",
       currentHostname: this.currentHostname,
-      siteContexts: this.siteContexts,
-      servers: this.controllerState.servers,
       currentContext: this.currentContext,
     });
   }

@@ -3,10 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { Logger } from "./logger.js";
+import { PageActionHandler } from "./pageActionHandler.js";
 import { ProxyHandler } from "./proxyHandler/index.js";
 import { RequestHandler } from "./requestHandler.js";
 import { SidebarHandler } from "./sidebarHandler.js";
-import { TabHandler } from "./tabHandler.js";
 import { ToolbarIconHandler } from "./toolbarIconHandler.js";
 import { VPNController } from "./vpncontroller/index.js";
 
@@ -20,13 +20,17 @@ class Main {
   vpnController = new VPNController(this);
   logger = new Logger(this);
   proxyHandler = new ProxyHandler(this, this.vpnController);
+  pageActionHandler = new PageActionHandler(
+    this,
+    this.vpnController,
+    this.proxyHandler
+  );
   requestHandler = new RequestHandler(
     this,
     this.vpnController,
     this.proxyHandler
   );
   sidebarHandler = new SidebarHandler(this, this.vpnController, this.proxyHandler);
-  tabHandler = new TabHandler(this, this.vpnController, this.proxyHandler);
   toolbarIconHandler = new ToolbarIconHandler(this, this.vpnController);
 
   async init() {
