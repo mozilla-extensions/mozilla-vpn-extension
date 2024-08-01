@@ -55,86 +55,84 @@
  *
  * Due to the way Postmessage works only "simple" values structured Clone supports are transmittable.
  *
- * Usage: 
- * 
- * In the Background Script: 
- * 
+ * Usage:
+ *
+ * In the Background Script:
+ *
  * expose(new MyTestService());
- * 
- * In the Popup: 
- * 
+ *
+ * In the Popup:
+ *
  * const service = getExposedObject("MyTestService");
  * console.log(await service.readOnlyMember)
  * await service.someCallableFunction("cool argument")
- * 
- * 
- * 
+ *
+ *
+ *
  *
  *
  */
 
 import { IBindable, property, ReadOnlyProperty } from "./property.js";
 
-
 export const getExposedObject = async (name = "ohno") => {
-    // TODO: Lesley noted this port might disconnect
-    // So we should handle this here and auto hook up a new
-    // port with the message port JUST IN CASE.
-    /** @type {browser.runtime.Port} */
-    const port = globalThis.chrome.runtime.connect({ name });
-  
-    const messagePort = toMessagePort(port);
-  
-    /** @type {IPC_INFO_MESSAGE} */
-    // @ts-ignore
-    const info = await requestFromPort(messagePort, {
-      ...new IPC_INFO_MESSAGE(),
-      id: makeID(),
-    });
-    return await createReplica(info.data, messagePort);
-};
+  // TODO: Lesley noted this port might disconnect
+  // So we should handle this here and auto hook up a new
+  // port with the message port JUST IN CASE.
+  /** @type {browser.runtime.Port} */
+  const port = globalThis.chrome.runtime.connect({ name });
 
+  const messagePort = toMessagePort(port);
+
+  /** @type {IPC_INFO_MESSAGE} */
+  // @ts-ignore
+  const info = await requestFromPort(messagePort, {
+    ...new IPC_INFO_MESSAGE(),
+    id: makeID(),
+  });
+  return await createReplica(info.data, messagePort);
+};
 
 /**
  * Creates a  browser.runtime.onConnect listener
- * for ${object} and set's up IPC Message handlers 
+ * for ${object} and set's up IPC Message handlers
  * based on it's ${PropertyDescriptor}
  *
  * @typedef {{ constructor:{
-*  name: String,
-*  properties:PropertyDescriptor
-* }} } ExposableObj
-* @param { ExposableObj } object - Any Object that has Properties, really.
-*/
+ *  name: String,
+ *  properties:PropertyDescriptor
+ * }} } ExposableObj
+ * @param { ExposableObj } object - Any Object that has Properties, really.
+ */
 export const expose = (object) => {
- const name = object.constructor.name;
- const propertyDescription = object.constructor.properties;
- if (!propertyDescription) {
-   throw new Error(
-     "Cannot Expose an Object without a 'static properties{}' definition!"
-   );
- }
- const messageHandler = createMessageHandlers(object, propertyDescription);
- browser.runtime.onConnect.addListener(async (port) => {
-   if (port.name != name) {
-     return;
-   }
-   pushBindables(object, propertyDescription, port);
-   port.onMessage.addListener((message) => {
-     // Merge an empty message, to make sure all
-     // fields exist.
-     const ipcMessage = {
-       ...new IPCMessage(),
-       ...message,
-     };
-     console.log(message);
-     getResponse(messageHandler, ipcMessage)
-       .then((response) => {
-         port.postMessage(response);
-       })
-       .catch(console.error);
-   });
- });
+  const name = object.constructor.name;
+  const propertyDescription = object.constructor.properties;
+  if (!propertyDescription) {
+    throw new Error(
+      "Cannot Expose an Object without a 'static properties{}' definition!"
+    );
+  }
+  const messageHandler = createMessageHandlers(object, propertyDescription);
+  browser.runtime.onConnect.addListener(async (port) => {
+    if (port.name != name) {
+      return;
+    }
+    pushBindables(object, propertyDescription, port);
+    port.onMessage.addListener((message) => {
+      // Merge an empty message, to make sure all
+      // fields exist.
+      const ipcMessage = {
+        ...new IPCMessage(),
+        ...message,
+      };
+      console.log(message);
+      getResponse(messageHandler, ipcMessage)
+        .then((response) => {
+          port.postMessage(response);
+        })
+        .catch(console.error);
+    });
+  });
 };
 
 const makeID = () => {
@@ -564,8 +562,6 @@ export const createReplica = async (propertyMap, port) => {
   );
   return replica;
 };
-
-
 
 /**
  * Takes a browser Port and Hooks it up to a
