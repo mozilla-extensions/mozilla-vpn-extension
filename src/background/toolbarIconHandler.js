@@ -6,7 +6,7 @@ import { Component } from "./component.js";
 import { VPNController, VPNState } from "./vpncontroller/index.js";
 
 /**
- * ToolbarIconHandler updates the browserAction (toolbar) icon 
+ * ToolbarIconHandler updates the browserAction (toolbar) icon
  * to reflect the VPN client's status and updates the icon in
  * response to darkmode/lightmode changes.
  */
@@ -49,7 +49,7 @@ export class ToolbarIconHandler extends Component {
       !!window.matchMedia("(prefers-color-scheme: dark)").matches
         ? "light"
         : "dark";
-    
+
     browser.browserAction.setIcon({
       path: {
         16: `./../assets/logos/browserAction/logo-${scheme}-${this.controllerState.state.toLowerCase()}.svg`,
