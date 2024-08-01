@@ -45,8 +45,8 @@ export class VPNController extends Component {
         this.handleResponse(response)
       );
 
-      this.postToApp("status");
       this.postToApp("servers");
+      this.postToApp("status");
 
       // When the mozillavpn dies or the VPN disconnects, we need to increase
       // the isolation key in order to create new proxy connections. Otherwise
@@ -136,6 +136,7 @@ export class VPNController extends Component {
       case "servers":
         // @ts-ignore
         const newState = new this.#mState.value.constructor({
+          ...this.#mState.value,
           servers: response.servers.countries,
         });
         VPNState.putIntoStorage(newState);
@@ -174,10 +175,23 @@ export class VPNController extends Component {
       case "status":
         const status = response.status;
         const controllerState = status.vpn;
+
         if (controllerState === "StateOn") {
+          const exit_city_name = status.location["exit_city_name"];
+          const exit_country_code = status.location["exit_country_code"];
+
+          const exitServerCountry = this.#mState.value.servers.find(
+            (country) => country.code === exit_country_code
+          );
+          const exitServerCity = exitServerCountry?.cities.find(
+            (city) => city.name === exit_city_name
+          );
+
           this.#mState.value = new StateVPNEnabled(
             this.#mState.value,
-            status.localProxy?.url
+            status.localProxy?.url,
+            exitServerCity,
+            exitServerCountry
           );
           return;
         }

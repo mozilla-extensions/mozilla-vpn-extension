@@ -4,6 +4,8 @@ import {
   StateVPNEnabled,
   VPNState,
   StateVPNUnavailable,
+  Server,
+  ServerCity,
 } from "../../../../src/background/vpncontroller/states";
 
 describe("VPN State Machine", () => {
@@ -43,5 +45,21 @@ describe("VPN State Machine", () => {
     expect(new StateVPNDisabled(testState).loophole).toBe(false);
     expect(new StateVPNUnavailable(testState).loophole).toBe(false);
     expect(new VPNState(testState).loophole).toBe(false);
+  });
+  test("The ExitServer Field is Set in 'Enabled' and Removed on Other states", () => {
+    const testCity = new ServerCity();
+    testCity.code = "de";
+    testCity.name = "Berlino";
+    testCity.servers = [];
+    const testState = new StateVPNEnabled(null, "aaa", testCity);
+
+    expect(testState.exitServerCity.code).toBe(testCity.code);
+
+    expect(new StateVPNEnabled(testState).exitServerCity.code).toBe(
+      testState.exitServerCity.code
+    );
+    expect(new StateVPNDisabled(testState).exitServerCity.code).toBe("");
+    expect(new StateVPNUnavailable(testState).exitServerCity.code).toBe("");
+    expect(new VPNState(testState).exitServerCity.code).toBe("");
   });
 });

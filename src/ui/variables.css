@@ -6,10 +6,17 @@
 :root {
   --window-width: 352px;
   --window-height: 448px;
-  --font-family: "Segoe UI";
+  --font-family: "Arial", sans-serif;
   --color-enabled: #3fe1b0;
   --main-card-background: #321c64;
   --main-card-text-color: white;
+  --main-card--pill-background: lch(
+    from var(--main-card-background) calc(l + 15) c h
+  );
+
+  --action-button-color: #0060df;
+
+  --padding-default: 16px;
 }
 
 @media (prefers-color-scheme: dark) {

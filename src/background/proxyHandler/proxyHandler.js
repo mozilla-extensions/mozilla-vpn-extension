@@ -89,7 +89,7 @@ export class ProxyHandler extends Component {
     switch (type) {
       case "add-context":
         log(`Adding origin: ${data.origin}`);
-        return this.#setContextForOrigin(data, this.controllerState.servers);
+        return this.#setContextForOrigin(data);
       case "remove-context":
         log(`Removing context for origin: ${data.origin}`);
         return this.#removeContextForOrigin(data.origin);
