@@ -83,7 +83,7 @@ export class PageActionHandler extends Component {
       return browser.pageAction.show(currentTab.id);
     }
 
-    if (this.currentContext.countryCode) {
+    if (this.currentContext && this.currentContext.countryCode) {
       browser.pageAction.setIcon({
         path: `../assets/flags/${this.currentContext.countryCode}.png`,
         tabId: currentTab.id,
