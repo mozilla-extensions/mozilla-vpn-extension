@@ -37,16 +37,12 @@ export class SidebarHandler extends Component {
   async init() {
     this.controller.state.subscribe(async (s) => {
       this.controllerState = s;
-      if (this.currentPort && this.currentPort.name === "sidebar") {
-        this.sendDataToCurrentPopup();
-      }
+      this.sendDataToCurrentPopup();
     });
 
     this.proxyHandler.siteContexts.subscribe(async (siteContexts) => {
       this.siteContexts = siteContexts;
-      if (this.currentPort && this.currentPort.name === "sidebar") {
-        this.sendDataToCurrentPopup();
-      }
+      this.sendDataToCurrentPopup();
     });
 
     const currentTab = await Utils.getCurrentTab();
@@ -92,6 +88,9 @@ export class SidebarHandler extends Component {
   }
 
   sendDataToCurrentPopup() {
+    if (!this.currentPort || this.currentPort.name !== "sidebar") {
+      return;
+    }
     return this.currentPort.postMessage({
       type: "tabInfo",
       currentHostname: this.currentHostname,

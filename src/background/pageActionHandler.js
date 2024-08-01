@@ -72,7 +72,7 @@ export class PageActionHandler extends Component {
     this.currentHostname = await Utils.getFormattedHostname(currentTab.url);
     this.currentContext = this.siteContexts.get(this.currentHostname);
 
-    if (this.currentContext.excluded) {
+    if (this.currentContext && this.currentContext.excluded) {
       // PageAction icons are automagically updated by the
       // browser in response to theme changes so we don't
       // don't need to specify theme specific icons here.
