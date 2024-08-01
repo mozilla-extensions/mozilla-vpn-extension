@@ -110,6 +110,12 @@ export class StackView extends LitElement {
     element.style.zIndex = "0";
     return element;
   }
+  /**
+   * The amount of things stacked
+   */
+  get count() {
+    return this.viewStack.length;
+  }
 
   /** @param {HTMLElement} element */
   baseStyleElement(element) {

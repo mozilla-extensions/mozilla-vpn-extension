@@ -70,12 +70,27 @@ export class BrowserActionPopup extends LitElement {
   stackView = createRef();
 
   render() {
+    const back = () => {
+      this.stackView?.value?.pop().then(() => {
+        this.requestUpdate();
+      });
+    };
+    const canGoBack = (() => {
+      if (!this.stackView.value) {
+        return false;
+      }
+      return this.stackView?.value?.count > 1;
+    })();
+    let title = this.stackView?.value?.currentElement?.dataset?.title;
+    title ??= "Mozilla VPN";
+
     return html`
+      <vpn-titlebar title="${title}" ${ref(this.titleBar)}>
+        ${canGoBack ? BrowserActionPopup.backBtn(back) : null}
+        <img slot="right" src="../../assets/img/settings-cog.svg" />
+      </vpn-titlebar>
       <stack-view ${ref(this.stackView)}>
-        <section>
-          <vpn-titlebar title="Mozilla VPN">
-            <img slot="right" src="../../assets/img/settings-cog.svg" />
-          </vpn-titlebar>
+        <section data-title="Mozilla VPN">
           <main>
             <vpn-card
               .enabled=${this.vpnState?.connected}
@@ -102,7 +117,9 @@ export class BrowserActionPopup extends LitElement {
 
   openServerList() {
     const onSelectServerResult = (event) => {
-      this.stackView.value?.pop();
+      this.stackView.value?.pop().then(() => {
+        this.requestUpdate();
+      });
       const city = event?.detail?.city;
       if (city) {
         // TODO: Set the City
@@ -112,7 +129,9 @@ export class BrowserActionPopup extends LitElement {
       this.vpnState.servers,
       onSelectServerResult
     );
-    this.stackView.value?.push(serverListElement);
+    this.stackView.value?.push(serverListElement).then(() => {
+      this.requestUpdate();
+    });
   }
 
   static sitePrefrencesTemplate(openServerList = () => {}, origin = "") {
@@ -135,6 +154,13 @@ export class BrowserActionPopup extends LitElement {
       </div>
       <button id="selectLocation">Reset Site Prefrences</button>
     `;
+  }
+  static backBtn(back) {
+    return html`<img
+      slot="left"
+      src="../../assets/img/arrow-icon-left.svg"
+      @click=${back}
+    />`;
   }
 
   /**
@@ -168,15 +194,9 @@ export class BrowserActionPopup extends LitElement {
    */
   static createServerList(list = [], onResult = () => {}) {
     const viewElement = document.createElement("section");
+    viewElement.dataset.title = "Select Location";
     render(
       html`
-        <vpn-titlebar title="Select Location">
-          <img
-            slot="left"
-            src="../../assets/img/arrow-icon-left.svg"
-            @click=${onResult}
-          />
-        </vpn-titlebar>
         <server-list .serverList=${list} @selectedCityChanged=${onResult}>
         </server-list>
       `,
