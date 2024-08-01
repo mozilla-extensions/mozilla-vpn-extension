@@ -21,6 +21,7 @@ export class ToolbarIconHandler extends Component {
     this.controller = controller;
   }
 
+  // TODO Use TBD ExtensionState
   /** @type {VPNState | undefined} */
   controllerState;
 
