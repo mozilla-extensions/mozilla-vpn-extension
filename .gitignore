@@ -4,3 +4,4 @@ dist/*
 coverage/
 # Mac OS X
 .DS_Store
+.vscode/settings.json

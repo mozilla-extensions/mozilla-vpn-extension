@@ -13,7 +13,7 @@
  * @template T
  *
  */
-class IBindable {
+export class IBindable {
   /**
    * Returns the Current value
    * @returns {T}
@@ -104,7 +104,7 @@ class Property extends IBindable {
  *
  * @template T
  */
-class ReadOnlyProperty extends IBindable {
+export class ReadOnlyProperty extends IBindable {
   /**
    * Constructs a Bindable<T> from a Property
    * @param {IBindable<T>} binding
