@@ -47,9 +47,10 @@
   "permissions": ["<all_urls>", "nativeMessaging", "storage", "proxy", "tabs"],
 
   "sidebar_action": {
-    "default_title": "Debug Sidebar",
+    "default_title": "Mozilla VPN Debug Sidebar",
     "default_panel": "ui/sidebar/sidebar.html",
-    "default_icon": "assets/logos/browserAction/logo-dark-unavilable.svg"
+    "default_icon": "assets/logos/browserAction/logo-dark-unavilable.svg",
+    "open_at_install": false
   }
   
 }
