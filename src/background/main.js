@@ -30,7 +30,11 @@ class Main {
     this.vpnController,
     this.proxyHandler
   );
-  sidebarHandler = new SidebarHandler(this, this.vpnController, this.proxyHandler);
+  sidebarHandler = new SidebarHandler(
+    this,
+    this.vpnController,
+    this.proxyHandler
+  );
   toolbarIconHandler = new ToolbarIconHandler(this, this.vpnController);
 
   async init() {
