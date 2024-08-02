@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import { ExtensionController } from "./extensionController/index.js";
 import { Logger } from "./logger.js";
 import { PageActionHandler } from "./pageActionHandler.js";
 import { ProxyHandler } from "./proxyHandler/index.js";
@@ -18,6 +19,10 @@ class Main {
 
   observers = new Set();
   vpnController = new VPNController(this);
+  extensionController = new ExtensionController(
+    this,
+    this.vpnController
+  );
   logger = new Logger(this);
   proxyHandler = new ProxyHandler(this, this.vpnController);
   pageActionHandler = new PageActionHandler(
@@ -33,7 +38,8 @@ class Main {
   sidebarHandler = new SidebarHandler(
     this,
     this.vpnController,
-    this.proxyHandler
+    this.proxyHandler,
+    this.extensionController
   );
   toolbarIconHandler = new ToolbarIconHandler(this, this.vpnController);
 

@@ -11,6 +11,7 @@ class SidebarPopup {
   #serverSelector;
   #excludeCheckbox;
   #clientStatusIndicator;
+  #extensionVpnSwitch;
 
   async init() {
     self = this;
@@ -28,13 +29,15 @@ class SidebarPopup {
             servers,
             currentContext,
             clientState,
+            extensionState
           } = msg;
           this.renderUI(
             currentHostname,
             siteContexts,
             servers,
             currentContext,
-            clientState
+            clientState,
+            extensionState
           );
         }
         if (msg.type === "clientStatus") {
@@ -52,6 +55,12 @@ class SidebarPopup {
     this.#clientStatusIndicator = document.getElementById(
       "client-status-indicator"
     );
+    this.#extensionVpnSwitch = document.getElementById("switch");
+
+    const handleSwitch = async(e) => {
+     const msg = this.#extensionVpnSwitch.checked ? "activate-fx" : "deactivate-fx";
+     await self.sendMessage(msg);
+    }
 
     const handleResetButtonClicks = async () => {
       if (this.#resetButton.disabled) {
@@ -115,6 +124,9 @@ class SidebarPopup {
 
     this.#excludeCheckbox.removeEventListener("change", handleCheckboxChanges);
     this.#excludeCheckbox.addEventListener("change", handleCheckboxChanges);
+
+    this.#extensionVpnSwitch.removeEventListener("click", handleSwitch);
+    this.#extensionVpnSwitch.addEventListener("click", handleSwitch);
   }
 
   async sendMessage(type, data = {}) {
@@ -129,11 +141,21 @@ class SidebarPopup {
     siteContexts,
     serverList,
     currentContext,
-    clientState
+    clientState,
+    extensionState
   ) {
     this.#currentHostname = currentHostname;
     this.#clientStatusIndicator.textContent = clientState;
     this.#clientStatusIndicator.dataset.status = clientState;
+
+    if (extensionState) {
+      const { state } = extensionState;
+      if (state == "On" || state == "OnPartial") {
+        this.#extensionVpnSwitch.checked = true;
+      } else {
+        this.#extensionVpnSwitch.checked = false;
+      }
+    }
 
     // Set origin labels
     document.querySelectorAll(".origin").forEach((el) => {

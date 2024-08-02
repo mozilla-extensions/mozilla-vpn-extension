@@ -21,14 +21,16 @@ export class SidebarHandler extends Component {
    * @param {*} receiver
    * @param {VPNController} controller
    */
-  constructor(receiver, controller, proxyHandler) {
+  constructor(receiver, controller, proxyHandler, extensionController) {
     super(receiver);
     this.controller = controller;
     this.proxyHandler = proxyHandler;
+    this.extensionController = extensionController;
   }
 
   /** @type {VPNState | undefined} */
   controllerState;
+  extensionState;
 
   siteContexts;
   currentHostname;
@@ -36,9 +38,15 @@ export class SidebarHandler extends Component {
 
   async init() {
     this.controller.state.subscribe(async (s) => {
+
       this.controllerState = s;
       this.sendDataToCurrentPopup();
     });
+
+    this.extensionController.state.subscribe(async(s) => {
+      this.extensionState = s;
+      this.sendDataToCurrentPopup();
+    })
 
     this.proxyHandler.siteContexts.subscribe(async (siteContexts) => {
       this.siteContexts = siteContexts;
@@ -75,6 +83,7 @@ export class SidebarHandler extends Component {
         servers: this.controllerState.servers,
         currentContext: this.currentContext,
         clientState: this.controllerState.state,
+        extensionState: this.extensionState
       });
     });
 
@@ -97,7 +106,7 @@ export class SidebarHandler extends Component {
       siteContexts: this.siteContexts,
       servers: this.controllerState.servers,
       currentContext: this.currentContext,
-      clientState: this.controllerState.state,
+      clientState: this.controllerState,
     });
   }
 }
