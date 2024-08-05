@@ -22,9 +22,9 @@ import {
   createReplicaGetter,
   createReplicaSetter,
   createReplicaBindable,
-} from "../../../src/utils/ipc";
+} from "../../../src/shared/ipc";
 
-import { property } from "../../../src/utils/property";
+import { property } from "../../../src/shared/property";
 
 // There is no crypto module in jest, so let's use super random values
 Object.defineProperty(globalThis, "crypto", {
