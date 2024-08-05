@@ -10,7 +10,7 @@ import { ToolbarIconHandler } from "./toolbarIconHandler.js";
 
 import { VPNController } from "./vpncontroller/index.js";
 
-import { expose } from "../utils/ipc.js";
+import { expose } from "../shared/ipc.js";
 const log = Logger.logger("Main");
 
 class Main {

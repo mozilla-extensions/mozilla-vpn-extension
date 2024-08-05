@@ -6,7 +6,7 @@ import { Component } from "./component.js";
 import { Logger } from "./logger.js";
 import { Utils } from "./utils.js";
 import { VPNController, VPNState } from "./vpncontroller/index.js";
-import { PropertyType } from "../utils/ipc.js";
+import { PropertyType } from "../shared/ipc.js";
 
 const log = Logger.logger("TabHandler");
 

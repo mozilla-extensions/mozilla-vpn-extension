@@ -5,11 +5,11 @@
 import { Component } from "../component.js";
 import { Logger } from "../logger.js";
 
-import { property } from "../../utils/property.js";
+import { property } from "../../shared/property.js";
 
 import { SiteContext } from "./siteContext.js";
 import { ProxyUtils } from "./proxyUtils.js";
-import { PropertyType } from "../../utils/ipc.js";
+import { PropertyType } from "../../shared/ipc.js";
 
 const log = Logger.logger("ProxyHandler");
 

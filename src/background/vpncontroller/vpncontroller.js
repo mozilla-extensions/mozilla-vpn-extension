@@ -6,8 +6,8 @@
 import { Component } from "../component.js";
 import { Logger } from "../logger.js";
 
-import { property } from "../../utils/property.js";
-import { PropertyType } from "../../utils/ipc.js";
+import { property } from "../../shared/property.js";
+import { PropertyType } from "../../shared/ipc.js";
 
 import {
   VPNState,
