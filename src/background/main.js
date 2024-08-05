@@ -7,8 +7,10 @@ import { ProxyHandler } from "./proxyHandler/index.js";
 import { RequestHandler } from "./requestHandler.js";
 import { TabHandler } from "./tabHandler.js";
 import { ToolbarIconHandler } from "./toolbarIconHandler.js";
+
 import { VPNController } from "./vpncontroller/index.js";
 
+import { expose } from "../utils/ipc.js";
 const log = Logger.logger("Main");
 
 class Main {
@@ -33,6 +35,9 @@ class Main {
     for (let observer of this.observers) {
       await observer.init();
     }
+    expose(this.vpnController);
+    expose(this.tabHandler);
+    expose(this.proxyHandler);
 
     this.#handlingEvent = false;
     this.#processPendingEvents();

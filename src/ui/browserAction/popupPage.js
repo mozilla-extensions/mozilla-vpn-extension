@@ -11,6 +11,8 @@ import {
   ref,
 } from "../../vendor/lit-all.min.js";
 
+import { ready } from "./backend.js";
+
 import { fontSizing, resetSizing } from "../../components/styles.js";
 
 // Other components used

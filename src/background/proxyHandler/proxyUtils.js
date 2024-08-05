@@ -18,13 +18,13 @@ export const ProxyUtils = {
    * Finds the servers available for provided location, orders them by weight,
    * and returns an array of proxyInfo objects.
    * @param {string} countryCode - The two-digit code for the country where the server is located.
-   * @param {string} cityName - The name of the city where the server is located.
+   * @param {string} cityCode - The name of the city where the server is located.
    * @param {any[]} servers - The server list.
    */
-  getProxies(countryCode, cityName, proxyServers) {
+  getProxies(countryCode, cityCode, proxyServers) {
     const serverCountry = proxyServers.find(({ code }) => code === countryCode);
     const serverCity = serverCountry.cities.find(
-      ({ name }) => name === cityName
+      ({ code }) => code === cityCode
     );
 
     const parsedProxies = [];

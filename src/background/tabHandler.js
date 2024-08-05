@@ -6,6 +6,7 @@ import { Component } from "./component.js";
 import { Logger } from "./logger.js";
 import { Utils } from "./utils.js";
 import { VPNController, VPNState } from "./vpncontroller/index.js";
+import { PropertyType } from "../utils/ipc.js";
 
 const log = Logger.logger("TabHandler");
 
@@ -16,6 +17,11 @@ const log = Logger.logger("TabHandler");
  * associated context (proxy info) if it exists.
  */
 export class TabHandler extends Component {
+  // Things to expose to the UI
+  static properties = {
+    popupData: PropertyType.Function,
+  };
+
   currentPort;
 
   /**
@@ -55,13 +61,7 @@ export class TabHandler extends Component {
     });
 
     browser.tabs.onUpdated.addListener(() => this.maybeShowIcon());
-    browser.tabs.onActivated.addListener(() => this.maybeShowIcon());
-
-    browser.runtime.onConnect.addListener(async (port) => {
-      log(`Connecting to ${port.name}`);
-      await this.portConnected(port);
-    });
-
+    browser.tabs.onActivated.addListener(() => this.handleActiveTabChange());
     this.maybeShowIcon();
   }
 
@@ -80,26 +80,13 @@ export class TabHandler extends Component {
     }
     return browser.pageAction.hide(currentTab.id);
   }
-
-  portConnected(port) {
-    this.currentPort = port;
-
-    port.onDisconnect.addListener(() => {
-      this.currentPort = null;
-    });
-
-    if (port.name === "pageAction") {
-      return this.sendDataToCurrentPopup();
-    }
-  }
-
-  sendDataToCurrentPopup() {
-    return this.currentPort.postMessage({
+  popupData() {
+    return {
       type: "tabInfo",
       currentHostname: this.currentHostname,
       siteContexts: this.siteContexts,
       servers: this.controllerState.servers,
       currentContext: this.currentContext,
-    });
+    };
   }
 }
