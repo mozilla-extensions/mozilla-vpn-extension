@@ -9,6 +9,7 @@ import { property } from "../../utils/property.js";
 
 import { SiteContext } from "./siteContext.js";
 import { ProxyUtils } from "./proxyUtils.js";
+import { PropertyType } from "../../utils/ipc.js";
 
 const log = Logger.logger("ProxyHandler");
 
@@ -17,6 +18,12 @@ const log = Logger.logger("ProxyHandler");
  * proxy information for specific origins (siteContexts).
  */
 export class ProxyHandler extends Component {
+  // Things to expose to the UI
+  static properties = {
+    siteContexts: PropertyType.Bindable,
+    addSiteContext: PropertyType.Function,
+  };
+
   constructor(receiver, controller) {
     super(receiver);
     this.controller = controller;
@@ -46,7 +53,7 @@ export class ProxyHandler extends Component {
     });
   }
 
-  async #addSiteContext(siteContext) {
+  async addSiteContext(siteContext) {
     const siteContexts = await this.#mSiteContexts.value;
     siteContexts.set(siteContext.origin, { ...siteContext });
     return this.#setSiteContexts(siteContexts);
@@ -57,21 +64,10 @@ export class ProxyHandler extends Component {
    * local socks proxy values for proxyInfo
    * @param {string} origin - The origin to exclude.
    */
-  async #excludeOrigin(origin) {
+  async excludeOrigin(origin) {
     const excluded = true;
-    // TODO: Replace with real local proxy info ✨
-    const proxyInfo = [
-      {
-        host: "us-dal-wg-socks5-504.relays.mullvad.net",
-        password: undefined,
-        port: "1080",
-        proxyDNS: true,
-        type: "socks",
-        username: undefined,
-      },
-    ];
     const siteContext = new SiteContext({ origin, excluded, proxyInfo });
-    return this.#addSiteContext(siteContext);
+    return this.addSiteContext(siteContext);
   }
 
   async #getSiteContexts() {
@@ -84,38 +80,6 @@ export class ProxyHandler extends Component {
     }
     return siteContexts;
   }
-
-  /**
-   * Handles events sent from the UI.
-   * @param {string} type - The event type.
-   * @param {Object} data - The event data.
-   */
-  handleEvent(type, data) {
-    switch (type) {
-      case "add-context":
-        log(`Adding origin: ${data.origin}`);
-        return this.#setContextForOrigin(data);
-      case "remove-context":
-        log(`Removing context for origin: ${data.origin}`);
-        return this.#removeContextForOrigin(data.origin);
-      case "exclude-origin":
-        log(`Excluding origin: ${data.origin}`);
-        return this.#excludeOrigin(data.origin);
-    }
-  }
-
-  portConnected(port) {
-    this.currentPort = port;
-
-    port.onMessage.addListener(async (message) => {
-      this.handleEvent(message.type, message.data);
-    });
-
-    port.onDisconnect.addListener(() => {
-      this.currentPort = null;
-    });
-  }
-
   /**
    * Removes the SiteContext of the provided origin
    * @param {string} origin - The origin to exclude.
@@ -142,7 +106,7 @@ export class ProxyHandler extends Component {
       this.controllerState.servers
     );
     const siteContext = new SiteContext({ ...info, proxyInfo });
-    return this.#addSiteContext(siteContext);
+    return this.addSiteContext(siteContext);
   }
 
   /**
