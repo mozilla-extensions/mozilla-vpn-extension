@@ -42,17 +42,6 @@ export class BrowserActionPopup extends LitElement {
     super();
     this.pageURL = "about:blank";
 
-    // Hook up the Controller Port to check the VPN Status
-    // and get the ServerList
-    /** @type {VPNState} */
-    this.vpnState = null;
-    this.controllerPort = globalThis.chrome.runtime.connect({
-      name: "vpncontroller",
-    });
-    this.controllerPort.onMessage.addListener((state) => {
-      console.log(state);
-      this.vpnState = state;
-    });
 
     // Get the Page URL that is active at the time of opening the popup
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
