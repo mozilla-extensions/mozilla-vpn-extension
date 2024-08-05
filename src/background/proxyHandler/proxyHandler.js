@@ -26,6 +26,7 @@ export class ProxyHandler extends Component {
   controllerState;
 
   #mSiteContexts = property(new Map());
+  currentPort;
 
   get siteContexts() {
     return this.#mSiteContexts.readOnly;
@@ -39,6 +40,10 @@ export class ProxyHandler extends Component {
     });
 
     this.#mSiteContexts.value = await this.#getSiteContexts();
+
+    browser.runtime.onConnect.addListener(async (port) => {
+      await this.portConnected(port);
+    });
   }
 
   async #addSiteContext(siteContext) {
@@ -97,6 +102,18 @@ export class ProxyHandler extends Component {
         log(`Excluding origin: ${data.origin}`);
         return this.#excludeOrigin(data.origin);
     }
+  }
+
+  portConnected(port) {
+    this.currentPort = port;
+
+    port.onMessage.addListener(async (message) => {
+      this.handleEvent(message.type, message.data);
+    });
+
+    port.onDisconnect.addListener(() => {
+      this.currentPort = null;
+    });
   }
 
   /**
