@@ -4,7 +4,7 @@
 
 import { Component } from "./component.js";
 import { Logger } from "./logger.js";
-import { Utils } from "./utils.js";
+import { Utils } from "../shared/utils.js";
 import { VPNController, VPNState } from "./vpncontroller/index.js";
 
 const log = Logger.logger("RequestHandler");
