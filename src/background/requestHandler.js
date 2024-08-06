@@ -84,14 +84,14 @@ export class RequestHandler extends Component {
    * @param { RequestDetails } requestInfo
    * @returns
    */
-  async interceptRequests(requestInfo) {
+  interceptRequests(requestInfo) {
     let { url, originUrl } = requestInfo;
     for (let urlString of [url, originUrl]) {
       if (urlString) {
-        const parsedHostname = await Utils.getFormattedHostname(urlString);
+        const parsedHostname = Utils.getFormattedHostname(urlString);
         const proxyInfo = this.proxyMap.get(parsedHostname);
+        console.log([urlString,proxyInfo])
         if (proxyInfo) {
-          log(`Sending ${parsedHostname} to ${proxyInfo[0].host}`);
           return proxyInfo;
         }
       }
@@ -137,7 +137,7 @@ export const resolveSiteContext = (siteContexts, vpnState) => {
     : [];
   siteContexts.forEach((ctx, origin) => {
     if (ctx.excluded) {
-      result.set(origin, { ...localProxy });
+      result.set(origin, [ ...localProxy ]);
     } else {
       result.set(
         origin,
