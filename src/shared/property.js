@@ -23,7 +23,7 @@ export class IBindable {
   }
   /**
    * Subscribe to changes of the Value
-   * @param {(T)=>void} _ - Callback when the value changes
+   * @param {(arg0: T)=>void} _ - Callback when the value changes
    * @returns {()=>void} - A Function to stop the subscription
    */
   subscribe(_) {
@@ -69,7 +69,7 @@ class Property extends IBindable {
   }
   /**
    * Returns a bindable for the Property
-   * @returns {ReadOnlyProperty<T|null>}
+   * @returns {ReadOnlyProperty<T>}
    */
   get readOnly() {
     return new ReadOnlyProperty(this);
@@ -227,4 +227,26 @@ export const property = (value) => {
  */
 export const computed = (property, transform) => {
   return new LazyComputedProperty(property, transform);
+};
+
+/**
+ * Creates a "sum-type" property.
+ * Takes 2 Properties {L,R} and a function (l,r)=>T
+ * When either L or R changes calls the function
+ * and updates the returned property.
+ *
+ *
+ * @template T
+ * @template L
+ * @template R
+ * @param {IBindable<L>} left - Left Hand Property
+ * @param {IBindable<R>} right - Right Hand Property
+ * @param {(arg0: L, arg1: R)=>T} transform - Called with the Property Value, must return the transformed value
+ * @returns {ReadOnlyProperty<T>} -
+ */
+export const propertySum = (left, right, transform) => {
+  const inner = property(transform(left.value, right.value));
+  left.subscribe((l) => inner.set(transform(l, right.value)));
+  right.subscribe((r) => inner.set(transform(left.value, r)));
+  return inner.readOnly;
 };
