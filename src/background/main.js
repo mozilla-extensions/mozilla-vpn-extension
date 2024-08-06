@@ -11,6 +11,7 @@ import { ToolbarIconHandler } from "./toolbarIconHandler.js";
 import { VPNController } from "./vpncontroller/index.js";
 
 import { expose } from "../shared/ipc.js";
+import { OmniBox } from "./omnibox.js";
 const log = Logger.logger("Main");
 
 class Main {
@@ -28,6 +29,7 @@ class Main {
   );
   tabHandler = new TabHandler(this, this.vpnController, this.proxyHandler);
   toolbarIconHandler = new ToolbarIconHandler(this, this.vpnController);
+  omnibox = new OmniBox(this, this.vpnController, this.requestHandler);
 
   async init() {
     log("Hello from the background script!");

@@ -64,9 +64,20 @@ export class RequestHandler extends Component {
   controllerState;
   /** @type {Map<string, SiteContext>} */
   siteContexts;
+  /** @type { Map<Number, browser.proxy.proxyInfo>} */
+  tabProxyInfo = new Map();
 
   async init() {
     log("Initiating RequestHandler");
+  }
+
+  addTabProxyInfo(id, info) {
+    console.log(`Adding for tab ${id} -> ${info}`);
+    this.tabProxyInfo.set(id, info);
+    if (!this.active) {
+      this.addRequestListener();
+    }
+    // TODO: Listen to this tab when it closes and remove it.
   }
 
   addRequestListener() {
@@ -86,8 +97,11 @@ export class RequestHandler extends Component {
    */
   async interceptRequests(requestInfo) {
     let { documentUrl } = requestInfo;
-    if (documentUrl != "https://mullvad.net/en/check") {
-      debugger;
+
+    if (this.tabProxyInfo.has(requestInfo.tabId)) {
+      const proxies = this.tabProxyInfo.get(requestInfo.tabId);
+      console.log("Using pinned Tab Proxy");
+      return proxies;
     }
 
     // If we load an iframe add

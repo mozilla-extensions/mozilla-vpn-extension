@@ -36,6 +36,9 @@
   "icons": {
     "48": "assets/logos/logo-dark.svg"
   },
+  "omnibox": {
+    "keyword": "vpn"
+  },
 
   "incognito": "spanning",
 

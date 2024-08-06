@@ -61,7 +61,7 @@ export class TabHandler extends Component {
     });
 
     browser.tabs.onUpdated.addListener(() => this.maybeShowIcon());
-    browser.tabs.onActivated.addListener(() => this.handleActiveTabChange());
+    //browser.tabs.onActivated.addListener(() => this.handleActiveTabChange());
     this.maybeShowIcon();
   }
 
