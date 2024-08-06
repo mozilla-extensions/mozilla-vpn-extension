@@ -81,16 +81,29 @@ export class RequestHandler extends Component {
 
   /**
    *
-   * @param { RequestDetails } requestInfo
+   * @param { proxy.RequestDetails } requestInfo
    * @returns
    */
-  interceptRequests(requestInfo) {
-    let { url, originUrl } = requestInfo;
-    for (let urlString of [url, originUrl]) {
+  async interceptRequests(requestInfo) {
+    let { documentUrl } = requestInfo;
+    if (documentUrl != "https://mullvad.net/en/check") {
+      debugger;
+    }
+
+    // If we load an iframe add
+    if (requestInfo.frameId !== 0) {
+      let topLevelFrame = await browser.webNavigation.getFrame({
+        frameId: requestInfo.parentFrameId,
+        tabId: requestInfo.tabId,
+      });
+      documentUrl = topLevelFrame.url;
+    }
+
+    for (let urlString of [documentUrl]) {
       if (urlString) {
         const parsedHostname = Utils.getFormattedHostname(urlString);
         const proxyInfo = this.proxyMap.get(parsedHostname);
-        console.log([urlString,proxyInfo])
+        console.log([parsedHostname, proxyInfo]);
         if (proxyInfo) {
           return proxyInfo;
         }
@@ -137,7 +150,7 @@ export const resolveSiteContext = (siteContexts, vpnState) => {
     : [];
   siteContexts.forEach((ctx, origin) => {
     if (ctx.excluded) {
-      result.set(origin, [ ...localProxy ]);
+      result.set(origin, [...localProxy]);
     } else {
       result.set(
         origin,
@@ -147,3 +160,24 @@ export const resolveSiteContext = (siteContexts, vpnState) => {
   });
   return result;
 };
+
+/**
+ * Contains information about a web request. An instance of this object is passed into the proxy.onRequest listener.
+ *
+ * @typedef {Object} proxy.RequestDetails
+ * @property {string} cookieStoreId - The cookie store ID of the current context. See Work with contextual identities for more information.
+ * @property {string} documentUrl - URL of the page into which the requested resource will be loaded.
+ * @property {number} frameId - Zero if the request happens in the main frame; a positive value is the ID of a subframe in which the request happens. If the document of a (sub-)frame is loaded (type is main_frame or sub_frame), frameId indicates the ID of this frame, not the ID of the outer frame. Frame IDs are unique within a tab.
+ * @property {boolean} fromCache - Indicates if this response will be fetched from disk cache.
+ * @property {boolean} incognito - true for private browsing requests.
+ * @property {string} method - Standard HTTP method: for example, "GET" or "POST".
+ * @property {string} originUrl - URL of the resource that triggered the request. Note that this may not be the same as the URL of the page into which the requested resource will be loaded. For example, if a document triggers a load in a different window through the target attribute of a link, or a CSS document includes an image using the url() functional notation, then this is the URL of the original document or of the CSS document, respectively.
+ * @property {number} parentFrameId - ID of the frame that contains the frame that sent the request. Set to -1 if no parent frame exists.
+ * @property {string} requestId - The ID of the request. Request IDs are unique within a browser session, so you can use an ID to identify different events associated with the same request.
+ * @property {webRequest.HttpHeaders} [requestHeaders] - The HTTP request headers that will be sent with this request. Note that this is only included if the "requestHeaders" option was passed into addListener().
+ * @property {number} tabId - ID of the tab in which the request takes place. Set to -1 if the request is not related to a tab.
+ * @property {boolean} thirdParty - Indicates whether the request and its content window hierarchy is third party.
+ * @property {number} timeStamp - The time when this event fired, in milliseconds since the epoch.
+ * @property {webRequest.ResourceType} type - The type of resource being requested: for example, "image", "script", or "stylesheet".
+ * @property {string} url - Target of the request.
+ */
