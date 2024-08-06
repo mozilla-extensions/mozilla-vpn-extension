@@ -22,7 +22,7 @@ export const Utils = {
   /**
    * Formats and retrieves the hostname from a given URL.
    * @param {string} url - The URL to format.
-   * @returns {string} - The formatted hostname.
+   * @returns {string} - The formatted hostname. Is empty if not valid for extension context.
    */
   getFormattedHostname(url) {
     // Handle sites being viewed in reader mode
@@ -33,16 +33,27 @@ export const Utils = {
       url = decodeURIComponent(encodedUrl);
     }
 
-    const getHostname = () => {
+    const isValid = (a) => {
       try {
         const urlObj = new URL(url);
+        return urlObj.protocol === "https:" || urlObj.protocol === "http:";
+      } catch (error) {
+        return false;
+      }
+    };
+
+    const getHostname = (aUrl) => {
+      try {
+        const urlObj = new URL(aUrl);
         return urlObj.hostname;
       } catch (e) {
         return null;
       }
     };
-
-    let hostname = getHostname();
+    if (!isValid(url)) {
+      return "";
+    }
+    let hostname = getHostname(url);
 
     // Use the entire URL if hostname is not valid (like about:debugging)
     if (!hostname || hostname === "") {
