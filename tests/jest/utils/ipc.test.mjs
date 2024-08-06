@@ -601,6 +601,30 @@ describe("createReplicaFunction", () => {
     expect(await fakeFunc()).toBe(43);
   });
 });
+it("Passes Function arguments", async () => {
+  let [a, b, c] = [0, 0, 0];
+  const testobj = {
+    func: (_a, _b, _c) => {
+      a = _a;
+      b = _b;
+      c = _c;
+
+      return 43;
+    },
+  };
+  const { port1, port2 } = new MessageChannel();
+
+  const fakeFunc = createReplicaFunction("func", port1);
+  const handler = createCallHandler(testobj, "func");
+  port2.addEventListener("message", async (e) => {
+    const response = await handler(e.data);
+    port2.postMessage(response);
+  });
+  expect(await fakeFunc(true, 99, "hello")).toBe(43);
+  expect(a).toBe(true);
+  expect(b).toBe(99);
+  expect(c).toBe("hello");
+});
 
 describe("createReplicaGetter", () => {
   it("creates a message on call", async () => {
