@@ -461,7 +461,11 @@ export const createReplicaFunction = (name, port) => {
       }
       return ipcResponse.data;
     } catch (error) {
-      throw new Error(`Error while Sending Call Request: ${error.toString()}`);
+      if (error instanceof Error) {
+        throw new Error(
+          `Error while Sending Call Request: ${error.toString()}`
+        );
+      }
     }
   };
 };
@@ -481,7 +485,9 @@ export const createReplicaGetter = (name, port) => {
       }
       return ipcResponse.data;
     } catch (error) {
-      throw new Error(`Error while Sending Get Request: ${error.toString()}`);
+      if (error instanceof Error) {
+        throw new Error(`Error while Sending Get Request: ${error.toString()}`);
+      }
     }
   };
 };
@@ -505,7 +511,11 @@ export const createReplicaSetter = (name, port) => {
       }
       return;
     } catch (error) {
-      throw new Error(`Error while Sending Call Request: ${error.toString()}`);
+      if (error instanceof Error) {
+        throw new Error(
+          `Error while Sending Call Request: ${error.toString()}`
+        );
+      }
     }
   };
 };
