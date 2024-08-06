@@ -37,10 +37,10 @@ export class VPNState {
   /** @type {Array <ServerCountry> } */
   servers = [];
 
-  /** @type {ServerCity } */
+  /** @type {ServerCity | undefined } */
   exitServerCity = new ServerCity();
 
-  /** @type {ServerCountry } */
+  /** @type {ServerCountry | undefined } */
   exitServerCountry = new ServerCountry();
   /**
    * Constructs state of another state, moving
@@ -58,6 +58,8 @@ export class VPNState {
     if (other.isExcluded != null) {
       this.isExcluded = other.isExcluded;
     }
+    this.exitServerCity = other.exitServerCity;
+    this.exitServerCountry = other.exitServerCountry;
   }
 
   /**
@@ -127,10 +129,8 @@ export class StateVPNEnabled extends VPNState {
    *
    * @param {VPNState} other -
    * @param {string|boolean} aloophole - False if loophole is not supported,
-   * @param {ServerCity | undefined} exitServerCity - the Exit City
-   * @param {ServerCountry | undefined} exitServerCity - the Exit City
    */
-  constructor(other, aloophole, exitServerCity, exitServerCountry) {
+  constructor(other, aloophole) {
     super(other);
     if (other) {
       this.loophole = other.loophole;
@@ -139,12 +139,6 @@ export class StateVPNEnabled extends VPNState {
     }
     if (aloophole) {
       this.loophole = aloophole;
-    }
-    if (exitServerCity) {
-      this.exitServerCity = exitServerCity;
-    }
-    if (exitServerCountry) {
-      this.exitServerCountry = exitServerCountry;
     }
   }
 

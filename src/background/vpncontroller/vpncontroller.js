@@ -145,23 +145,25 @@ export class VPNController extends Component {
       case "status":
         const status = response.status;
         const controllerState = status.vpn;
+        const exit_city_name = status.location["exit_city_name"];
+        const exit_country_code = status.location["exit_country_code"];
+        const exitServerCountry = this.#mState.value.servers.find(
+          (country) => country.code === exit_country_code
+        );
+        const exitServerCity = exitServerCountry?.cities.find(
+          (city) => city.name === exit_city_name
+        );
+
+        const next_state = {
+          ...this.#mState.value,
+          exitServerCity,
+          exitServerCountry,
+        };
 
         if (controllerState === "StateOn") {
-          const exit_city_name = status.location["exit_city_name"];
-          const exit_country_code = status.location["exit_country_code"];
-
-          const exitServerCountry = this.#mState.value.servers.find(
-            (country) => country.code === exit_country_code
-          );
-          const exitServerCity = exitServerCountry?.cities.find(
-            (city) => city.name === exit_city_name
-          );
-
           this.#mState.value = new StateVPNEnabled(
-            this.#mState.value,
-            status.localProxy?.url,
-            exitServerCity,
-            exitServerCountry
+            next_state,
+            status.localProxy?.url
           );
           return;
         }
@@ -169,7 +171,7 @@ export class VPNController extends Component {
           controllerState === "StateOff" ||
           controllerState === "StateDisconnecting"
         ) {
-          this.#mState.value = new StateVPNDisabled(this.#mState.value);
+          this.#mState.value = new StateVPNDisabled(next_state);
           return;
         }
         // Let's increase the network key isolation at any vpn status change.
