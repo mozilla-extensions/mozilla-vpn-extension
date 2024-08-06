@@ -6,6 +6,7 @@
     "noEmit": true,
     "module": "esnext",
     "target": "esnext",
+    "lib": ["ESNext"],
     "strict": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
