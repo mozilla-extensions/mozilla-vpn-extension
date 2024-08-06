@@ -332,6 +332,7 @@ export const createCallHandler = (object, name) => {
       const result = object[name].apply(object, message.data);
       if (result && result.then) {
         // If it is a Promise return the chained promise.
+        result.catch(console.error);
         return result.then((data) => {
           return {
             ...new IPC_CALL_RESPONSE(),
@@ -348,6 +349,7 @@ export const createCallHandler = (object, name) => {
         data: result,
       });
     } catch (error) {
+      console.error(error);
       return Promise.resolve({
         ...new IPC_CALL_RESPONSE(),
         id: message.id,
@@ -443,7 +445,7 @@ export const createReplicaFunction = (name, port) => {
   /**
    * @param {any} args -
    */
-  return async (args) => {
+  return async (...args) => {
     const message = new IPC_CALLMESSAGE();
     message.data = args;
     message.id = makeID();
