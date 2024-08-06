@@ -19,7 +19,7 @@ export const ProxyUtils = {
    * and returns an array of proxyInfo objects.
    * @param {string} countryCode - The two-digit code for the country where the server is located.
    * @param {string} cityCode - The name of the city where the server is located.
-   * @param {any[]} servers - The server list.
+   * @param {import("../../components/serverlist").ServerCountryList} proxyServers - The server list.
    */
   getProxies(countryCode, cityCode, proxyServers) {
     const serverCountry = proxyServers.find(({ code }) => code === countryCode);
@@ -51,7 +51,7 @@ export const ProxyUtils = {
       /(?<type>(https?)|(socks4?)):\/\/(\b(?<username>[\w-]+):(?<password>[\w-]+)@)?(?<host>((?:\d{1,3}\.){3}\d{1,3}\b)|(\b([\w.-]+)+))(:(?<port>\d+))?/;
     const matches = proxyRegexp.exec(proxyStr);
     if (!matches) {
-      return null;
+      throw new Error(`Unable to parse ${proxyStr}`);
     }
     return { ...matches.groups };
   },
