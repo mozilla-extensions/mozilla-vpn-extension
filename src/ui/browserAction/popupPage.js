@@ -11,7 +11,9 @@ import {
   ref,
 } from "../../vendor/lit-all.min.js";
 
-import { ready } from "./backend.js";
+import { vpnController, proxyHandler } from "./backend.js";
+
+import { Utils } from "../../shared/utils.js";
 
 import { fontSizing, resetSizing } from "../../components/styles.js";
 
@@ -20,6 +22,11 @@ import "./../../components/stackview.js";
 import "./../../components/serverlist.js";
 import "./../../components/vpncard.js";
 import "./../../components/titlebar.js";
+import { SiteContext } from "../../background/proxyHandler/siteContext.js";
+import {
+  ServerCountry,
+  VPNState,
+} from "../../background/vpncontroller/states.js";
 
 /**
  * @typedef {import("../../background/vpncontroller/states.js").VPNState} VPNState
@@ -36,23 +43,40 @@ export class BrowserActionPopup extends LitElement {
   static properties = {
     vpnState: { type: Object },
     pageURL: { type: String },
+    _siteContext: { type: Object },
+    hasSiteContext: { type: Boolean },
   };
 
   constructor() {
     super();
-    this.pageURL = "about:blank";
-
-
-    // Get the Page URL that is active at the time of opening the popup
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      let activeTab = tabs[0];
-      let domain = new URL(activeTab.url);
-      console.log(domain);
-      this.pageURL = domain;
+    this.pageURL = null;
+    this._siteContext = null;
+    Utils.getCurrentTab().then(async (tab) => {
+      const hostname = Utils.getFormattedHostname(tab.url);
+      this.pageURL = hostname;
+      if (proxyHandler.siteContexts.value.has(this.pageURL)) {
+        this._siteContext = proxyHandler.siteContexts.value.get(this.pageURL);
+      }
     });
+    vpnController.state.subscribe((s) => (this.vpnState = s));
   }
   connectedCallback() {
     super.connectedCallback();
+  }
+
+  get currentSiteContext() {
+    if (this._siteContext) {
+      return this._siteContext;
+    }
+    return defaultSiteContext(this.vpnState, this.pageURL);
+  }
+  set currentSiteContext(value) {
+    if (value) {
+      proxyHandler.addSiteContext(value);
+    } else {
+      proxyHandler.removeContextForOrigin(this._siteContext.origin);
+    }
+    this._siteContext = value;
   }
 
   /**
@@ -85,8 +109,8 @@ export class BrowserActionPopup extends LitElement {
           <main>
             <vpn-card
               .enabled=${this.vpnState?.connected}
-              .cityName=${this.vpnState?.exitServerCity.name}
-              .countryFlag=${this.vpnState?.exitServerCountry.code}
+              .cityName=${this.vpnState?.exitServerCity?.name}
+              .countryFlag=${this.vpnState?.exitServerCountry?.code}
             ></vpn-card>
             ${this.locationSettings()}
           </main>
@@ -96,13 +120,34 @@ export class BrowserActionPopup extends LitElement {
   }
 
   locationSettings() {
-    if (!BrowserActionPopup.canShowLocationSettings(this.pageURL)) {
+    if (!this.pageURL) {
       return null;
     }
-    const url = new URL(this.pageURL);
+    const resetSitePrefrences = async () => {
+      this.currentSiteContext = null;
+    };
+    const toggleExcludeWebsite = async () => {
+      if (this.currentSiteContext.excluded) {
+        resetSitePrefrences();
+        return;
+      }
+      const new_cntxt = {
+        ...this.currentSiteContext,
+        excluded: true,
+        origin: this.pageURL,
+      };
+      this.currentSiteContext = new_cntxt;
+    };
+
     return BrowserActionPopup.sitePrefrencesTemplate(
+      this.currentSiteContext,
       this.openServerList.bind(this),
-      url.hostname
+      toggleExcludeWebsite,
+      (ctx = new SiteContext()) => {
+        return nameFor(ctx.countryCode, ctx.cityCode, this.vpnState.servers);
+      },
+      resetSitePrefrences,
+      this._siteContext !== null
     );
   }
 
@@ -112,8 +157,15 @@ export class BrowserActionPopup extends LitElement {
         this.requestUpdate();
       });
       const city = event?.detail?.city;
+      const country = event?.detail?.country;
       if (city) {
-        // TODO: Set the City
+        const newSiteContext = new SiteContext({
+          cityCode: city.code,
+          countryCode: country.code,
+          origin: this.pageURL,
+          excluded: false,
+        });
+        this.currentSiteContext = newSiteContext;
       }
     };
     const serverListElement = BrowserActionPopup.createServerList(
@@ -125,25 +177,55 @@ export class BrowserActionPopup extends LitElement {
     });
   }
 
-  static sitePrefrencesTemplate(openServerList = () => {}, origin = "") {
+  static sitePrefrencesTemplate(
+    siteContext = new SiteContext(),
+    openServerList = () => {},
+    tooggleExcluded = () => {},
+    getNameForContext = (ctx = new SiteContext()) => {
+      return "";
+    },
+    removeSiteContext = () => {},
+    hasSiteContext = false
+  ) {
+    const pageLocationPicker = (() => {
+      if (siteContext.excluded) {
+        return null;
+      }
+      return html`
+        <h2>Select site location</h2>
+        <div class="row" id="selectPageLocation" @click=${openServerList}>
+          <img
+            src="../../assets//flags/${siteContext.countryCode}.png"
+            height="24"
+            width="24"
+          />
+          <p>${getNameForContext(siteContext)}</p>
+          <img
+            src="../../assets/img/arrow-icon-right.svg"
+            height="12"
+            width="12"
+            class="arrow"
+          />
+        </div>
+      `;
+    })();
+
     return html`
       <h1>Preferences for this site</h1>
       <div class="row">
-        <input type="checkbox" />
-        <p>Always turn off VPN protection for <b>${origin}</b></p>
-      </div>
-      <h2>Select site location</h2>
-      <div class="row" id="selectPageLocation" @click=${openServerList}>
-        <img src="../../assets//flags/CA.png" height="24" width="24" />
-        <p>Toronto</p>
-        <img
-          src="../../assets/img/arrow-icon-right.svg"
-          height="12"
-          width="12"
-          class="arrow"
+        <input
+          type="checkbox"
+          ?checked=${siteContext.excluded}
+          @click=${tooggleExcluded}
         />
+        <p>Always turn off VPN protection for <b>${siteContext.origin}</b></p>
       </div>
-      <button id="selectLocation">Reset Site Prefrences</button>
+      ${pageLocationPicker}
+      ${hasSiteContext
+        ? html`<button id="selectLocation" @click=${removeSiteContext}>
+            Reset Site Prefrences
+          </button>`
+        : null}
     `;
   }
   static backBtn(back) {
@@ -153,28 +235,6 @@ export class BrowserActionPopup extends LitElement {
       @click=${back}
     />`;
   }
-
-  /**
-   * Returns true if the Current URL can have a Site-Specific Location
-   * @param {*} pageURL - The Current website
-   * @returns
-   */
-  static canShowLocationSettings(pageURL = "about:blank") {
-    if (!URL.canParse(pageURL)) {
-      return false;
-    }
-    const url = new URL(pageURL);
-    // No http/s nothing to show influence.
-    // i.e data url's or about://
-    if (!(url.protocol === "https:" || url.protocol === "http:")) {
-      return false;
-    }
-    // TODO: Check if we have more restrictions,
-    // i remember there was a restricted url list, somewhere of pages
-    // we cannot interact with i.e accounts.mozilla.org
-    return true;
-  }
-
   /**
    *
    * @param { import("./../../components/serverlist.js").ServerCountryList } list - The ServerList to Render
@@ -304,3 +364,25 @@ export class BrowserActionPopup extends LitElement {
   `;
 }
 customElements.define("popup-browseraction", BrowserActionPopup);
+
+const nameFor = (
+  countryCode = "de",
+  cityCode = "ber",
+  serverList = [new ServerCountry()]
+) => {
+  if (!serverList) {
+    return "";
+  }
+  return serverList
+    .find((sc) => sc.code === countryCode)
+    ?.cities.find((c) => c.code === cityCode)?.name;
+};
+
+const defaultSiteContext = (vpnState = new VPNState(), origin = "") => {
+  return new SiteContext({
+    origin,
+    countryCode: vpnState?.exitServerCountry?.code,
+    cityCode: vpnState?.exitServerCity?.code,
+    excluded: false,
+  });
+};
