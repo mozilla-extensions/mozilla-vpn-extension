@@ -43,6 +43,10 @@ export class VPNState {
   /** @type {ServerCountry | undefined } */
   exitServerCountry = new ServerCountry();
   /**
+   * Timestamp since the VPN connection was established
+   */
+  connectedSince = 0;
+  /**
    * Constructs state of another state, moving
    * non essential data.
    *
@@ -130,15 +134,19 @@ export class StateVPNEnabled extends VPNState {
    * @param {VPNState} other -
    * @param {string|boolean} aloophole - False if loophole is not supported,
    */
-  constructor(other, aloophole) {
+  constructor(other, aloophole, connectedSince) {
     super(other);
     if (other) {
       this.loophole = other.loophole;
       this.exitServerCity = other.exitServerCity;
       this.exitServerCountry = other.exitServerCountry;
+      this.connectedSince = other.connectedSince;
     }
     if (aloophole) {
       this.loophole = aloophole;
+    }
+    if (connectedSince) {
+      this.connectedSince = connectedSince;
     }
   }
 
