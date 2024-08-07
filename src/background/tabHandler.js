@@ -54,32 +54,46 @@ export class TabHandler extends Component {
 
     this.proxyHandler.siteContexts.subscribe((siteContexts) => {
       this.siteContexts = siteContexts;
-      this.maybeShowIcon;
-      if (this.currentPort) {
-        this.sendDataToCurrentPopup();
-      }
+      this.maybeShowIcon();
     });
 
     browser.tabs.onUpdated.addListener(() => this.maybeShowIcon());
-    browser.tabs.onActivated.addListener(() => this.handleActiveTabChange());
+    browser.tabs.onActivated.addListener(() => this.maybeShowIcon());
     this.maybeShowIcon();
   }
 
   async maybeShowIcon() {
     const currentTab = await Utils.getCurrentTab();
+    if (this.controllerState.state !== "Enabled") {
+      return browser.pageAction.hide(currentTab.id);
+    }
+
     this.currentHostname = await Utils.getFormattedHostname(currentTab.url);
     this.currentContext = this.siteContexts.get(this.currentHostname);
 
-    if (this.controllerState.state === "Enabled") {
-      // TODO replace with flags
+    if (this.currentContext && this.currentContext.excluded) {
+      // PageAction icons are automagically updated by the
+      // browser in response to theme changes so we don't
+      // don't need to specify theme specific icons here.
       browser.pageAction.setIcon({
-        path: "../assets/logos/logo-light.svg",
+        path: `../assets/logos/logo-dark-excluded.svg`,
         tabId: currentTab.id,
       });
       return browser.pageAction.show(currentTab.id);
     }
+
+    if (this.currentContext && this.currentContext.countryCode) {
+      browser.pageAction.setIcon({
+        path: `../assets/flags/${this.currentContext.countryCode}.png`,
+        tabId: currentTab.id,
+      });
+      return browser.pageAction.show(currentTab.id);
+    }
+
     return browser.pageAction.hide(currentTab.id);
   }
+
+
   popupData() {
     return {
       type: "tabInfo",
