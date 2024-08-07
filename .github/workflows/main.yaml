@@ -35,8 +35,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: mozilla-vpn-extension-unsigned.xpi
-          path: dist/mozilla-vpn-extension.xpi
-
+          path: dist/
   lint:
     name: Check Linting
     runs-on: ubuntu-latest
@@ -86,7 +85,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: mozilla-vpn-extension-unsigned.xpi
-          path: _site/mozilla-vpn-extension-unsigned.xpi
+          path: _site/
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
       - name: Deploy to GitHub Pages
