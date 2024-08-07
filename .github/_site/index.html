@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Extension Landing Page</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: linear-gradient(to top, #00008b, #800080);
+        font-family: Arial, sans-serif;
+      }
+      .container {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+      }
+      h1 {
+        color: white;
+      }
+      .download-button {
+        padding: 15px 30px;
+        font-size: 18px;
+        color: #fff;
+        background-color: #007bff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+      }
+      .download-button:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <img src="./header.svg" />
+      <h1>VPN Extension Nightly</h1>
+      <a href="mozilla-vpn-extension.xpi" class="download-button"
+        >Download XPI
+      </a>
+    </div>
+  </body>
+</html>
