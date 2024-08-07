@@ -51,7 +51,7 @@ export const ProxyUtils = {
       /(?<type>(https?)|(socks4?)):\/\/(\b(?<username>[\w-]+):(?<password>[\w-]+)@)?(?<host>((?:\d{1,3}\.){3}\d{1,3}\b)|(\b([\w.-]+)+))(:(?<port>\d+))?/;
     const matches = proxyRegexp.exec(proxyStr);
     if (!matches) {
-      throw new Error(`Unable to parse ${proxyStr}`);
+      return null;
     }
     return { ...matches.groups };
   },

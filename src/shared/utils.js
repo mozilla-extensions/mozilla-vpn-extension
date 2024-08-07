@@ -32,16 +32,6 @@ export const Utils = {
       const encodedUrl = url.slice(readerPrefix.length);
       url = decodeURIComponent(encodedUrl);
     }
-
-    const isValid = (a) => {
-      try {
-        const urlObj = new URL(url);
-        return urlObj.protocol === "https:" || urlObj.protocol === "http:";
-      } catch (error) {
-        return false;
-      }
-    };
-
     const getHostname = (aUrl) => {
       try {
         const urlObj = new URL(aUrl);
@@ -50,9 +40,6 @@ export const Utils = {
         return null;
       }
     };
-    if (!isValid(url)) {
-      return "";
-    }
     let hostname = getHostname(url);
 
     // Use the entire URL if hostname is not valid (like about:debugging)
@@ -60,5 +47,14 @@ export const Utils = {
       return url;
     }
     return hostname;
+  },
+
+  isValidForProxySetting: (url) => {
+    try {
+      const urlObj = new URL(url);
+      return urlObj.protocol === "https:" || urlObj.protocol === "http:";
+    } catch (error) {
+      return false;
+    }
   },
 };

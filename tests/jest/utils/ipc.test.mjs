@@ -344,7 +344,14 @@ describe("CallHandler", () => {
       name: "x",
       type: "CALL",
     };
+    let errorCalled = false;
+    globalThis.console = {
+      error: () => {
+        errorCalled = true;
+      },
+    };
     const result = await handler(message);
+    expect(errorCalled).toBe(true);
     expect(result.ok).toBe(false);
     expect(result.id).toBe(message.id);
     expect(result.data.toString()).toBe("Error: OH NO!");
@@ -488,11 +495,12 @@ describe("requestFromPort", () => {
     const { port1, port2 } = new MessageChannel();
     const message = {
       ...new IPCMessage(),
-      id: 11111,
+      id: 19991,
     };
     const done = new Promise((r) => {
       port2.addEventListener("message", (ev) => {
         r(ev.data);
+        port2.postMessage({ ...ev.data });
       });
     });
 
@@ -505,7 +513,7 @@ describe("requestFromPort", () => {
     const { port1, port2 } = new MessageChannel();
     const message = {
       ...new IPCMessage(),
-      id: 11111,
+      id: 12345,
     };
     const didSend = new Promise((r) => {
       port2.addEventListener("message", (ev) => {

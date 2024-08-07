@@ -52,6 +52,9 @@ export class BrowserActionPopup extends LitElement {
     this.pageURL = null;
     this._siteContext = null;
     Utils.getCurrentTab().then(async (tab) => {
+      if (!Utils.isValidForProxySetting(tab.url)) {
+        return;
+      }
       const hostname = Utils.getFormattedHostname(tab.url);
       this.pageURL = hostname;
       if (proxyHandler.siteContexts.value.has(this.pageURL)) {
