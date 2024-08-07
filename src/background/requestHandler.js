@@ -41,8 +41,6 @@ export class RequestHandler extends Component {
       console.log(proxyMap);
       this.onNewProxyMap(proxyMap);
     });
-
-    self = this;
   }
 
   /**
@@ -86,11 +84,7 @@ export class RequestHandler extends Component {
    */
   async interceptRequests(requestInfo) {
     let { documentUrl } = requestInfo;
-    if (documentUrl != "https://mullvad.net/en/check") {
-      debugger;
-    }
-
-    // If we load an iframe add
+    // If we load an iframe request the top level document.
     if (requestInfo.frameId !== 0) {
       let topLevelFrame = await browser.webNavigation.getFrame({
         frameId: requestInfo.parentFrameId,
@@ -103,7 +97,6 @@ export class RequestHandler extends Component {
       if (urlString) {
         const parsedHostname = Utils.getFormattedHostname(urlString);
         const proxyInfo = this.proxyMap.get(parsedHostname);
-        console.log([parsedHostname, proxyInfo]);
         if (proxyInfo) {
           return proxyInfo;
         }
