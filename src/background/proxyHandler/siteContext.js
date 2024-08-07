@@ -6,9 +6,8 @@ export class SiteContext {
   constructor(context) {
     context ??= {};
     this.origin = context.origin ?? "";
-    this.cityName = context.cityName ?? "";
+    this.cityCode = context.cityCode ?? "";
     this.countryCode = context.countryCode ?? "";
     this.excluded = context.excluded ?? false;
-    this.proxyInfo = context.proxyInfo ?? [];
   }
 }

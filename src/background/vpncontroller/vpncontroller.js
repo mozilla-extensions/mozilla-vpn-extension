@@ -6,7 +6,8 @@
 import { Component } from "../component.js";
 import { Logger } from "../logger.js";
 
-import { property } from "../../utils/property.js";
+import { property } from "../../shared/property.js";
+import { PropertyType } from "../../shared/ipc.js";
 
 import {
   VPNState,
@@ -26,6 +27,13 @@ const log = Logger.logger("TabHandler");
  * and send Messages to obtain info
  */
 export class VPNController extends Component {
+  // Things to expose to the UI
+  static properties = {
+    state: PropertyType.Bindable,
+    postToApp: PropertyType.Function,
+    isolationKey: PropertyType.Value,
+  };
+
   get state() {
     return this.#mState.readOnly;
   }
@@ -65,44 +73,6 @@ export class VPNController extends Component {
   async init() {
     this.#mState.value = await VPNState.fromStorage();
     this.initNativeMessaging();
-
-    //browser.runtime.onConnect
-    globalThis.browser.runtime.onConnect.addListener((port) => {
-      console.log("new content script connected");
-      if (port.name === "vpncontroller") {
-        this.#onContentScriptConnected(port);
-      }
-    });
-  }
-  /**
-   *
-   * @param {browser.runtime.Port} cs
-   */
-  #onContentScriptConnected(cs) {
-    console.log("new content script connected");
-    // Queue up a status response
-    queueMicrotask(() => {
-      cs.postMessage(this.#mState.value);
-    });
-    const unsubscribe = this.#mState.subscribe((value) => {
-      cs.postMessage(value);
-    });
-    // Remove it when disconnected
-    cs.onDisconnect.addListener(() => {
-      unsubscribe();
-    });
-    // If it sends a valid message for the client
-    // forward it
-    cs.onMessage.addListener((message) => {
-      log(message);
-      if (REQUEST_TYPES.includes(message.toString())) {
-        this.postToApp(message.toString());
-      } else {
-        console.error(
-          `Attempt to request Illegal Command to VPN: ${message.toString()}`
-        );
-      }
-    });
   }
   /**
    * Sends a message to the client
@@ -175,23 +145,25 @@ export class VPNController extends Component {
       case "status":
         const status = response.status;
         const controllerState = status.vpn;
+        const exit_city_name = status.location["exit_city_name"];
+        const exit_country_code = status.location["exit_country_code"];
+        const exitServerCountry = this.#mState.value.servers.find(
+          (country) => country.code === exit_country_code
+        );
+        const exitServerCity = exitServerCountry?.cities.find(
+          (city) => city.name === exit_city_name
+        );
+
+        const next_state = {
+          ...this.#mState.value,
+          exitServerCity,
+          exitServerCountry,
+        };
 
         if (controllerState === "StateOn") {
-          const exit_city_name = status.location["exit_city_name"];
-          const exit_country_code = status.location["exit_country_code"];
-
-          const exitServerCountry = this.#mState.value.servers.find(
-            (country) => country.code === exit_country_code
-          );
-          const exitServerCity = exitServerCountry?.cities.find(
-            (city) => city.name === exit_city_name
-          );
-
           this.#mState.value = new StateVPNEnabled(
-            this.#mState.value,
-            status.localProxy?.url,
-            exitServerCity,
-            exitServerCountry
+            next_state,
+            status.localProxy?.url
           );
           return;
         }
@@ -199,7 +171,7 @@ export class VPNController extends Component {
           controllerState === "StateOff" ||
           controllerState === "StateDisconnecting"
         ) {
-          this.#mState.value = new StateVPNDisabled(this.#mState.value);
+          this.#mState.value = new StateVPNDisabled(next_state);
           return;
         }
         // Let's increase the network key isolation at any vpn status change.

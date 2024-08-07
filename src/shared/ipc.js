@@ -117,7 +117,8 @@ export const expose = (object) => {
     if (port.name != name) {
       return;
     }
-    pushBindables(object, propertyDescription, port);
+    const stopSubscriptions = pushBindables(object, propertyDescription, port);
+    port.onDisconnect.addListener(stopSubscriptions);
     port.onMessage.addListener((message) => {
       // Merge an empty message, to make sure all
       // fields exist.
@@ -125,7 +126,6 @@ export const expose = (object) => {
         ...new IPCMessage(),
         ...message,
       };
-      console.log(message);
       getResponse(messageHandler, ipcMessage)
         .then((response) => {
           port.postMessage(response);
@@ -332,6 +332,7 @@ export const createCallHandler = (object, name) => {
       const result = object[name].apply(object, message.data);
       if (result && result.then) {
         // If it is a Promise return the chained promise.
+        result.catch(console.error);
         return result.then((data) => {
           return {
             ...new IPC_CALL_RESPONSE(),
@@ -348,6 +349,7 @@ export const createCallHandler = (object, name) => {
         data: result,
       });
     } catch (error) {
+      console.error(error);
       return Promise.resolve({
         ...new IPC_CALL_RESPONSE(),
         id: message.id,
@@ -409,22 +411,29 @@ export const createMessageHandlers = (object, propertyMap) => {
  * @param {any} object - The Object to create handlers for
  * @param {PropertyDescriptor} propertyMap - Its PropertyDescriptor
  * @param {{postMessage(any)}} port - The port to send updates to.
+ * @returns {()=>void} A callback to stop the created subscriptions
  */
 export const pushBindables = (object, propertyMap, port) => {
+  const stopFunctions = [];
+
   Object.entries(propertyMap)
     .filter(([_, description]) => description.type === "Bindable")
     .forEach(([name, _]) => {
       /** @type {IBindable} */
       let bindable = object[name];
-      bindable.subscribe((v) => {
+      const stop = bindable.subscribe((v) => {
         port.postMessage({
           ...new IPC_PUSH_MESSAGE(),
           data: v,
           name: name,
           id: makeID(),
         });
+        stopFunctions.push(stop);
       });
     });
+  return () => {
+    stopFunctions.forEach((f) => f());
+  };
 };
 
 /**
@@ -436,7 +445,7 @@ export const createReplicaFunction = (name, port) => {
   /**
    * @param {any} args -
    */
-  return async (args) => {
+  return async (...args) => {
     const message = new IPC_CALLMESSAGE();
     message.data = args;
     message.id = makeID();
@@ -452,7 +461,11 @@ export const createReplicaFunction = (name, port) => {
       }
       return ipcResponse.data;
     } catch (error) {
-      throw new Error(`Error while Sending Call Request: ${error.toString()}`);
+      if (error instanceof Error) {
+        throw new Error(
+          `Error while Sending Call Request: ${error.toString()}`
+        );
+      }
     }
   };
 };
@@ -472,7 +485,9 @@ export const createReplicaGetter = (name, port) => {
       }
       return ipcResponse.data;
     } catch (error) {
-      throw new Error(`Error while Sending Get Request: ${error.toString()}`);
+      if (error instanceof Error) {
+        throw new Error(`Error while Sending Get Request: ${error.toString()}`);
+      }
     }
   };
 };
@@ -496,7 +511,11 @@ export const createReplicaSetter = (name, port) => {
       }
       return;
     } catch (error) {
-      throw new Error(`Error while Sending Call Request: ${error.toString()}`);
+      if (error instanceof Error) {
+        throw new Error(
+          `Error while Sending Call Request: ${error.toString()}`
+        );
+      }
     }
   };
 };
@@ -576,7 +595,6 @@ export const toMessagePort = (extensionPort) => {
     extensionPort.postMessage(m.data);
   });
   extensionPort.onMessage.addListener((m) => {
-    console.log(m);
     port1.postMessage(m);
   });
   //extensionPort.onDisconnect.addListener(port1.close);

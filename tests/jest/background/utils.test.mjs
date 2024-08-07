@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { describe, expect, test, jest } from "@jest/globals";
-import { Utils } from "../../../src/background/utils";
+import { Utils } from "../../../src/shared/utils";
 
 // Mock the browser API
 const mockQuery = jest.fn();

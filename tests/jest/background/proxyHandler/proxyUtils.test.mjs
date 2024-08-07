@@ -25,6 +25,7 @@ describe("ProxyUtils", () => {
           cities: [
             {
               name: "Dallas",
+              code: "DAL",
               servers: [
                 { socksName: "us-dal-1", weight: 10 },
                 { socksName: "us-dal-2", weight: 20 },
@@ -35,7 +36,7 @@ describe("ProxyUtils", () => {
         },
       ];
 
-      const result = ProxyUtils.getProxies("US", "Dallas", servers);
+      const result = ProxyUtils.getProxies("US", "DAL", servers);
       expect(result).toEqual([
         {
           type: "socks",

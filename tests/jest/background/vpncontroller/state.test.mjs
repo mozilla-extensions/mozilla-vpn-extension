@@ -51,15 +51,26 @@ describe("VPN State Machine", () => {
     testCity.code = "de";
     testCity.name = "Berlino";
     testCity.servers = [];
-    const testState = new StateVPNEnabled(null, "aaa", testCity);
+    const testState = new StateVPNEnabled(
+      {
+        exitServerCity: testCity,
+      },
+      "aaa"
+    );
 
     expect(testState.exitServerCity.code).toBe(testCity.code);
 
     expect(new StateVPNEnabled(testState).exitServerCity.code).toBe(
       testState.exitServerCity.code
     );
-    expect(new StateVPNDisabled(testState).exitServerCity.code).toBe("");
-    expect(new StateVPNUnavailable(testState).exitServerCity.code).toBe("");
-    expect(new VPNState(testState).exitServerCity.code).toBe("");
+    expect(new StateVPNDisabled(testState).exitServerCity.code).toBe(
+      testState.exitServerCity.code
+    );
+    expect(new StateVPNUnavailable(testState).exitServerCity.code).toBe(
+      testState.exitServerCity.code
+    );
+    expect(new VPNState(testState).exitServerCity.code).toBe(
+      testState.exitServerCity.code
+    );
   });
 });

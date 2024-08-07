@@ -22,9 +22,9 @@ import {
   createReplicaGetter,
   createReplicaSetter,
   createReplicaBindable,
-} from "../../../src/utils/ipc";
+} from "../../../src/shared/ipc";
 
-import { property } from "../../../src/utils/property";
+import { property } from "../../../src/shared/property";
 
 // There is no crypto module in jest, so let's use super random values
 Object.defineProperty(globalThis, "crypto", {
@@ -344,7 +344,14 @@ describe("CallHandler", () => {
       name: "x",
       type: "CALL",
     };
+    let errorCalled = false;
+    globalThis.console = {
+      error: () => {
+        errorCalled = true;
+      },
+    };
     const result = await handler(message);
+    expect(errorCalled).toBe(true);
     expect(result.ok).toBe(false);
     expect(result.id).toBe(message.id);
     expect(result.data.toString()).toBe("Error: OH NO!");
@@ -488,11 +495,12 @@ describe("requestFromPort", () => {
     const { port1, port2 } = new MessageChannel();
     const message = {
       ...new IPCMessage(),
-      id: 11111,
+      id: 19991,
     };
     const done = new Promise((r) => {
       port2.addEventListener("message", (ev) => {
         r(ev.data);
+        port2.postMessage({ ...ev.data });
       });
     });
 
@@ -505,7 +513,7 @@ describe("requestFromPort", () => {
     const { port1, port2 } = new MessageChannel();
     const message = {
       ...new IPCMessage(),
-      id: 11111,
+      id: 12345,
     };
     const didSend = new Promise((r) => {
       port2.addEventListener("message", (ev) => {
@@ -600,6 +608,30 @@ describe("createReplicaFunction", () => {
     });
     expect(await fakeFunc()).toBe(43);
   });
+});
+it("Passes Function arguments", async () => {
+  let [a, b, c] = [0, 0, 0];
+  const testobj = {
+    func: (_a, _b, _c) => {
+      a = _a;
+      b = _b;
+      c = _c;
+
+      return 43;
+    },
+  };
+  const { port1, port2 } = new MessageChannel();
+
+  const fakeFunc = createReplicaFunction("func", port1);
+  const handler = createCallHandler(testobj, "func");
+  port2.addEventListener("message", async (e) => {
+    const response = await handler(e.data);
+    port2.postMessage(response);
+  });
+  expect(await fakeFunc(true, 99, "hello")).toBe(43);
+  expect(a).toBe(true);
+  expect(b).toBe(99);
+  expect(c).toBe("hello");
 });
 
 describe("createReplicaGetter", () => {
