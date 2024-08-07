@@ -93,7 +93,6 @@ export class TabHandler extends Component {
     return browser.pageAction.hide(currentTab.id);
   }
 
-
   popupData() {
     return {
       type: "tabInfo",
