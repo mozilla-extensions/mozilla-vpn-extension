@@ -145,6 +145,12 @@ export class VPNController extends Component {
       case "status":
         const status = response.status;
         const controllerState = status.vpn;
+        const connectedSince = (() => {
+          if (!status.connectedSince) {
+            return 0;
+          }
+          return parseInt(status.connectedSince);
+        })();
         const exit_city_name = status.location["exit_city_name"];
         const exit_country_code = status.location["exit_country_code"];
         const exitServerCountry = this.#mState.value.servers.find(
@@ -163,7 +169,8 @@ export class VPNController extends Component {
         if (controllerState === "StateOn") {
           this.#mState.value = new StateVPNEnabled(
             next_state,
-            status.localProxy?.url
+            status.localProxy?.url,
+            connectedSince
           );
           return;
         }

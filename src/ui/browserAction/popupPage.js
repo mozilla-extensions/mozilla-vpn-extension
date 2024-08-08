@@ -114,6 +114,7 @@ export class BrowserActionPopup extends LitElement {
               .enabled=${this.vpnState?.connected}
               .cityName=${this.vpnState?.exitServerCity?.name}
               .countryFlag=${this.vpnState?.exitServerCountry?.code}
+              .connectedSince=${this.vpnState?.connectedSince}
             ></vpn-card>
             ${this.locationSettings()}
           </main>

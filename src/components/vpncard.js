@@ -27,10 +27,9 @@ export class VPNCard extends LitElement {
   constructor() {
     super();
     this.enabled = false;
-    this.connectedSince = Date.now();
-
     this.cityName = "";
     this.countryFlag = "";
+    this.connectedSince = 0;
   }
   #intervalHandle = null;
 
@@ -78,9 +77,11 @@ export class VPNCard extends LitElement {
         formatSingle(secs)
       );
     }
-    const timeString = this.enabled
-      ? html`<p>${formatTime(Date.now() - this.connectedSince)}</p>`
-      : html``;
+    //console.log(`Connected Since ${this.connectedSince}`)
+    const time = Date.now() - this.connectedSince;
+    //console.log(`Elapsed Time: ${time}`)
+
+    const timeString = this.enabled ? html`<p>${formatTime(time)}</p>` : html``;
 
     const subLine = this.enabled
       ? "Secure and private"
@@ -222,31 +223,5 @@ export class VPNCard extends LitElement {
       border-radius: 6px;
     }
   `;
-
-  /**
-   * Returns the Properties this element should have based on a VPN State
-   * @param {VPNState} vpnState
-   * @returns {VPNCard.properties}
-   */
-  static propertiesFrom(vpnState) {
-    return {
-      enabled: vpnState.connected,
-      cityName: vpnState.exitServerCity?.name,
-      countryFlag: vpnState.exitServerCountry?.code,
-      connectedSince: Date.now(), // TODO: We actually dont send this from the client
-    };
-  }
-  /**
-   * Returns the Properties this element should have based on a VPN State
-   * @param {VPNState} vpnState
-   * @returns {void}
-   */
-  apply(vpnState) {
-    const bag = VPNCard.propertiesFrom(vpnState);
-    this.enabled = bag.enabled;
-    this.cityName = bag.cityName;
-    this.countryFlag = bag.countryFlag;
-    this.connectedSince = bag.connectedSince;
-  }
 }
 customElements.define("vpn-card", VPNCard);
