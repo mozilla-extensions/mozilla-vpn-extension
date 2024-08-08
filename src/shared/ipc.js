@@ -635,14 +635,18 @@ export const requestFromPort = (
     port.addEventListener("message", listener);
     port.postMessage(message);
   });
-  const timeout = new Promise((_, reject) =>
-    setTimeout(() => {
+  const timeout = new Promise((_, reject) => {
+    const timer = setTimeout(() => {
       reject(
         new Error(
           `Timed out while waiting for (${message.type})${message.name}:${message.id}`
         )
       );
-    }, maxTimeout)
-  );
+    }, maxTimeout);
+    // Cancel the timeout on success
+    hasMessage.then(() => {
+      clearTimeout(timer);
+    });
+  });
   return Promise.race([hasMessage, timeout]);
 };
