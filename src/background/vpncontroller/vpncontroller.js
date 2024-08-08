@@ -144,7 +144,6 @@ export class VPNController extends Component {
         break;
       case "status":
         const status = response.status;
-        console.log(status);
         const controllerState = status.vpn;
         const connectedSince = (() => {
           if (!status.connectedSince) {
