@@ -491,24 +491,6 @@ describe("getResponse", () => {
   });
 });
 describe("requestFromPort", () => {
-  it("it Sends the passed ipcmessage", async () => {
-    const { port1, port2 } = new MessageChannel();
-    const message = {
-      ...new IPCMessage(),
-      id: 19991,
-    };
-    const done = new Promise((r) => {
-      port2.addEventListener("message", (ev) => {
-        r(ev.data);
-        port2.postMessage({ ...ev.data });
-      });
-    });
-
-    requestFromPort(port1, message);
-
-    const outMessage = await done;
-    expect(outMessage.id).toBe(message.id);
-  });
   it("it resolves on recieving a response", async () => {
     const { port1, port2 } = new MessageChannel();
     const message = {
@@ -531,6 +513,7 @@ describe("requestFromPort", () => {
     expect(didSendData).toBe(true);
     expect(response.id).toBe(message.id);
     expect(response.out).toBe("response");
+    port1.close();
   });
   it("it rejects after a timeout", async () => {
     const { port1 } = new MessageChannel();
@@ -544,6 +527,7 @@ describe("requestFromPort", () => {
     } catch (error) {
       expect(error.toString()).toContain("Timed out while waiting for ");
     }
+    port1.close();
   });
 });
 
@@ -570,6 +554,7 @@ describe("pushBindables", () => {
 
     const response = await hasMessage;
     expect(response.data).toBe("updated");
+    port1.close();
   });
 });
 
@@ -591,6 +576,7 @@ describe("createReplicaFunction", () => {
     });
     await fakeFunc();
     expect(was_called).toBe(true);
+    port1.close();
   });
   it("Passes Function results", async () => {
     const testobj = {
@@ -607,6 +593,7 @@ describe("createReplicaFunction", () => {
       port2.postMessage(response);
     });
     expect(await fakeFunc()).toBe(43);
+    port1.close();
   });
 });
 it("Passes Function arguments", async () => {
@@ -632,6 +619,7 @@ it("Passes Function arguments", async () => {
   expect(a).toBe(true);
   expect(b).toBe(99);
   expect(c).toBe("hello");
+  port1.close();
 });
 
 describe("createReplicaGetter", () => {
@@ -648,6 +636,7 @@ describe("createReplicaGetter", () => {
       port2.postMessage(response);
     });
     expect(await fakeFunc()).toBe(43);
+    port1.close();
   });
 });
 
@@ -666,6 +655,7 @@ describe("createReplicaSetter", () => {
     });
     await fakeFunc(999);
     expect(testobj.hi).toBe(999);
+    port1.close();
   });
 });
 
@@ -691,6 +681,7 @@ describe("createReplicaBindable", () => {
     });
     const otherReplica = await createReplicaBindable("hello", port1);
     expect(otherReplica.value).toBe(43);
+    port1.close();
   });
   it("forwards changes", async () => {
     const { port1, port2 } = new MessageChannel();
@@ -712,5 +703,6 @@ describe("createReplicaBindable", () => {
     });
     obj.hello.set(69);
     await done;
+    port1.close();
   });
 });
