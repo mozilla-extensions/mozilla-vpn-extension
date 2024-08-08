@@ -128,7 +128,8 @@ export class ServerList extends LitElement {
       padding-block: 0;
       padding-inline-end: 0;
       padding-inline-start: 20px;
-      font-family: var(--fontMetropolis);
+      font-family: var(--font-family);
+      font-weight: bold;
       pointer-events: none;
       color: var(--text-color-primary);
     }
@@ -144,6 +145,9 @@ export class ServerList extends LitElement {
       margin-inline-start: 8px;
       margin-inline-end: 8px;
       inline-size: calc(100% - 16px);
+    }
+    .server-city-list-visibility-btn {
+      align-items: center;
     }
 
     /* We need to temporarily use !important for this button to make sure the right color applies */
@@ -178,6 +182,7 @@ export class ServerList extends LitElement {
       transform: rotate(-90deg);
       transition: transform 0.275s ease-in-out;
       inline-size: 24px;
+      height: 24px;
     }
 
     .opened .toggle {
@@ -193,6 +198,7 @@ export class ServerList extends LitElement {
         visibility 0.4s ease;
       list-style-type: none;
       visibility: hidden;
+      margin-left: 48px;
     }
 
     .opened .server-city-list {
