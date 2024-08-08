@@ -51,6 +51,8 @@ export class BrowserActionPopup extends LitElement {
     super();
     this.pageURL = null;
     this._siteContext = null;
+    /** @type {VPNState} */
+    this.vpnState = null;
     Utils.getCurrentTab().then(async (tab) => {
       if (!Utils.isValidForProxySetting(tab.url)) {
         return;
@@ -102,6 +104,17 @@ export class BrowserActionPopup extends LitElement {
     let title = this.stackView?.value?.currentElement?.dataset?.title;
     title ??= "Mozilla VPN";
 
+    let card = html`
+      <vpn-card
+        .enabled=${this.vpnState?.connected}
+        .cityName=${this.vpnState?.exitServerCity?.name}
+        .countryFlag=${this.vpnState?.exitServerCountry?.code}
+      ></vpn-card>
+    `;
+    if (!this.vpnState.alive) {
+      card = html`<vpn-card-placeholder></vpn-card-placeholder>`;
+    }
+
     return html`
       <vpn-titlebar title="${title}" ${ref(this.titleBar)}>
         ${canGoBack ? BrowserActionPopup.backBtn(back) : null}
@@ -109,14 +122,7 @@ export class BrowserActionPopup extends LitElement {
       </vpn-titlebar>
       <stack-view ${ref(this.stackView)}>
         <section data-title="Mozilla VPN">
-          <main>
-            <vpn-card
-              .enabled=${this.vpnState?.connected}
-              .cityName=${this.vpnState?.exitServerCity?.name}
-              .countryFlag=${this.vpnState?.exitServerCountry?.code}
-            ></vpn-card>
-            ${this.locationSettings()}
-          </main>
+          <main>${card} ${this.locationSettings()}</main>
         </section>
       </stack-view>
     `;
