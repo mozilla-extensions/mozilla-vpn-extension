@@ -10,27 +10,12 @@
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" href="../variables.css" />
-    <link rel="stylesheet" href="pageAction.css" />
-    <script src="pageAction.js" type="module"></script>
+    <link rel="stylesheet" href="./pageAction.css" />
+
+    <script src="./pageAction.js" type="module"></script>
     <title>Mozilla VPN</title>
   </head>
   <body>
-    <div class="tabInfo">
-      <h5>Current origin:</h5>
-      <span class="origin"></span>
-
-      <h5>Sites with special proxy configs:</h5>
-
-      <ol id="siteContextsList"></ol>
-
-      <div class="checkbox-wrapper">
-        <input type="checkbox" id="exclude-origin" />
-        <span>Exclude <span class="origin"></span></span>
-      </div>
-    </div>
-    <div class="flex">
-      <select id="servers"></select>
-      <button id="removeContext">Reset!</button>
-    </div>
+    <page-action-popup></page-action-popup>
   </body>
 </html>

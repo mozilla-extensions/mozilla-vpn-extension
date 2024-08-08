@@ -49,10 +49,6 @@ export class ProxyHandler extends Component {
     });
 
     this.#mSiteContexts.value = await this.#getSiteContexts();
-
-    browser.runtime.onConnect.addListener(async (port) => {
-      await this.portConnected(port);
-    });
   }
 
   /**

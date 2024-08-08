@@ -226,7 +226,7 @@ export class BrowserActionPopup extends LitElement {
       ${pageLocationPicker}
       ${hasSiteContext
         ? html`<button id="selectLocation" @click=${removeSiteContext}>
-            Reset Site Prefrences
+            Reset Site Preferences
           </button>`
         : null}
     `;
