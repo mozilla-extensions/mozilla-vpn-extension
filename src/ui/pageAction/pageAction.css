@@ -3,78 +3,114 @@
    file, You can obtain one at http://mozilla.org/MPL/2.0/. 
 */
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --button-primary-bg-default: rgba(0, 221, 255, 1);
+    --button-primary-bg-hover: rgba(128, 235, 255, 1);
+    --button-primary-bg-active: rgba(170, 242, 255, 1);
+    --button-primary-bg-disabled: rgba(0, 221, 255, 1);
+    --button-primary-text-color: rgba(21, 20, 26, 1);
+    --button-secondary-bg-default: rgba(251, 251, 254, 0.07);
+    --button-secondary-bg-hover: rgba(251, 251, 254, 0.14);
+    --button-secondary-bg-active: rgba(251, 251, 254, 0.21);
+    --button-secondary-bg-disabled: rgba(251, 251, 254, 0.07);
+    --button-secondary-text-color: rgba(255, 255, 255, 1);
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --button-primary-bg-default: rgba(0, 96, 223, 1);
+    --button-primary-bg-hover: rgba(2, 80, 187, 1);
+    --button-primary-bg-active: rgba(5, 64, 150, 1);
+    --button-primary-bg-disabled: rgba(0, 96, 223, 1);
+    --button-primary-text-color: rgba(255, 255, 255, 1);
+    --button-secondary-bg-default: rgba(21, 20, 26, 0.07);
+    --button-secondary-bg-hover: rgba(21, 20, 26, 0.14);
+    --button-secondary-bg-active: rgba(21, 20, 26, 0.21);
+    --button-secondary-bg-disabled: rgba(21, 20, 26, 0.21);
+    --button-secondary-text-color: rgba(21, 20, 26, 1);
+  }
+}
+
 body {
-  font-size: 1rem;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-  min-inline-size: 300px;
-  margin: 0;
-  background-color: black;
-  color: white;
-}
-
-span,
-ol li {
-  font-size: 0.85rem;
-}
-
-.tabInfo {
+  margin: 0px;
   padding: 1rem;
+  font-size: 13px;
+  min-inline-size: 240px;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--panel-bg-color);
+  color: var(--text-color-primary);
+  font-family: var(--font-family);
+  overflow: hidden;
 }
 
-button {
-  block-size: 3rem;
-  background-color: fuchsia;
-  border-image: linear-gradient(90deg, #00a7e1 50%, #f6531d 0) 20;
-  border-image-width: 4px;
-  inline-size: 90%;
-}
-
-button:hover {
-  background-color: aqua;
-}
-
-button:active {
-  background-color: hotpink;
-}
-
-button:disabled {
-  background: repeating-radial-gradient(#e66465, #9198e5 20%);
-  cursor: not-allowed;
-  opacity: 0.9;
+h1 {
+  font-size: 13px;
+  font-weight: 600;
+  margin-block: 0px 0.5rem;
+  padding-block-end: 1rem;
+  text-align: center;
+  border-bottom: 1px solid rgb(173, 173, 173, 0.8);
 }
 
 .flex {
   display: flex;
-  align-items: center;
-  flex-direction: column;
 }
 
-.current {
-  background-image: linear-gradient(to right, #b1ff3f8f, #007cff7d);
-  color: white;
+#context-description {
+  margin-block: 4px 0;
 }
 
-.flex > * {
-  margin: auto auto 1rem auto;
-}
-
-h5 {
-  margin-block-end: 0.5rem;
-  margin-block-start: 2rem;
-  color: orange;
-}
-
-select {
-  inline-size: 90%;
-  margin-block-end: 1rem;
-  block-size: 2rem;
-}
-
-.checkbox-wrapper {
-  margin-block-start: 1rem;
-}
-
-input {
+#context-img {
   margin-inline-end: 0.5rem;
+  block-size: 1rem;
+  margin-block: auto;
+}
+
+/* #context-status {
+  padding: 1rem;
+} */
+
+p {
+  margin-block: 0.5rem;
+}
+
+button {
+  margin-block-start: 1rem;
+  margin-inline: auto 0;
+  font-weight: 500;
+  padding: 4px 16px;
+  min-block-size: 32px;
+  border-radius: 4px;
+  border: none;
+  background: none;
+  transition: background 0.1s ease;
+}
+
+.primary {
+  background: var(--button-primary-bg-default);
+  color: var(--button-primary-text-color);
+}
+
+.primary:hover {
+  background: var(--button-primary-bg-hover);
+}
+
+.primary:active {
+  background: var(--button-primary-bg-active);
+}
+
+.secondary {
+  background: var(--button-secondary-bg-default);
+  color: var(--button-secondary-text-color);
+}
+
+.secondary:hover {
+  background: var(--button-secondary-bg-hover);
+}
+
+.secondary:active {
+  background: var(--button-secondary-bg-active);
 }

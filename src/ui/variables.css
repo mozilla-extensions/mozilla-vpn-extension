@@ -3,10 +3,40 @@
    file, You can obtain one at http://mozilla.org/MPL/2.0/. 
 */
 
+@font-face {
+  font-family: "Inter Regular";
+  font-style: normal;
+  font-weight: normal;
+  src:
+    local("Inter Regular"),
+    url("./../assets/fonts/Inter-Regular.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Inter Semi Bold";
+  font-style: normal;
+  font-weight: normal;
+  src:
+    local("Inter Semi Bold"),
+    url("./../assets/fonts/Inter-SemiBold.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Inter Bold";
+  font-style: normal;
+  font-weight: normal;
+  src:
+    local("Inter Bold"),
+    url("./../assets/fonts/Inter-Bold.woff") format("woff");
+}
+
 :root {
   --window-width: 352px;
   --window-height: 448px;
-  --font-family: "Arial", sans-serif;
+
+  --font-family: "Inter Regular";
+  --font-family-semi-bold: "Inter Semi Bold";
+  --font-family-bold: "Inter Bold";
   --color-enabled: #3fe1b0;
   --main-card-background: #321c64;
   --main-card-text-color: white;
