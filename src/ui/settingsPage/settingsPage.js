@@ -12,8 +12,7 @@ import {
 import { fontSizing, resetSizing } from "../../components/styles.js";
 import { getExposedObject } from "../../shared/ipc.js";
 
-import * as parts from "./parts.js";
-
+import "./tableElement.js";
 /**
  * This is the Page-Level Component for the SettingsPafe
  *
@@ -21,14 +20,10 @@ import * as parts from "./parts.js";
 export class SettingsPage extends LitElement {
   static properties = {
     contexts: { type: Object },
-    sortingKey: { type: String },
-    sortingAcending: { type: Boolean },
   };
   constructor() {
     super();
     this.contexts = new Map();
-    this.sortingKey = "origin";
-    this.sortingAcending = true;
     this.vpnController = getExposedObject("VPNController");
     this.vpnController.then((c) => {
       c.state.subscribe((state) => (this.serverList = state.servers));
@@ -42,32 +37,11 @@ export class SettingsPage extends LitElement {
   connectedCallback() {
     super.connectedCallback();
   }
-
-  sorters = {
-    origin: (a, b) => a.origin.localeCompare(b.origin),
-    city: (a, b) => a.cityCode.localeCompare(b.cityCode),
-    excluded: (a, b) => a.excluded - b.excluded,
-  };
-
   filterInput = createRef();
-
-  #setSorting(key, acending) {
-    (this.sortingKey = key), (this.sortingAcending = acending);
-  }
 
   render() {
     // Step 1 Filter the List, so only items that include the website are here
-    const filteredList = parts.filter(
-      this.contexts,
-      this.filterInput.value?.value
-    );
-    // Step 2 Select the active sorter,
-    // if decending wrap it in a function swapping the inputs
-    let sorter = this.sortingAcending
-      ? this.sorters[this.sortingKey]
-      : (a, b) => this.sorters[this.sortingKey](b, a);
-    // Sort it!
-    const sortedList = filteredList.sort(sorter);
+    const filteredList = filter(this.contexts, this.filterInput.value?.value);
     // Let's render the view!
     return html`
       <header>
@@ -103,17 +77,10 @@ export class SettingsPage extends LitElement {
             @input=${() => this.requestUpdate()}
           />
         </div>
-        <div class="tableHolder">
-          <table>
-            ${parts.tableHeading(
-              this.sortingKey,
-              this.sortingAcending,
-              this.#setSorting.bind(this)
-            )}
-            ${sortedList.map((c) => parts.tableRow(c, this.serverList))}
-          </table>
-          ${parts.noElementPlaceHolder(this.contexts)}
-        </div>
+        <mz-context-table
+          .contexts=${filteredList}
+          .serverList=${this.serverList}
+        ></mz-context-table>
       </main>
     `;
   }
@@ -160,19 +127,7 @@ export class SettingsPage extends LitElement {
       height: 30px;
       width: 30px;
     }
-    .tableHolder {
-      background: lch(from var(--panel-bg-color) calc(l + 5) c h);
-      border: 1px solid var(--border-color);
-      border-radius: 5px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
 
-    .tableHolder table {
-      width: 100%;
-    }
     h2 {
       font-size: 38px;
       font-style: normal;
@@ -199,74 +154,27 @@ export class SettingsPage extends LitElement {
       border: 2px solid var(--border-color);
       border-radius: 5px;
     }
-    .tableHeader {
-      height: 56px;
-    }
-    .tableHeader th {
-      text-align: left;
-      padding-left: 16px;
-    }
 
-    .emptyState {
-      padding: 50px 10px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-    h3 {
-      font-size: 24px;
-      font-style: normal;
-      font-weight: 700;
-      line-height: 26px;
-      margin-bottom: 16px;
-    }
     main p {
       font-size: 14px;
       font-style: normal;
       font-weight: 400;
       line-height: 21px;
     }
-
-    .tableHolder th {
-      background-color: var(--panel-bg-color);
-    }
-    .tableHolder th button {
-      background-color: transparent;
-      border: none;
-      position: relative;
-    }
-    .tableHolder th button.sorted-down::after {
-      content: " ";
-      position: absolute;
-      top: -5px;
-      background-image: url("../../assets/img/arrow-toggle.svg");
-      background-position: center center;
-      background-repeat: no-repeat;
-      margin-inline-start: 8px;
-      pointer-events: none;
-      transform: rotate(0deg);
-      transition: transform 0.275s ease-in-out;
-      inline-size: 24px;
-      height: 24px;
-    }
-    .tableHolder th button.sorted-up::after {
-      content: " ";
-      position: absolute;
-      top: -5px;
-      background-image: url("../../assets/img/arrow-toggle.svg");
-      background-position: center center;
-      background-repeat: no-repeat;
-      margin-inline-start: 8px;
-      pointer-events: none;
-      transform: rotate(180deg);
-      transition: transform 0.275s ease-in-out;
-      inline-size: 24px;
-      height: 24px;
-    }
-    .tableHolder td {
-      padding: 16px;
-    }
   `;
 }
 customElements.define("mz-settingspage", SettingsPage);
+
+/**
+ * Takes a map of sitecontexts
+ * @param {Map<String,SiteContext>} siteContextList
+ */
+export const filter = (siteContextList, filterString = "") => {
+  const out = [];
+  siteContextList.keys().forEach((key) => {
+    if (key.includes(filterString)) {
+      out.push({ ...siteContextList.get(key) });
+    }
+  });
+  return out;
+};
