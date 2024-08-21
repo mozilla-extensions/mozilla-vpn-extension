@@ -4,6 +4,8 @@ import {
   LitElement,
   classMap,
   styleMap,
+  createRef,
+  ref,
 } from "../vendor/lit-all.min.js";
 import { resetSizing } from "./styles.js";
 
@@ -35,6 +37,7 @@ export class ServerList extends LitElement {
     serverList: { type: Array },
     selectedCity: { type: ServerCity },
     openedCountries: { type: [] },
+    filter: { type: String },
   };
 
   constructor() {
@@ -44,6 +47,8 @@ export class ServerList extends LitElement {
     this.selectedCity = new ServerCity();
     /** @type {Array<ServerCountry>} */
     this.openedCountries = [];
+
+    this.filter = "";
   }
 
   /** @param {ServerCity} city  */
@@ -92,18 +97,42 @@ export class ServerList extends LitElement {
       detail: { city, country },
     });
   }
+  filterInput = createRef();
 
   render() {
-    return countrylistHolder(
+    const filteredList = filterList(
       this.serverList,
-      this.#getCountryListItem.bind(this)
+      this.filterInput.value?.value
     );
+    if (filteredList.length == 1) {
+      // Nit: If we only have one, spare them a click and auto expand it.
+      this.openedCountries.push(filteredList.at(0));
+    }
+
+    return html`
+      <input
+        type="text"
+        class="search"
+        placeholder="Search Countries"
+        ${ref(this.filterInput)}
+        @change=${() => this.requestUpdate()}
+        @input=${() => this.requestUpdate()}
+      />
+      ${countrylistHolder(filteredList, this.#getCountryListItem.bind(this))}
+    `;
   }
 
   static styles = css`
     ${resetSizing}
 
+    :host {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
     #moz-vpn-server-list-panel {
+      width: 100%;
       block-size: var(--panelSize);
       max-block-size: var(--panelSize);
       min-block-size: var(--panelSize);
@@ -232,6 +261,20 @@ export class ServerList extends LitElement {
       color: var(--text-color-primary);
       padding-inline-start: 18px;
     }
+
+    input.search {
+      margin-bottom: 32px;
+      padding: 10px 20px;
+      padding-left: 30px;
+      color: var(--text-color-invert);
+      width: calc(max(50%, 300px));
+      background-image: url("../../assets/img/search-icon.svg");
+      background-position: 2.5px 6px;
+      background-repeat: no-repeat;
+      border: 2px solid var(--border-color);
+      border-radius: 5px;
+      color: black;
+    }
   `;
 }
 customElements.define("server-list", ServerList);
@@ -341,4 +384,20 @@ export const countrylistHolder = (
       </ul>
     </div>
   `;
+};
+
+/**
+ *
+ * @param {Array<ServerCountry>} serverCountryList - The input List
+ * @param {String} filterString - A String to filter by
+ * @returns {Array<ServerCountry>} - The Filtered List
+ */
+export const filterList = (serverCountryList, filterString = "") => {
+  const target = filterString.toLowerCase();
+  return serverCountryList.filter((c) => {
+    if (c.name.toLowerCase().includes(target)) {
+      return true;
+    }
+    return c.cities.some((cty) => cty.name.toLowerCase().includes(target));
+  });
 };
