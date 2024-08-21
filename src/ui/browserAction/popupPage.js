@@ -51,10 +51,10 @@ export class BrowserActionPopup extends LitElement {
     super();
     this.pageURL = null;
     this._siteContext = null;
-    this.updatePage();
     browser.tabs.onUpdated.addListener(() => this.updatePage());
     browser.tabs.onActivated.addListener(() => this.updatePage());
     vpnController.state.subscribe((s) => (this.vpnState = s));
+    this.updatePage();
   }
   updatePage() {
     Utils.getCurrentTab().then(async (tab) => {
