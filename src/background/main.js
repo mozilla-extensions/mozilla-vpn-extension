@@ -91,4 +91,11 @@ main.init();
 globalThis["main"] = main;
 
 // Just do this for debugging
-chrome.browserAction.openPopup();
+//chrome.browserAction.openPopup();
+
+/**
+browser.tabs.create({
+  url: "/ui/settingsPage/index.html",
+})
+
+ */

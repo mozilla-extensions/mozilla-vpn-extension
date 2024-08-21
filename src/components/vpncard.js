@@ -57,8 +57,8 @@ export class VPNCard extends LitElement {
       on: this.enabled,
     };
     const shieldURL = this.enabled
-      ? "../../assets/img/shield-on.svg"
-      : "../../assets/img/shield-off.svg";
+      ? "../../assets/img/globe-shield-on.svg"
+      : "../../assets/img/globe-shield-off.svg";
 
     function formatSingle(value) {
       if (value === 0) return "00";

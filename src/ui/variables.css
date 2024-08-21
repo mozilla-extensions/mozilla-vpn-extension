@@ -55,6 +55,7 @@
     --border-color: lch(from var(--panel-bg-color) calc(l + 15) c h);
 
     --text-color-primary: white;
+    --text-color-invert: #3d3d3d;
   }
 }
 
@@ -66,6 +67,7 @@
         **/
     --panel-bg-color: #f9f9fb;
     --text-color-primary: #3d3d3d;
+    --text-color-invert: white;
     --border-color: lch(from var(--panel-bg-color) calc(l - 15) c h);
   }
 }
