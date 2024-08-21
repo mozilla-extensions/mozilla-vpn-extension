@@ -37,7 +37,6 @@ export class ServerList extends LitElement {
     serverList: { type: Array },
     selectedCity: { type: ServerCity },
     openedCountries: { type: [] },
-    filter: { type: String },
   };
 
   constructor() {
@@ -47,8 +46,6 @@ export class ServerList extends LitElement {
     this.selectedCity = new ServerCity();
     /** @type {Array<ServerCountry>} */
     this.openedCountries = [];
-
-    this.filter = "";
   }
 
   /** @param {ServerCity} city  */
