@@ -272,7 +272,9 @@ export const tableRow = (ctx, serverList, removeOrigin) => {
 
   return html`
     <tr class="">
-      <td>${ctx.origin}</td>
+      <td>
+        <a href="https://${ctx.origin}">${ctx.origin}</a>
+      </td>
       <td class="row">
         <img src="../../assets/img/shield-${ctx.excluded ? "off" : "on"}.svg" />
         ${ctx.excluded ? "OFF" : "ON"}
