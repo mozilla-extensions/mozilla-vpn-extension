@@ -22,7 +22,7 @@ export class ContextTable extends LitElement {
     contexts: { type: Array },
     sortingKey: { type: String },
     sortingAcending: { type: Boolean },
-    onRemoveOrigin: {type: Function}
+    onRemoveOrigin: { type: Function },
   };
   constructor() {
     super();
@@ -30,7 +30,7 @@ export class ContextTable extends LitElement {
     this.contexts = [];
     this.sortingKey = "origin";
     this.sortingAcending = true;
-    this.onRemoveOrigin = ()=>{};
+    this.onRemoveOrigin = () => {};
   }
   sorters = {
     origin: (a, b) => a.origin.localeCompare(b.origin),
@@ -61,7 +61,9 @@ export class ContextTable extends LitElement {
             this.sortingAcending,
             this.#setSorting.bind(this)
           )}
-          ${sortedList.map((c) => tableRow(c, this.serverList, this.onRemoveOrigin))}
+          ${sortedList.map((c) =>
+            tableRow(c, this.serverList, this.onRemoveOrigin)
+          )}
         </table>
         ${noElementPlaceHolder(this.contexts)}
       </div>
@@ -170,28 +172,26 @@ export class ContextTable extends LitElement {
     .tableHolder td {
       padding: 16px;
     }
-    .deleteBtn{
-        background-color: transparent;
-        color: transparent;
-        border: transparent;
-        background-image: url("../../assets/img/delete-gray.svg");
-        background-position: center center;
+    .deleteBtn {
+      background-color: transparent;
+      color: transparent;
+      border: transparent;
+      background-image: url("../../assets/img/delete-gray.svg");
+      background-position: center center;
       background-repeat: no-repeat;
-      transition: ease-in-out 0.3s; 
+      transition: ease-in-out 0.3s;
     }
-    .deleteBtn:hover{
-        filter: brightness(1.5);
+    .deleteBtn:hover {
+      filter: brightness(1.5);
     }
-    td.delete{
-        width: 30px;
+    td.delete {
+      width: 30px;
     }
-    .row{
-        display: flex;
-        align-content: center;
-        align-items: center;
+    .row {
+      display: flex;
+      align-content: center;
+      align-items: center;
     }
-
-
   `;
 }
 customElements.define("mz-context-table", ContextTable);
@@ -279,7 +279,14 @@ export const tableRow = (ctx, serverList, removeOrigin) => {
       </td>
       <td>${name}</td>
       <td class="delete">
-        <button class="deleteBtn" @click=${()=>{removeOrigin(ctx.origin)}}>remove</button>
+        <button
+          class="deleteBtn"
+          @click=${() => {
+            removeOrigin(ctx.origin);
+          }}
+        >
+          remove
+        </button>
       </td>
     </tr>
   `;

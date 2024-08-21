@@ -85,10 +85,10 @@ export class SettingsPage extends LitElement {
       </main>
     `;
   }
-  removeOrigin(origin){
-    this.proxyHandler.then(handler => {
-        handler.removeContextForOrigin(origin);
-    })
+  removeOrigin(origin) {
+    this.proxyHandler.then((handler) => {
+      handler.removeContextForOrigin(origin);
+    });
   }
 
   static styles = css`
