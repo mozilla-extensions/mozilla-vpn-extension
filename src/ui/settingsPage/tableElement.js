@@ -22,6 +22,7 @@ export class ContextTable extends LitElement {
     contexts: { type: Array },
     sortingKey: { type: String },
     sortingAcending: { type: Boolean },
+    onRemoveOrigin: {type: Function}
   };
   constructor() {
     super();
@@ -29,6 +30,7 @@ export class ContextTable extends LitElement {
     this.contexts = [];
     this.sortingKey = "origin";
     this.sortingAcending = true;
+    this.onRemoveOrigin = ()=>{};
   }
   sorters = {
     origin: (a, b) => a.origin.localeCompare(b.origin),
@@ -59,7 +61,7 @@ export class ContextTable extends LitElement {
             this.sortingAcending,
             this.#setSorting.bind(this)
           )}
-          ${sortedList.map((c) => tableRow(c, this.serverList))}
+          ${sortedList.map((c) => tableRow(c, this.serverList, this.onRemoveOrigin))}
         </table>
         ${noElementPlaceHolder(this.contexts)}
       </div>
@@ -168,6 +170,23 @@ export class ContextTable extends LitElement {
     .tableHolder td {
       padding: 16px;
     }
+    .deleteBtn{
+        background-color: transparent;
+        color: transparent;
+        border: transparent;
+        background-image: url("../../assets/img/delete-gray.svg");
+        background-position: center center;
+      background-repeat: no-repeat;
+      transition: ease-in-out 0.3s; 
+    }
+    .deleteBtn:hover{
+        filter: brightness(1.5);
+    }
+    td.delete{
+        width: 30px;
+    }
+
+
   `;
 }
 customElements.define("mz-context-table", ContextTable);
@@ -217,12 +236,13 @@ export const tableHeading = (
           Location
         </button>
       </th>
+      <th></th>
     </tr>
   `;
 };
 
-export const noElementPlaceHolder = (contexts = new Map()) => {
-  if (contexts.size != 0) {
+export const noElementPlaceHolder = (contexts = []) => {
+  if (contexts.length != 0) {
     return null;
   }
   return html`
@@ -240,7 +260,7 @@ export const noElementPlaceHolder = (contexts = new Map()) => {
 /**
  * @param {SiteContext} ctx
  */
-export const tableRow = (ctx, serverList) => {
+export const tableRow = (ctx, serverList, removeOrigin) => {
   const name = ctx.excluded
     ? ""
     : Utils.nameFor(ctx.countryCode, ctx.cityCode, serverList);
@@ -252,6 +272,9 @@ export const tableRow = (ctx, serverList) => {
         <img src="../../assets/img/shield-${ctx.excluded ? "off" : "on"}.svg" />
       </td>
       <td>${name}</td>
+      <td class="delete">
+        <button class="deleteBtn" @click=${()=>{removeOrigin(ctx.origin)}}>remove</button>
+      </td>
     </tr>
   `;
 };

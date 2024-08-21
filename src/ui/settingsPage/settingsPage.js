@@ -80,9 +80,15 @@ export class SettingsPage extends LitElement {
         <mz-context-table
           .contexts=${filteredList}
           .serverList=${this.serverList}
+          .onRemoveOrigin=${this.removeOrigin.bind(this)}
         ></mz-context-table>
       </main>
     `;
+  }
+  removeOrigin(origin){
+    this.proxyHandler.then(handler => {
+        handler.removeContextForOrigin(origin);
+    })
   }
 
   static styles = css`
