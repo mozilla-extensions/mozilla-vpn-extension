@@ -51,8 +51,16 @@ export class BrowserActionPopup extends LitElement {
     super();
     this.pageURL = null;
     this._siteContext = null;
+    browser.tabs.onUpdated.addListener(() => this.updatePage());
+    browser.tabs.onActivated.addListener(() => this.updatePage());
+    vpnController.state.subscribe((s) => (this.vpnState = s));
+    this.updatePage();
+  }
+  updatePage() {
     Utils.getCurrentTab().then(async (tab) => {
       if (!Utils.isValidForProxySetting(tab.url)) {
+        this.pageURL = null;
+        this._siteContext = null;
         return;
       }
       const hostname = Utils.getFormattedHostname(tab.url);
@@ -61,8 +69,8 @@ export class BrowserActionPopup extends LitElement {
         this._siteContext = proxyHandler.siteContexts.value.get(this.pageURL);
       }
     });
-    vpnController.state.subscribe((s) => (this.vpnState = s));
   }
+
   connectedCallback() {
     super.connectedCallback();
   }
