@@ -2,8 +2,8 @@
   "manifest_version": 2,
   "version": "1.0",
   "author": "Mozilla",
-  "name": "Mozilla VPN Web Extension (TODO Localize)",
-  "description": "Mozilla VPN",
+  "name": "__MSG_extensionName__",
+  "description": "__MSG_extensionDescription__",
 
   "browser_specific_settings": {
     "gecko": {
@@ -36,6 +36,7 @@
   "icons": {
     "48": "assets/logos/logo-dark.svg"
   },
+  "default_locale": "en",
 
   "incognito": "spanning",
 

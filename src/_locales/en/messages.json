@@ -1,0 +1,69 @@
+{
+  "extensionName": {
+    "message": "Mozilla VPN Extension",
+    "description": "Name of the extension."
+  },
+
+  "extensionDescription": {
+    "message": "Integrate VPN into Firefox: Exclude Tabs, set Site locations and more!",
+    "description": "Description of the extension."
+  },
+
+  "notificationTitle": {
+    "message": "Click notification",
+    "description": "Title of the click notification."
+  },
+  "productName": {
+    "message": "Mozilla VPN",
+    "description": "Name of the Product"
+  },
+
+  "notificationContent": {
+    "message": "You clicked $URL$.",
+    "description": "Tells the user which link they clicked.",
+    "placeholders": {
+      "url": {
+        "content": "$1",
+        "example": "https://developer.mozilla.org"
+      }
+    }
+  },
+  "titleServerList": {
+    "message": "Select site location",
+    "description": "The header of a Serverlist, prompting the user to select a location"
+  },
+  "titlePageSettings": {
+    "message": "Preferences for this site",
+    "description": "The header for website specific settings i.e exclude a page from vpn"
+  },
+  "exludePageFor": {
+    "message": "Always turn off VPN protection for  $origin$ ",
+    "description": "Setting to exclude a website from vpn ",
+    "placeholders": {
+      "origin": {
+        "content": "$1",
+        "example": "developer.mozilla.org"
+      }
+    }
+  },
+  "resetPageSettings": {
+    "message": "Reset site preferences",
+    "description": "Button Text to Reset all Site specific settings"
+  },
+  "isPrivateConnection": {
+    "message": "Secure and private",
+    "description": "Subheader in the 'card' telling users their current connection is secured by the vpn"
+  },
+  "turnOnForPrivateConnection": {
+    "message": "Turn on to protect your browser",
+    "description": "Call to Action for users to turn on the VPN"
+  },
+  "vpnIsOn": {
+    "message": "VPN is On",
+    "description": "Header to signal that VPN connection is enabled"
+  },
+  "vpnIsOff": {
+    "message": "VPN is Off",
+    "description": "Header to signal that VPN connection is disabled"
+  }
+}

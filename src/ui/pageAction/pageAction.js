@@ -7,6 +7,7 @@ import { html, css, LitElement } from "../../vendor/lit-all.min.js";
 import { vpnController, proxyHandler } from "../browserAction/backend.js";
 
 import { Utils } from "../../shared/utils.js";
+import { tr } from "../../shared/i18n.js";
 
 import { fontSizing, resetSizing } from "../../components/styles.js";
 
@@ -81,7 +82,7 @@ export class PageActionPopup extends LitElement {
     };
 
     return html`
-      <h1>Mozilla VPN</h1>
+      <h1>${tr("productName")}</h1>
       <p id="context-description">${contextDescriptionText()}</p>
 
       <div class="flex">
