@@ -101,9 +101,18 @@ export class ServerList extends LitElement {
       this.serverList,
       this.filterInput.value?.value
     );
+    let countryListProvider = this.#getCountryListItem.bind(this);
     if (filteredList.length == 1) {
-      // Nit: If we only have one, spare them a click and auto expand it.
-      this.openedCountries.push(filteredList.at(0));
+      // Nit: If we only have one, use a countryListItem provider that
+      // forces the list to be open :)
+      countryListProvider = (serverCountry) => {
+        return countryListItem(
+          serverCountry,
+          true,
+          () => {},
+          this.#getCityItem.bind(this)
+        );
+      };
     }
 
     return html`
@@ -115,7 +124,7 @@ export class ServerList extends LitElement {
         @change=${() => this.requestUpdate()}
         @input=${() => this.requestUpdate()}
       />
-      ${countrylistHolder(filteredList, this.#getCountryListItem.bind(this))}
+      ${countrylistHolder(filteredList, countryListProvider)}
     `;
   }
 
