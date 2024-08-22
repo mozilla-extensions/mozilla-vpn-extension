@@ -34,11 +34,20 @@ export class ProxyHandler extends Component {
   controllerState;
 
   #mSiteContexts = property(new Map());
+  #lastChangedOrigin = property("");
   currentPort;
 
   /** @type {IBindable<Map<String, SiteContext>>} */
   get siteContexts() {
     return this.#mSiteContexts.readOnly;
+  }
+  /**
+   * Returns a bindable containing the last origin
+   * whos siteContext got changed
+   * @type {IBindable<String>}
+   * */
+  get lastChangedOrigin() {
+    return this.#lastChangedOrigin.readOnly;
   }
 
   async init() {
@@ -72,6 +81,7 @@ export class ProxyHandler extends Component {
 
     const siteContexts = await this.#mSiteContexts.value;
     siteContexts.set(siteContext.origin, { ...siteContext });
+    this.#lastChangedOrigin.set(siteContext.origin);
     return this.#setSiteContexts(siteContexts);
   }
   async #getSiteContexts() {
@@ -91,6 +101,7 @@ export class ProxyHandler extends Component {
   async removeContextForOrigin(origin) {
     const siteContexts = this.#mSiteContexts.value;
     siteContexts.delete(origin);
+    this.#lastChangedOrigin.set(origin);
     return this.#setSiteContexts(siteContexts);
   }
 
