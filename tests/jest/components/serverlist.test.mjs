@@ -207,7 +207,7 @@ describe("Serverlist Templates", () => {
     document.body.append(element);
     // Wait for lit to render to the dom
     await element.requestUpdate();
-    const button = element.shadowRoot.querySelector("input");
+    const button = element.shadowRoot.querySelector("input[type='radio']");
     expect(button.dataset.cityName).not.toBeNull();
     button.click();
 
