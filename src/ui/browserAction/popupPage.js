@@ -14,7 +14,7 @@ import {
 import { vpnController, proxyHandler } from "./backend.js";
 
 import { Utils } from "../../shared/utils.js";
-
+import { tr } from "../../shared/i18n.js";
 import { fontSizing, resetSizing } from "../../components/styles.js";
 
 // Other components used
@@ -108,7 +108,7 @@ export class BrowserActionPopup extends LitElement {
       return this.stackView?.value?.count > 1;
     })();
     let title = this.stackView?.value?.currentElement?.dataset?.title;
-    title ??= "Mozilla VPN";
+    title ??= tr("productName");
 
     return html`
       <vpn-titlebar title="${title}" ${ref(this.titleBar)}>
@@ -116,7 +116,7 @@ export class BrowserActionPopup extends LitElement {
         <img slot="right" src="../../assets/img/settings-cog.svg" />
       </vpn-titlebar>
       <stack-view ${ref(this.stackView)}>
-        <section data-title="Mozilla VPN">
+        <section data-title="${tr("productName")}">
           <main>
             <vpn-card
               .enabled=${this.vpnState?.connected}
@@ -204,7 +204,7 @@ export class BrowserActionPopup extends LitElement {
         return null;
       }
       return html`
-        <h2>Select site location</h2>
+        <h2>${tr("titleServerList")}</h2>
         <div class="row" id="selectPageLocation" @click=${openServerList}>
           <img
             src="../../assets//flags/${siteContext.countryCode}.png"
@@ -223,19 +223,19 @@ export class BrowserActionPopup extends LitElement {
     })();
 
     return html`
-      <h1>Preferences for this site</h1>
+      <h1>${tr("titlePageSettings")}</h1>
       <div class="row">
         <input
           type="checkbox"
           ?checked=${siteContext.excluded}
           @click=${tooggleExcluded}
         />
-        <p>Always turn off VPN protection for <b>${siteContext.origin}</b></p>
+        <p>${tr("exludePageFor", siteContext.origin)}</p>
       </div>
       ${pageLocationPicker}
       ${hasSiteContext
         ? html`<button id="selectLocation" @click=${removeSiteContext}>
-            Reset Site Preferences
+            ${tr("resetPageSettings")}
           </button>`
         : null}
     `;

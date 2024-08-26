@@ -9,7 +9,7 @@ import {
   classMap,
   styleMap,
 } from "../vendor/lit-all.min.js";
-
+import { tr } from "../shared/i18n.js";
 import { resetSizing } from "./styles.js";
 
 /**
@@ -84,15 +84,16 @@ export class VPNCard extends LitElement {
     const timeString = this.enabled ? html`<p>${formatTime(time)}</p>` : html``;
 
     const subLine = this.enabled
-      ? "Secure and private"
-      : "Turn on to protect your browser";
+      ? tr("isPrivateConnection")
+      : tr("turnOnForPrivateConnection");
+    const vpnHeader = this.enabled ? tr("vpnIsOn") : tr("vpnIsOff");
 
     return html`
       <div class="${classMap(boxClasses)}">
         <main>
           <img src=${shieldURL} />
           <div class="infobox">
-            <h1>VPN is ${this.enabled ? "On" : "Off"}</h1>
+            <h1>${vpnHeader}</h1>
             <p>${subLine}</p>
             ${timeString}
           </div>
