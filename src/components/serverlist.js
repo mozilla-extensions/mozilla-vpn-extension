@@ -9,6 +9,8 @@ import {
 } from "../vendor/lit-all.min.js";
 import { resetSizing } from "./styles.js";
 
+import { tr } from "../shared/i18n.js";
+
 import { ServerCity } from "../background/vpncontroller/states.js";
 
 /**
@@ -119,7 +121,7 @@ export class ServerList extends LitElement {
       <input
         type="text"
         class="search"
-        placeholder="Search Countries"
+        placeholder="${tr("searchServer")}"
         ${ref(this.filterInput)}
         @change=${() => this.requestUpdate()}
         @input=${() => this.requestUpdate()}

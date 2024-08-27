@@ -115,5 +115,9 @@
   "altTextOpenSettingsPage": {
     "message": "Open Settings Page",
     "description": "Alt text for the button that opens the Extensions Settings page"
+  },
+  "searchServer": {
+    "message": "Search Server",
+    "description": "Placeholder for the Input field Where users can search the Serverlist"
   }
 }
