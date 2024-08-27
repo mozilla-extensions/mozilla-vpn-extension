@@ -269,7 +269,7 @@ export class ServerList extends LitElement {
     }
 
     input.search {
-      margin-bottom: 32px;
+      margin-bottom: 16px;
       padding: 10px 20px;
       padding-left: 30px;
       color: var(--text-color-invert);
