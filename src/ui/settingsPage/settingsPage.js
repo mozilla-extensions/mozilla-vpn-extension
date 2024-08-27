@@ -11,8 +11,8 @@ import {
 } from "../../vendor/lit-all.min.js";
 import { fontSizing, resetSizing } from "../../components/styles.js";
 import { getExposedObject } from "../../shared/ipc.js";
-
 import "./tableElement.js";
+import { tr } from "../../shared/i18n.js";
 /**
  * This is the Page-Level Component for the SettingsPafe
  *
@@ -45,7 +45,7 @@ export class SettingsPage extends LitElement {
     // Let's render the view!
     return html`
       <header>
-        <picture class="icon">
+        <picture class="icon" alt="${tr("productName")}">
           <!-- User prefers light mode: -->
           <source
             srcset="../../assets/logos/logo-dark.svg"
@@ -57,13 +57,17 @@ export class SettingsPage extends LitElement {
             media="(prefers-color-scheme: dark)"
           />
           <!-- User has no color preference: -->
-          <img src="../../assets/logos/logo-dark.svg" />
+          <img
+            src="../../assets/logos/logo-dark.svg"
+            alt="${tr("productName")}"
+          />
         </picture>
         <h1>Mozilla VPN</h1>
       </header>
       <main>
-        <h2>Website Preferences</h2>
+        <h2>${tr("headlineWebsitePreferences")}</h2>
         <p>
+          <!-- TODO: Check if those strings are the ones we want to publish. -->
           You can manage VPN preferences for each website in the Mozilla VPN for
           Firefox extension.
         </p>
@@ -71,7 +75,7 @@ export class SettingsPage extends LitElement {
           <img />
           <input
             type="text"
-            placeholder="Search Websites"
+            placeholder=${tr("placeholderSearchWebsites")}
             ${ref(this.filterInput)}
             @change=${() => this.requestUpdate()}
             @input=${() => this.requestUpdate()}

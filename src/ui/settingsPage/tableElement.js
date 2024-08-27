@@ -11,6 +11,7 @@ import {
 } from "../../vendor/lit-all.min.js";
 import { fontSizing, resetSizing } from "../../components/styles.js";
 import { Utils } from "../../shared/utils.js";
+import { tr } from "../../shared/i18n.js";
 
 /**
  * This Element consumes an Array<SiteContext> renders it as a Table
@@ -225,7 +226,7 @@ export const tableHeading = (
     <tr class="tableHeader">
       <th>
         <button class=${getClass("origin")} @click=${() => onClick("origin")}>
-          Website
+          ${tr("tableHeadingWebsite")}
         </button>
       </th>
       <th>
@@ -233,12 +234,12 @@ export const tableHeading = (
           class=${getClass("excluded")}
           @click=${() => onClick("excluded")}
         >
-          VPN status
+          ${tr("tableHeadingVpnStatus")}
         </button>
       </th>
       <th>
         <button class=${getClass("city")} @click=${() => onClick("city")}>
-          Location
+          ${tr("tableHeadingLocation")}
         </button>
       </th>
       <th></th>
@@ -253,11 +254,8 @@ export const noElementPlaceHolder = (contexts = []) => {
   return html`
     <div class="emptyState">
       <img src="../../assets/img/country-tabs.svg" />
-      <h3>You havent set any website preferences yet</h3>
-      <p>
-        If you turn off VPN protection or set a custom location for any
-        websites,you'll see them here.
-      </p>
+      <h3>${tr("headlineNoWebsitePreferences")}</h3>
+      <p>${tr("noWebsitePreferencesSubText")}</p>
     </div>
   `;
 };
@@ -276,18 +274,22 @@ export const tableRow = (ctx, serverList, removeOrigin) => {
         <a href="https://${ctx.origin}">${ctx.origin}</a>
       </td>
       <td class="row">
-        <img src="../../assets/img/shield-${ctx.excluded ? "off" : "on"}.svg" />
-        ${ctx.excluded ? "OFF" : "ON"}
+        <img
+          aria-hidden="true"
+          src="../../assets/img/shield-${ctx.excluded ? "off" : "on"}.svg"
+        />
+        ${ctx.excluded ? tr("vpnOfStatus") : tr("vpnOnStatus")}
       </td>
       <td>${name}</td>
       <td class="delete">
         <button
           class="deleteBtn"
+          title="${tr("altTextRemoveWebsiteButton", ctx.origin)}"
           @click=${() => {
             removeOrigin(ctx.origin);
           }}
         >
-          remove
+          ${tr("altTextRemoveWebsiteButton", ctx.origin)}
         </button>
       </td>
     </tr>
