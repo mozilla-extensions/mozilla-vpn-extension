@@ -23,7 +23,7 @@ export class ContextTable extends LitElement {
     serverList: { type: Array },
     contexts: { type: Array },
     sortingKey: { type: String },
-    sortingAcending: { type: Boolean },
+    sortingAscending: { type: Boolean },
     onRemoveOrigin: { type: Function },
   };
   constructor() {
@@ -31,7 +31,7 @@ export class ContextTable extends LitElement {
     this.serverList = [];
     this.contexts = [];
     this.sortingKey = "origin";
-    this.sortingAcending = true;
+    this.sortingAscending = true;
     this.onRemoveOrigin = () => {};
   }
   sorters = {
@@ -42,14 +42,14 @@ export class ContextTable extends LitElement {
 
   filterInput = createRef();
 
-  #setSorting(key, acending) {
-    (this.sortingKey = key), (this.sortingAcending = acending);
+  #setSorting(key, ascending) {
+    (this.sortingKey = key), (this.sortingAscending = ascending);
   }
 
   render() {
     // Step 2 Select the active sorter,
     // if decending wrap it in a function swapping the inputs
-    let sorter = this.sortingAcending
+    let sorter = this.sortingAscending
       ? this.sorters[this.sortingKey]
       : (a, b) => this.sorters[this.sortingKey](b, a);
     // Sort it!
@@ -60,7 +60,7 @@ export class ContextTable extends LitElement {
         <table>
           ${tableHeading(
             this.sortingKey,
-            this.sortingAcending,
+            this.sortingAscending,
             this.#setSorting.bind(this)
           )}
           ${sortedList.map((c) =>
@@ -167,14 +167,14 @@ customElements.define("mz-context-table", ContextTable);
 
 export const tableHeading = (
   sortedBy = "",
-  acending = true,
+  ascending = true,
   sortBy = () => {}
 ) => {
   const getClass = (id) => {
     if (sortedBy != id) {
       return "";
     }
-    if (acending) {
+    if (ascending) {
       return "sorted-down";
     }
     return "sorted-up";
@@ -183,7 +183,7 @@ export const tableHeading = (
   const onClick = (clickedId) => {
     // If it's the same, just toggle sort type.
     if (clickedId === sortedBy) {
-      sortBy(clickedId, !acending);
+      sortBy(clickedId, !ascending);
       return;
     }
     // Otherwise just asc search.
