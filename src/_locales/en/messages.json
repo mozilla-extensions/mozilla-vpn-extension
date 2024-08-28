@@ -66,6 +66,14 @@
     "message": "VPN is Off",
     "description": "Header to signal that VPN connection is disabled"
   },
+  "vpnOffStatus": {
+    "message": "OFF",
+    "description": "Label indicating that the VPN is off."
+  },
+  "vpnOnStatus": {
+    "message": "ON",
+    "description": "Label indicating that the VPN is on."
+  },
   "headlineWebsitePreferences": {
     "message": "Website Preferences",
     "description": "Headline for the Website Preferences page."

@@ -62,7 +62,7 @@ export class SettingsPage extends LitElement {
             alt="${tr("productName")}"
           />
         </picture>
-        <h1>Mozilla VPN</h1>
+        <h1>${tr("productName")}</h1>
       </header>
       <main>
         <h2>${tr("headlineWebsitePreferences")}</h2>
