@@ -13,6 +13,7 @@ import { fontSizing, resetSizing } from "../../components/styles.js";
 import { getExposedObject } from "../../shared/ipc.js";
 import "./tableElement.js";
 import { tr } from "../../shared/i18n.js";
+import { settingTypo } from "./styles.js";
 /**
  * This is the Page-Level Component for the SettingsPafe
  *
@@ -85,7 +86,9 @@ export class SettingsPage extends LitElement {
           .contexts=${filteredList}
           .serverList=${this.serverList}
           .onRemoveOrigin=${this.removeOrigin.bind(this)}
-        ></mz-context-table>
+        >
+          ${this.contexts.size == 0 ? noElementPlaceHolder() : null}
+        </mz-context-table>
       </main>
     `;
   }
@@ -98,6 +101,7 @@ export class SettingsPage extends LitElement {
   static styles = css`
     ${fontSizing}
     ${resetSizing}
+    ${settingTypo}
 
   body {
       width: var(--window-width);
@@ -138,25 +142,11 @@ export class SettingsPage extends LitElement {
       width: 30px;
     }
 
-    h2 {
-      font-size: 38px;
-      font-style: normal;
-      font-weight: 700;
-      line-height: 40px; /* 105.263% */
-      margin-bottom: 18px;
-    }
-    p {
-      font-size: 16px;
-      font-style: normal;
-      font-weight: 400;
-      line-height: 169.336%;
-      margin-bottom: 32px;
-    }
     input {
       margin-bottom: 32px;
       padding: 10px 20px;
       padding-left: 30px;
-      color: var(--text-color-invert);
+      color: black;
       width: calc(max(50%, 300px));
       background-image: url("../../assets/img/search-icon.svg");
       background-position: 2.5px 6px;
@@ -165,11 +155,12 @@ export class SettingsPage extends LitElement {
       border-radius: 5px;
     }
 
-    main p {
-      font-size: 14px;
-      font-style: normal;
-      font-weight: 400;
-      line-height: 21px;
+    .emptyState {
+      padding: 50px 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
     }
   `;
 }
@@ -181,10 +172,20 @@ customElements.define("mz-settingspage", SettingsPage);
  */
 export const filter = (siteContextList, filterString = "") => {
   const out = [];
-  siteContextList.keys().forEach((key) => {
+  for (const [key] of siteContextList.entries()) {
     if (key.includes(filterString)) {
       out.push({ ...siteContextList.get(key) });
     }
-  });
+  }
   return out;
+};
+
+export const noElementPlaceHolder = () => {
+  return html`
+    <div class="emptyState">
+      <img aria-hidden="true" src="../../assets/img/country-tabs.svg" />
+      <h3>${tr("headlineNoWebsitePreferences")}</h3>
+      <p>${tr("noWebsitePreferencesSubText")}</p>
+    </div>
+  `;
 };

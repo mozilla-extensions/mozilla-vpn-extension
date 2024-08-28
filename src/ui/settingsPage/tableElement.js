@@ -12,6 +12,7 @@ import {
 import { fontSizing, resetSizing } from "../../components/styles.js";
 import { Utils } from "../../shared/utils.js";
 import { tr } from "../../shared/i18n.js";
+import { settingTypo } from "./styles.js";
 
 /**
  * This Element consumes an Array<SiteContext> renders it as a Table
@@ -66,7 +67,7 @@ export class ContextTable extends LitElement {
             tableRow(c, this.serverList, this.onRemoveOrigin)
           )}
         </table>
-        ${noElementPlaceHolder(this.contexts)}
+        <slot></slot>
       </div>
     `;
   }
@@ -74,6 +75,7 @@ export class ContextTable extends LitElement {
   static styles = css`
     ${fontSizing}
     ${resetSizing}
+    ${settingTypo}
       * {
       color: var(--text-color-primary);
     }
@@ -91,47 +93,13 @@ export class ContextTable extends LitElement {
     .tableHolder table {
       width: 100%;
     }
-    h2 {
-      font-size: 38px;
-      font-style: normal;
-      font-weight: 700;
-      line-height: 40px; /* 105.263% */
-      margin-bottom: 18px;
-    }
-    p {
-      font-size: 16px;
-      font-style: normal;
-      font-weight: 400;
-      line-height: 169.336%;
-      margin-bottom: 32px;
-    }
+
     .tableHeader {
       height: 56px;
     }
     .tableHeader th {
       text-align: left;
       padding-left: 16px;
-    }
-
-    .emptyState {
-      padding: 50px 10px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-    h3 {
-      font-size: 24px;
-      font-style: normal;
-      font-weight: 700;
-      line-height: 26px;
-      margin-bottom: 16px;
-    }
-    main p {
-      font-size: 14px;
-      font-style: normal;
-      font-weight: 400;
-      line-height: 21px;
     }
 
     .tableHolder th {
@@ -247,19 +215,6 @@ export const tableHeading = (
   `;
 };
 
-export const noElementPlaceHolder = (contexts = []) => {
-  if (contexts.length != 0) {
-    return null;
-  }
-  return html`
-    <div class="emptyState">
-      <img src="../../assets/img/country-tabs.svg" />
-      <h3>${tr("headlineNoWebsitePreferences")}</h3>
-      <p>${tr("noWebsitePreferencesSubText")}</p>
-    </div>
-  `;
-};
-
 /**
  * @param {SiteContext} ctx
  */
@@ -278,7 +233,7 @@ export const tableRow = (ctx, serverList, removeOrigin) => {
           aria-hidden="true"
           src="../../assets/img/shield-${ctx.excluded ? "off" : "on"}.svg"
         />
-        ${ctx.excluded ? tr("vpnOfStatus") : tr("vpnOnStatus")}
+        ${ctx.excluded ? tr("vpnOffStatus") : tr("vpnOnStatus")}
       </td>
       <td>${name}</td>
       <td class="delete">
