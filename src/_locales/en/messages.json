@@ -111,5 +111,9 @@
         "example": "developer.mozilla.org"
       }
     }
+  },
+  "altTextOpenSettingsPage": {
+    "message": "Open Settings Page",
+    "description": "Alt text for the button that opens the Extensions Settings page"
   }
 }

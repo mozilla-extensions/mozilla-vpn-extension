@@ -22,7 +22,7 @@ import "./../../components/stackview.js";
 import "./../../components/serverlist.js";
 import "./../../components/vpncard.js";
 import "./../../components/titlebar.js";
-import { settingsButton } from "./../../components/settingsBtn.js";
+import "./../../components/iconbutton.js";
 import { SiteContext } from "../../background/proxyHandler/siteContext.js";
 import {
   ServerCountry,
@@ -114,7 +114,12 @@ export class BrowserActionPopup extends LitElement {
     return html`
       <vpn-titlebar title="${title}" ${ref(this.titleBar)}>
         ${canGoBack ? BrowserActionPopup.backBtn(back) : null}
-        ${settingsButton()}
+        <mz-iconlink
+          alt=${tr("altTextOpenSettingsPage")}
+          href="/ui/settingsPage/index.html"
+          icon="settings-cog"
+          slot="right"
+        ></mz-iconlink>
       </vpn-titlebar>
       <stack-view ${ref(this.stackView)}>
         <section data-title="${tr("productName")}">
