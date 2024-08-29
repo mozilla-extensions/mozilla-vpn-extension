@@ -47,6 +47,8 @@
   --action-button-color: #0060df;
 
   --padding-default: 16px;
+  --button-transition: background-color 0.2s ease;
+  --button-border-radius: 5px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -55,6 +57,11 @@
     --border-color: lch(from var(--panel-bg-color) calc(l + 15) c h);
 
     --text-color-primary: white;
+
+    --button-ghost-bg-default: rgba(255, 255, 255, 0.0);
+    --button-ghost-bg-hovered: rgba(255, 255, 255, 0.1);
+    --button-ghost-bg-pressed: rgba(255, 255, 255, 0.15);
+    --button-ghost-outline: rgba(255, 255, 255, 0.5);
   }
 }
 
@@ -67,5 +74,10 @@
     --panel-bg-color: #f9f9fb;
     --text-color-primary: #3d3d3d;
     --border-color: lch(from var(--panel-bg-color) calc(l - 15) c h);
+
+    --button-ghost-bg-default: rgba(230, 230, 230, 0);
+    --button-ghost-bg-hovered: rgba(230, 230, 230, 1);
+    --button-ghost-bg-pressed: rgba(194, 194, 194, 1);
+    --button-ghost-outline: rgba(230, 230, 230, 0.5);
   }
 }

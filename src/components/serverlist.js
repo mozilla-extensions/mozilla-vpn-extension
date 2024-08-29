@@ -5,7 +5,7 @@ import {
   classMap,
   styleMap,
 } from "../vendor/lit-all.min.js";
-import { resetSizing } from "./styles.js";
+import { ghostButtonStyles, resetSizing } from "./styles.js";
 
 import { ServerCity } from "../background/vpncontroller/states.js";
 
@@ -101,7 +101,7 @@ export class ServerList extends LitElement {
   }
 
   static styles = css`
-    ${resetSizing}
+    ${resetSizing} ${ghostButtonStyles}
 
     #moz-vpn-server-list-panel {
       block-size: var(--panelSize);
@@ -145,32 +145,13 @@ export class ServerList extends LitElement {
       margin-inline-start: 8px;
       margin-inline-end: 8px;
       inline-size: calc(100% - 16px);
-    }
-    .server-city-list-visibility-btn {
-      align-items: center;
+      position: relative;
     }
 
     /* We need to temporarily use !important for this button to make sure the right color applies */
     .server-city-list-visibility-btn {
       display: flex;
-      background-color: var(--panel-bg-color) !important;
-      border-radius: 4px;
-      border: none;
-      transition: background-color 0.3s ease;
-    }
-
-    .server-city-list-visibility-btn:hover {
-      background-color: var(--button-bg-hover-color-secondary) !important;
-    }
-
-    .server-city-list-visibility-btn:focus {
-      outline: 2px solid var(--button-bg-focus-color-primary);
-      outline-offset: 2px;
-    }
-
-    .server-city-list-visibility-btn:active {
-      background-color: var(--button-bg-active-color-secondary) !important;
-      outline: none;
+      align-items: center;
     }
 
     .toggle {
@@ -306,7 +287,7 @@ export const countryListItem = (
       data-country-code="${serverCountry.code}"
       @click=${onclick}
     >
-      <button class="server-city-list-visibility-btn ">
+      <button class="server-city-list-visibility-btn ghost-btn">
         <div class="toggle"></div>
         <img
           class="server-country-flag"

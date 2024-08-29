@@ -15,7 +15,7 @@ import { vpnController, proxyHandler } from "./backend.js";
 
 import { Utils } from "../../shared/utils.js";
 import { tr } from "../../shared/i18n.js";
-import { fontSizing, resetSizing } from "../../components/styles.js";
+import { fontSizing, ghostButtonStyles, resetSizing } from "../../components/styles.js";
 
 // Other components used
 import "./../../components/stackview.js";
@@ -210,8 +210,8 @@ export class BrowserActionPopup extends LitElement {
         return null;
       }
       return html`
-        <h2>${tr("titleServerList")}</h2>
-        <div class="row" id="selectPageLocation" @click=${openServerList}>
+        <h2 class="select-location-title">${tr("titleServerList")}</h2>
+        <button class="row ghost-btn" id="selectPageLocation" @click=${openServerList}>
           <img
             src="../../assets//flags/${siteContext.countryCode}.png"
             height="24"
@@ -224,7 +224,7 @@ export class BrowserActionPopup extends LitElement {
             width="12"
             class="arrow"
           />
-        </div>
+        </button>
       `;
     })();
 
@@ -275,7 +275,7 @@ export class BrowserActionPopup extends LitElement {
   }
 
   static styles = css`
-    ${fontSizing}${resetSizing}
+    ${fontSizing}${resetSizing}${ghostButtonStyles}
     section {
       background-color: var(--panel-bg-color);
     }
@@ -283,63 +283,63 @@ export class BrowserActionPopup extends LitElement {
     main {
       padding: var(--padding-default);
     }
+
     * {
       color: var(--text-color-primary);
       font-family: var(--font-family);
     }
+
     .row {
       display: flex;
       justify-content: center;
       align-items: center;
     }
+
     .row p {
       flex: 1;
       flex-grow: 1;
     }
+
     .row img:first-child {
       margin-right: var(--padding-default);
     }
+
     .row img:last-of-type {
       margin-left: var(--padding-default);
     }
+
     #selectPageLocation {
-      transition: all 0.15s ease;
-      background: transparent;
-      border-radius: 10px;
       padding: calc(var(--padding-default) / 2) 0px;
       position: relative;
+      margin-block-start: 0px;
     }
+
     #selectPageLocation:hover {
       cursor: default;
     }
-    #selectPageLocation:hover::before {
-      content: " ";
-      opacity: 0.9;
-    }
+
     #selectPageLocation::before {
-      content: " ";
-      z-index: -1;
-      opacity: 0;
-      background: lch(from var(--panel-bg-color) calc(l - 15) c h);
-      transform: all 0.5s ease;
-      background: white;
-      width: 105%;
-      height: 105%;
-      border-radius: 5px;
-      position: absolute;
-      top: -2.5%;
-      left: -2.5%;
+      inset: 0px -8px;
+    }
+
+    #selectPageLocation p {
+      text-align: left;
     }
 
     vpn-card {
       display: block;
       margin-bottom: calc(var(--padding-default) * 1);
     }
+
     h1,
-    h2,
     h3 {
       margin-top: calc(var(--padding-default) / 2);
       margin-bottom: calc(var(--padding-default) / 2);
+    }
+
+    h2  {
+      margin-block-start: var(--padding-default);
+      margin-block-end: calc(var(--padding-default) / 4)
     }
 
     input {
@@ -374,9 +374,6 @@ export class BrowserActionPopup extends LitElement {
     @media (prefers-color-scheme: dark) {
       .arrow {
         filter: invert();
-      }
-      #selectPageLocation::before {
-        background: lch(from var(--panel-bg-color) calc(l + 15) c h);
       }
     }
   `;
