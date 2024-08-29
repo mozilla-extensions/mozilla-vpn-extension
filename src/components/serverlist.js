@@ -103,13 +103,6 @@ export class ServerList extends LitElement {
   static styles = css`
     ${resetSizing} ${ghostButtonStyles}
 
-    #moz-vpn-server-list-panel {
-      block-size: var(--panelSize);
-      max-block-size: var(--panelSize);
-      min-block-size: var(--panelSize);
-      overflow-x: hidden;
-      overflow-y: hidden;
-    }
     .server-list-item {
       display: flex;
       flex-direction: column;
