@@ -113,7 +113,6 @@ export const fontSizing = css`
 `;
 
 export const ghostButtonStyles = css`
-
   button.ghost-btn {
     background-color: transparent;
     border: none;
@@ -153,5 +152,4 @@ export const ghostButtonStyles = css`
     background: var(--button-ghost-bg-pressed);
     border: none;
   }
-
 `;

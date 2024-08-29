@@ -15,7 +15,11 @@ import { vpnController, proxyHandler } from "./backend.js";
 
 import { Utils } from "../../shared/utils.js";
 import { tr } from "../../shared/i18n.js";
-import { fontSizing, ghostButtonStyles, resetSizing } from "../../components/styles.js";
+import {
+  fontSizing,
+  ghostButtonStyles,
+  resetSizing,
+} from "../../components/styles.js";
 
 // Other components used
 import "./../../components/stackview.js";
@@ -211,7 +215,11 @@ export class BrowserActionPopup extends LitElement {
       }
       return html`
         <h2 class="select-location-title">${tr("titleServerList")}</h2>
-        <button class="row ghost-btn" id="selectPageLocation" @click=${openServerList}>
+        <button
+          class="row ghost-btn"
+          id="selectPageLocation"
+          @click=${openServerList}
+        >
           <img
             src="../../assets//flags/${siteContext.countryCode}.png"
             height="24"
@@ -337,9 +345,9 @@ export class BrowserActionPopup extends LitElement {
       margin-bottom: calc(var(--padding-default) / 2);
     }
 
-    h2  {
+    h2 {
       margin-block-start: var(--padding-default);
-      margin-block-end: calc(var(--padding-default) / 4)
+      margin-block-end: calc(var(--padding-default) / 4);
     }
 
     input {

@@ -58,7 +58,7 @@
 
     --text-color-primary: white;
 
-    --button-ghost-bg-default: rgba(255, 255, 255, 0.0);
+    --button-ghost-bg-default: rgba(255, 255, 255, 0);
     --button-ghost-bg-hovered: rgba(255, 255, 255, 0.1);
     --button-ghost-bg-pressed: rgba(255, 255, 255, 0.15);
     --button-ghost-outline: rgba(255, 255, 255, 0.5);
