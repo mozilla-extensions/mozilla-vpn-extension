@@ -83,7 +83,7 @@ export class RequestHandler extends Component {
    * @returns
    */
   async interceptRequests(requestInfo) {
-    let { documentUrl } = requestInfo;
+    let { documentUrl, url } = requestInfo;
     // If we load an iframe request the top level document.
     if (requestInfo.frameId !== 0) {
       let topLevelFrame = await browser.webNavigation.getFrame({
@@ -93,7 +93,7 @@ export class RequestHandler extends Component {
       documentUrl = topLevelFrame.url;
     }
 
-    for (let urlString of [documentUrl]) {
+    for (let urlString of [documentUrl, url]) {
       if (urlString) {
         const parsedHostname = Utils.getFormattedHostname(urlString);
         const proxyInfo = this.proxyMap.get(parsedHostname);
