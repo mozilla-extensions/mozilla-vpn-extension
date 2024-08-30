@@ -76,12 +76,12 @@ export class BrowserActionPopup extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    requestIdleCallback(()=>{
+    requestIdleCallback(() => {
       vpnController.postToApp("status");
     });
-    requestIdleCallback(()=>{
+    requestIdleCallback(() => {
       vpnController.postToApp("servers");
-    })
+    });
   }
 
   get currentSiteContext() {
