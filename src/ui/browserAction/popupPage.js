@@ -299,7 +299,7 @@ export class BrowserActionPopup extends LitElement {
     }
 
     main {
-      padding: var(--padding-default);
+      padding: var(--padding-default) var(--padding-default) 0 var(--padding-default);
     }
 
     * {
@@ -329,7 +329,7 @@ export class BrowserActionPopup extends LitElement {
     #selectPageLocation {
       padding: calc(var(--padding-default) / 2) 0px;
       position: relative;
-      margin-block-start: 0px;
+      margin-block: 0px var(--padding-default);
     }
 
     #selectPageLocation:hover {
