@@ -139,6 +139,12 @@ export class ServerList extends LitElement {
       align-items: center;
     }
 
+    #moz-vpn-server-list-panel {
+      width: 100%;
+      overflow-x: hidden;
+      overflow-y: hidden;
+    }
+
     .server-list-item {
       display: flex;
       flex-direction: column;
@@ -244,16 +250,15 @@ export class ServerList extends LitElement {
     }
 
     input.search {
-      margin-bottom: 16px;
-      padding: 10px 20px;
-      padding-left: 30px;
+      margin-block: 16px;
+      padding: 10px 20px 10px 30px;
       color: var(--text-color-invert);
-      width: calc(max(50%, 300px));
+      width: calc(max(50%, 312px));
       background-image: url("../../assets/img/search-icon.svg");
       background-position: 2.5px 6px;
       background-repeat: no-repeat;
       border: 2px solid var(--border-color);
-      border-radius: 5px;
+      border-radius: var(--button-border-radius);
       color: black;
     }
   `;
