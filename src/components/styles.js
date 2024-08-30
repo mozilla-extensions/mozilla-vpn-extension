@@ -123,17 +123,7 @@ export const ghostButtonStyles = css`
   .ghost-btn::before {
     content: " ";
     pointer-events: none;
-    background: var(--button-ghost-bg-default);
-    transition: var(--button-transition);
-    border-radius: var(--button-border-radius);
-    position: absolute;
-    inset: 0px;
-  }
-
-  .ghost-btn::before {
-    content: " ";
-    pointer-events: none;
-    background: var(--button-ghost-bg-default);
+    background: lch(from var(--button-ghost-bg-color) l c h / 0.0);
     transition: var(--button-transition);
     border-radius: var(--button-border-radius);
     position: absolute;
@@ -141,15 +131,15 @@ export const ghostButtonStyles = css`
   }
 
   .ghost-btn:hover::before {
-    background: var(--button-ghost-bg-hovered);
+    background: lch(from var(--button-ghost-bg-color) l c h / 0.1);
   }
 
   .ghost-btn:focus::before {
-    border: 2px solid var(--button-ghost-outline);
+    border: 2px solid lch(from var(--button-ghost-bg-color) l c h / 0.5);
   }
 
   .ghost-btn:active::before {
-    background: var(--button-ghost-bg-pressed);
+    background: lch(from var(--button-ghost-bg-color) l c h / 0.15);
     border: none;
   }
 `;
