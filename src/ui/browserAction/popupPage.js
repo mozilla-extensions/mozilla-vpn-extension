@@ -22,6 +22,7 @@ import "./../../components/stackview.js";
 import "./../../components/serverlist.js";
 import "./../../components/vpncard.js";
 import "./../../components/titlebar.js";
+import "./../../components/iconbutton.js";
 import { SiteContext } from "../../background/proxyHandler/siteContext.js";
 import {
   ServerCountry,
@@ -127,7 +128,12 @@ export class BrowserActionPopup extends LitElement {
     return html`
       <vpn-titlebar title="${title}" ${ref(this.titleBar)}>
         ${canGoBack ? BrowserActionPopup.backBtn(back) : null}
-        <img slot="right" src="../../assets/img/settings-cog.svg" />
+        <mz-iconlink
+          alt=${tr("altTextOpenSettingsPage")}
+          href="/ui/settingsPage/index.html"
+          icon="settings-cog"
+          slot="right"
+        ></mz-iconlink>
       </vpn-titlebar>
       <stack-view ${ref(this.stackView)}>
         <section data-title="Mozilla VPN">
@@ -162,7 +168,11 @@ export class BrowserActionPopup extends LitElement {
       this.openServerList.bind(this),
       toggleExcludeWebsite,
       (ctx = new SiteContext()) => {
-        return nameFor(ctx.countryCode, ctx.cityCode, this.vpnState.servers);
+        return Utils.nameFor(
+          ctx.countryCode,
+          ctx.cityCode,
+          this.vpnState.servers
+        );
       },
       resetSitePrefrences,
       this._siteContext !== null
@@ -382,19 +392,6 @@ export class BrowserActionPopup extends LitElement {
   `;
 }
 customElements.define("popup-browseraction", BrowserActionPopup);
-
-const nameFor = (
-  countryCode = "de",
-  cityCode = "ber",
-  serverList = [new ServerCountry()]
-) => {
-  if (!serverList) {
-    return "";
-  }
-  return serverList
-    .find((sc) => sc.code === countryCode)
-    ?.cities.find((c) => c.code === cityCode)?.name;
-};
 
 const defaultSiteContext = (vpnState = new VPNState(), origin = "") => {
   return new SiteContext({
