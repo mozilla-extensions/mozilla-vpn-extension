@@ -4,8 +4,12 @@ import {
   LitElement,
   classMap,
   styleMap,
+  createRef,
+  ref,
 } from "../vendor/lit-all.min.js";
 import { resetSizing } from "./styles.js";
+
+import { tr } from "../shared/i18n.js";
 
 import { ServerCity } from "../background/vpncontroller/states.js";
 
@@ -92,18 +96,51 @@ export class ServerList extends LitElement {
       detail: { city, country },
     });
   }
+  filterInput = createRef();
 
   render() {
-    return countrylistHolder(
+    const filteredList = filterList(
       this.serverList,
-      this.#getCountryListItem.bind(this)
+      this.filterInput.value?.value
     );
+    let countryListProvider = this.#getCountryListItem.bind(this);
+    if (filteredList.length == 1) {
+      // Nit: If we only have one, use a countryListItem provider that
+      // forces the list to be open :)
+      countryListProvider = (serverCountry) => {
+        return countryListItem(
+          serverCountry,
+          true,
+          () => {},
+          this.#getCityItem.bind(this)
+        );
+      };
+    }
+
+    return html`
+      <input
+        type="text"
+        class="search"
+        placeholder="${tr("searchServer")}"
+        ${ref(this.filterInput)}
+        @change=${() => this.requestUpdate()}
+        @input=${() => this.requestUpdate()}
+      />
+      ${countrylistHolder(filteredList, countryListProvider)}
+    `;
   }
 
   static styles = css`
     ${resetSizing}
 
+    :host {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
     #moz-vpn-server-list-panel {
+      width: 100%;
       block-size: var(--panelSize);
       max-block-size: var(--panelSize);
       min-block-size: var(--panelSize);
@@ -232,6 +269,20 @@ export class ServerList extends LitElement {
       color: var(--text-color-primary);
       padding-inline-start: 18px;
     }
+
+    input.search {
+      margin-bottom: 16px;
+      padding: 10px 20px;
+      padding-left: 30px;
+      color: var(--text-color-invert);
+      width: calc(max(50%, 300px));
+      background-image: url("../../assets/img/search-icon.svg");
+      background-position: 2.5px 6px;
+      background-repeat: no-repeat;
+      border: 2px solid var(--border-color);
+      border-radius: 5px;
+      color: black;
+    }
   `;
 }
 customElements.define("server-list", ServerList);
@@ -341,4 +392,20 @@ export const countrylistHolder = (
       </ul>
     </div>
   `;
+};
+
+/**
+ *
+ * @param {Array<ServerCountry>} serverCountryList - The input List
+ * @param {String} filterString - A String to filter by
+ * @returns {Array<ServerCountry>} - The Filtered List
+ */
+export const filterList = (serverCountryList, filterString = "") => {
+  const target = filterString.toLowerCase();
+  return serverCountryList.filter((c) => {
+    if (c.name.toLowerCase().includes(target)) {
+      return true;
+    }
+    return c.cities.some((cty) => cty.name.toLowerCase().includes(target));
+  });
 };

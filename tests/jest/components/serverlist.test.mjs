@@ -49,7 +49,14 @@ const testCountry = (() => {
   out.name = "Testville";
   return out;
 })();
-const testServerList = [testCountry];
+const testCountry2 = (() => {
+  let out = new ServerCountry();
+  out.cities = [testCity, otherTestCity];
+  out.code = "oh-no";
+  out.name = "OtherVille";
+  return out;
+})();
+const testServerList = [testCountry, testCountry2];
 //#endregion
 
 describe("Serverlist Templates", () => {
@@ -194,6 +201,27 @@ describe("Serverlist Templates", () => {
     // Make sure once adopted to the dom it has rendered into a shadowdom
     expect(element.shadowRoot).not.toBeNull();
   });
+  test("Serverlist Expands Items on Click", async () => {
+    /** @type {ServerList} */
+    const element = document.createElement("server-list");
+    document.body.append(element);
+    element.serverList = testServerList;
+    await element.requestUpdate();
+    // Make sure importing the Module registers the custom element
+    expect(customElements.get("server-list")).toBe(ServerList);
+    //
+    const country = element.shadowRoot.querySelector(".server-list-item");
+    // Should not be opened by default
+    expect(country.classList.contains("opened")).toBe(false);
+    // After clicking on it, it should be opened
+    country.click();
+    await element.requestUpdate();
+    expect(country.classList.contains("opened")).toBe(true);
+    // Clicking it again should close it.
+    country.click();
+    await element.requestUpdate();
+    expect(country.classList.contains("opened")).toBe(false);
+  });
 
   test("Serverlist element emits a signal if the active city changes", async () => {
     /** @type {ServerList} */
@@ -207,7 +235,7 @@ describe("Serverlist Templates", () => {
     document.body.append(element);
     // Wait for lit to render to the dom
     await element.requestUpdate();
-    const button = element.shadowRoot.querySelector("input");
+    const button = element.shadowRoot.querySelector("input[type='radio']");
     expect(button.dataset.cityName).not.toBeNull();
     button.click();
 
@@ -216,5 +244,66 @@ describe("Serverlist Templates", () => {
       new Promise((_, err) => setTimeout(err, 100)),
     ]);
     expect(cityName).toBe(button.dataset.cityName);
+  });
+  test("Serverlist element *NOT* emits a signal if the same city is selected", async () => {
+    /** @type {ServerList} */
+    const element = document.createElement("server-list");
+    const newCityEmitted = new Promise((_, err) => {
+      element.addEventListener("selectedCityChanged", (e) => {
+        err(e.detail.city.name);
+      });
+    });
+    element.serverList = testServerList;
+    // Set the active city to the one we will click
+    element.selectedCity = testServerList[0].cities[0];
+    document.body.append(element);
+    // Wait for lit to render to the dom
+    await element.requestUpdate();
+    const button = element.shadowRoot.querySelector("input[type='radio']");
+    expect(button.dataset.cityName).not.toBeNull();
+    button.click();
+
+    const isOk = await Promise.race([
+      newCityEmitted,
+      // Queue a microtask to make sure all events have been processed
+      new Promise((res) => queueMicrotask(() => res(true))),
+    ]);
+    expect(isOk).toBe(true);
+  });
+
+  test("Serverlist can filter by text input", async () => {
+    /** @type {ServerList} */
+    const element = document.createElement("server-list");
+
+    element.serverList = testServerList;
+    document.body.append(element);
+    // Wait for lit to render to the dom
+    await element.requestUpdate();
+    expect(
+      element.shadowRoot.querySelectorAll(".server-list-item").length
+    ).toBe(2);
+    const queryInput = element.shadowRoot.querySelector("input[type='text']");
+    queryInput.value = "Other";
+    await element.requestUpdate();
+    expect(
+      element.shadowRoot.querySelectorAll(".server-list-item").length
+    ).toBe(1);
+  });
+  test("Serverlist will auto open if only one Element is present", async () => {
+    /** @type {ServerList} */
+    const element = document.createElement("server-list");
+
+    element.serverList = testServerList;
+    document.body.append(element);
+    // Wait for lit to render to the dom
+    await element.requestUpdate();
+    expect(
+      element.shadowRoot.querySelectorAll(".server-list-item").length
+    ).toBe(2);
+    const queryInput = element.shadowRoot.querySelector("input[type='text']");
+    queryInput.value = "Other";
+    await element.requestUpdate();
+    // We should now have one .opened City
+    expect(element.shadowRoot.querySelectorAll(".opened").length).toBe(1);
   });
 });
