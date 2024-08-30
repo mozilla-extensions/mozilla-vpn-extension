@@ -9,10 +9,14 @@
  * @returns The Message translated for the Users Language.
  */
 export const tr = (id, ...arg) => {
-  const candidate = browser.i18n.getMessage(id, arg);
-  if (!candidate || candidate.length === 0) {
-    console.error(`Missing Translation Message for ${id}`);
+  try {
+    const candidate = browser.i18n.getMessage(id, arg);
+    if (!candidate || candidate.length === 0) {
+      console.error(`Missing Translation Message for ${id}`);
+      return id;
+    }
+    return candidate;
+  } catch (error) {
     return id;
   }
-  return candidate;
 };
