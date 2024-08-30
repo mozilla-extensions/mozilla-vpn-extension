@@ -138,7 +138,7 @@ export class ServerList extends LitElement {
       flex-direction: column;
       align-items: center;
     }
-    
+
     .server-list-item {
       display: flex;
       flex-direction: column;

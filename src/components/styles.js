@@ -123,7 +123,7 @@ export const ghostButtonStyles = css`
   .ghost-btn::before {
     content: " ";
     pointer-events: none;
-    background: lch(from var(--button-ghost-bg-color) l c h / 0.0);
+    background: lch(from var(--button-ghost-bg-color) l c h / 0);
     transition: var(--button-transition);
     border-radius: var(--button-border-radius);
     position: absolute;
