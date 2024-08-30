@@ -4,7 +4,6 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/. 
 -->
 
-<!-- Placeholder garbage UI for local debugging purposes only -->
 <!doctype html>
 <html>
   <head>
@@ -14,12 +13,17 @@
     />
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" href="../variables.css" />
-    <link rel="stylesheet" href="./pageAction.css" />
-
-    <script src="./pageAction.js" type="module"></script>
-    <title>Mozilla VPN</title>
+    <title>Mozilla VPN Settings</title>
+    <script src="settingsPage.js" type="module"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: var(--panel-bg-color);
+      }
+    </style>
   </head>
   <body>
-    <page-action-popup></page-action-popup>
+    <mz-settingspage></mz-settingspage>
   </body>
 </html>

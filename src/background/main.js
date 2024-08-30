@@ -11,6 +11,7 @@ import { ToolbarIconHandler } from "./toolbarIconHandler.js";
 import { VPNController } from "./vpncontroller/index.js";
 
 import { expose } from "../shared/ipc.js";
+import { TabReloader } from "./tabReloader.js";
 const log = Logger.logger("Main");
 
 class Main {
@@ -28,6 +29,7 @@ class Main {
   );
   tabHandler = new TabHandler(this, this.vpnController, this.proxyHandler);
   toolbarIconHandler = new ToolbarIconHandler(this, this.vpnController);
+  tabReloader = new TabReloader(this, this.proxyHandler);
 
   async init() {
     log("Hello from the background script!");
@@ -91,4 +93,11 @@ main.init();
 globalThis["main"] = main;
 
 // Just do this for debugging
-chrome.browserAction.openPopup();
+//chrome.browserAction.openPopup();
+
+/**
+browser.tabs.create({
+  url: "/ui/settingsPage/index.html",
+})
+
+ */

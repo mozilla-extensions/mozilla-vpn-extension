@@ -65,5 +65,59 @@
   "vpnIsOff": {
     "message": "VPN is Off",
     "description": "Header to signal that VPN connection is disabled"
+  },
+  "vpnOffStatus": {
+    "message": "OFF",
+    "description": "Label indicating that the VPN is off."
+  },
+  "vpnOnStatus": {
+    "message": "ON",
+    "description": "Label indicating that the VPN is on."
+  },
+  "headlineWebsitePreferences": {
+    "message": "Website Preferences",
+    "description": "Headline for the Website Preferences page."
+  },
+  "placeholderSearchWebsites": {
+    "message": "Search Websites",
+    "description": "Placeholder text for the search input field to search websites."
+  },
+  "tableHeadingWebsite": {
+    "message": "Website",
+    "description": "Table heading for the column listing websites."
+  },
+  "tableHeadingVpnStatus": {
+    "message": "VPN Status",
+    "description": "Table heading for the column indicating whether the VPN is on or off for a website."
+  },
+  "tableHeadingLocation": {
+    "message": "Location",
+    "description": "Table heading for the column showing the location of the website."
+  },
+  "headlineNoWebsitePreferences": {
+    "message": "You haven't set any website preferences yet",
+    "description": "Headline shown when the user hasn't set any website preferences."
+  },
+  "noWebsitePreferencesSubText": {
+    "message": "If you turn off VPN protection or set a custom location for any websites, you'll see them here.",
+    "description": "Subtext shown when there are no website preferences set by the user."
+  },
+  "altTextRemoveWebsiteButton": {
+    "message": "Remove rule for $origin$",
+    "description": "Alt text for the button that removes a website rule from the list of preferences.",
+    "placeholders": {
+      "origin": {
+        "content": "$1",
+        "example": "developer.mozilla.org"
+      }
+    }
+  },
+  "altTextOpenSettingsPage": {
+    "message": "Open Settings Page",
+    "description": "Alt text for the button that opens the Extensions Settings page"
+  },
+  "searchServer": {
+    "message": "Search Server",
+    "description": "Placeholder for the Input field Where users can search the Serverlist"
   }
 }

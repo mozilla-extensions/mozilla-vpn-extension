@@ -57,4 +57,16 @@ export const Utils = {
       return false;
     }
   },
+  nameFor: (
+    countryCode = "de",
+    cityCode = "ber",
+    serverList = [new ServerCountry()]
+  ) => {
+    if (!serverList) {
+      return "";
+    }
+    return serverList
+      .find((sc) => sc.code === countryCode)
+      ?.cities.find((c) => c.code === cityCode)?.name;
+  },
 };
