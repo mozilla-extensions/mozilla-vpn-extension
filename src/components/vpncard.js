@@ -133,9 +133,11 @@ export class VPNCard extends LitElement {
       align-items: flex-start;
       justify-content: space-between;
       flex-direction: column;
+      box-shadow: var(--box-shadow-off);
     }
     .box.on {
       background: var(--main-card-background);
+      box-shadow: var(--box-shadow-on);
     }
     main,
     footer {
@@ -283,6 +285,7 @@ export class VPNCardPlaceHolder extends LitElement {
       align-items: center;
       justify-content: space-between;
       flex-direction: row;
+      box-shadow: var(--box-shadow-off);
     }
     .infobox {
       flex: 4;

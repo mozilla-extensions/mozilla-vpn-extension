@@ -49,6 +49,8 @@
   --padding-default: 16px;
   --button-transition: background-color 0.2s ease;
   --button-border-radius: 5px;
+  --box-shadow-on: rgba(0, 0, 0, 0.28) 2px 2px 4px;
+  --box-shadow-off: rgba(0, 0, 0, 0.06) 2px 2px 7px;
 }
 
 @media (prefers-color-scheme: dark) {
