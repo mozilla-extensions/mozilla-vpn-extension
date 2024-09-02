@@ -7,7 +7,6 @@ import {
   css,
   LitElement,
   classMap,
-  styleMap,
 } from "../vendor/lit-all.min.js";
 import { tr } from "../shared/i18n.js";
 import { resetSizing } from "./styles.js";
