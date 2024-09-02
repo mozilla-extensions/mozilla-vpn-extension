@@ -65,7 +65,6 @@ export class TitleBar extends LitElement {
       height: 48px;
       padding: 0px 16px;
       border-bottom: 1px solid var(--border-color);
-      margin-bottom: 5px;
     }
     /**
         * We expect inside the slots to be gray, 

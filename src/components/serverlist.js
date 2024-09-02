@@ -7,7 +7,7 @@ import {
   createRef,
   ref,
 } from "../vendor/lit-all.min.js";
-import { resetSizing } from "./styles.js";
+import { ghostButtonStyles, resetSizing } from "./styles.js";
 
 import { tr } from "../shared/i18n.js";
 
@@ -131,7 +131,7 @@ export class ServerList extends LitElement {
   }
 
   static styles = css`
-    ${resetSizing}
+    ${resetSizing} ${ghostButtonStyles}
 
     :host {
       display: flex;
@@ -141,12 +141,10 @@ export class ServerList extends LitElement {
 
     #moz-vpn-server-list-panel {
       width: 100%;
-      block-size: var(--panelSize);
-      max-block-size: var(--panelSize);
-      min-block-size: var(--panelSize);
       overflow-x: hidden;
       overflow-y: hidden;
     }
+
     .server-list-item {
       display: flex;
       flex-direction: column;
@@ -182,32 +180,13 @@ export class ServerList extends LitElement {
       margin-inline-start: 8px;
       margin-inline-end: 8px;
       inline-size: calc(100% - 16px);
-    }
-    .server-city-list-visibility-btn {
-      align-items: center;
+      position: relative;
     }
 
     /* We need to temporarily use !important for this button to make sure the right color applies */
     .server-city-list-visibility-btn {
       display: flex;
-      background-color: var(--panel-bg-color) !important;
-      border-radius: 4px;
-      border: none;
-      transition: background-color 0.3s ease;
-    }
-
-    .server-city-list-visibility-btn:hover {
-      background-color: var(--button-bg-hover-color-secondary) !important;
-    }
-
-    .server-city-list-visibility-btn:focus {
-      outline: 2px solid var(--button-bg-focus-color-primary);
-      outline-offset: 2px;
-    }
-
-    .server-city-list-visibility-btn:active {
-      background-color: var(--button-bg-active-color-secondary) !important;
-      outline: none;
+      align-items: center;
     }
 
     .toggle {
@@ -271,16 +250,15 @@ export class ServerList extends LitElement {
     }
 
     input.search {
-      margin-bottom: 16px;
-      padding: 10px 20px;
-      padding-left: 30px;
+      margin-block: 16px;
+      padding: 10px 20px 10px 30px;
       color: var(--text-color-invert);
-      width: calc(max(50%, 300px));
+      width: calc(max(50%, 312px));
       background-image: url("../../assets/img/search-icon.svg");
       background-position: 2.5px 6px;
       background-repeat: no-repeat;
       border: 2px solid var(--border-color);
-      border-radius: 5px;
+      border-radius: var(--button-border-radius);
       color: black;
     }
   `;
@@ -357,7 +335,7 @@ export const countryListItem = (
       data-country-code="${serverCountry.code}"
       @click=${onclick}
     >
-      <button class="server-city-list-visibility-btn ">
+      <button class="server-city-list-visibility-btn ghost-btn">
         <div class="toggle"></div>
         <img
           class="server-country-flag"

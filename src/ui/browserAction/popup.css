@@ -3,8 +3,17 @@
    file, You can obtain one at http://mozilla.org/MPL/2.0/. 
 */
 
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  overscroll-behavior: none;
+}
+
 body {
   width: var(--window-width);
+  max-block-size: var(--window-max-height);
   background-color: var(--panel-bg-color);
   padding: 0;
   margin: 0;

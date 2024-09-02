@@ -111,3 +111,35 @@ export const fontSizing = css`
     font-weight: 600;
   }
 `;
+
+export const ghostButtonStyles = css`
+  button.ghost-btn {
+    background-color: transparent;
+    border: none;
+    border-radius: var(--button-border-radius);
+    outline: none !important;
+  }
+
+  .ghost-btn::before {
+    content: " ";
+    pointer-events: none;
+    background: lch(from var(--button-ghost-bg-color) l c h / 0);
+    transition: var(--button-transition);
+    border-radius: var(--button-border-radius);
+    position: absolute;
+    inset: 0px;
+  }
+
+  .ghost-btn:hover::before {
+    background: lch(from var(--button-ghost-bg-color) l c h / 0.1);
+  }
+
+  .ghost-btn:focus::before {
+    border: 2px solid lch(from var(--button-ghost-bg-color) l c h / 0.5);
+  }
+
+  .ghost-btn:active::before {
+    background: lch(from var(--button-ghost-bg-color) l c h / 0.15);
+    border: none;
+  }
+`;
