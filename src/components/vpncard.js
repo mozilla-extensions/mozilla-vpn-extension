@@ -254,7 +254,7 @@ export class VPNCardPlaceHolder extends LitElement {
 
   static styles = css`
     main {
-      padding: var(--padding-default); 
+      padding: var(--padding-default);
       display: flex;
     }
     * {

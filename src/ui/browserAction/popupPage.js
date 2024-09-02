@@ -299,7 +299,8 @@ export class BrowserActionPopup extends LitElement {
     }
 
     main {
-      padding: var(--padding-default) var(--padding-default) 0 var(--padding-default);
+      padding: var(--padding-default) var(--padding-default) 0
+        var(--padding-default);
     }
 
     * {
