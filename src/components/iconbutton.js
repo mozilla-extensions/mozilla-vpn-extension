@@ -3,9 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { html, LitElement, css } from "../vendor/lit-all.min.js";
-import {
-  ghostButtonStyles
-} from "../components/styles.js";
+import { ghostButtonStyles } from "../components/styles.js";
 
 /**
  * `IconLinkButton`
@@ -28,7 +26,7 @@ export class IconLinkButton extends LitElement {
     href: { attribute: true },
     alt: { attribute: true },
     icon: { attribute: true },
-    onClicked: { attribute: true},
+    onClicked: { attribute: true },
   };
   constructor() {
     super();
@@ -45,9 +43,14 @@ export class IconLinkButton extends LitElement {
         });
         break;
       case "go-back":
-        document.dispatchEvent(new CustomEvent("goBack", { bubbles : true, cancelable: true, details: null }));
+        document.dispatchEvent(
+          new CustomEvent("goBack", {
+            bubbles: true,
+            cancelable: true,
+            details: null,
+          })
+        );
     }
-
   }
   render() {
     return html`
@@ -64,7 +67,7 @@ export class IconLinkButton extends LitElement {
   }
 
   static styles = css`
-  ${ghostButtonStyles}
+    ${ghostButtonStyles}
   `;
 }
 customElements.define("mz-iconlink", IconLinkButton);

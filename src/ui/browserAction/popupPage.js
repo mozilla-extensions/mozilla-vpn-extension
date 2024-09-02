@@ -67,7 +67,9 @@ export class BrowserActionPopup extends LitElement {
       });
     };
 
-    window.addEventListener("goBack", () => { back() });
+    window.addEventListener("goBack", () => {
+      back();
+    });
   }
   updatePage() {
     /** @type {VPNState} */
@@ -115,8 +117,6 @@ export class BrowserActionPopup extends LitElement {
    * Ref's are Elements we want to keep track of
    */
   stackView = createRef();
-
-  
 
   render() {
     const canGoBack = (() => {
@@ -277,13 +277,12 @@ export class BrowserActionPopup extends LitElement {
     `;
   }
   static backBtn() {
-    return html`
-    <mz-iconlink
-    alt=${tr("altTextOpenSettingsPage")}
-    onClicked="go-back"
-    icon="arrow-icon-left"
-    slot="left"
-    ></mz-iconlink>`
+    return html` <mz-iconlink
+      alt=${tr("altTextOpenSettingsPage")}
+      onClicked="go-back"
+      icon="arrow-icon-left"
+      slot="left"
+    ></mz-iconlink>`;
   }
   /**
    *
