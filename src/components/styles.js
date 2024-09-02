@@ -130,6 +130,10 @@ export const ghostButtonStyles = css`
     padding: 0;
   }
 
+  .ghost-icon-btn img {
+    filter: invert(1);
+  }
+
   .ghost-btn::before {
     content: " ";
     pointer-events: none;
