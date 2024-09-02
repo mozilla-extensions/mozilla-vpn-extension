@@ -75,7 +75,7 @@ export class StackView extends LitElement {
     await new Promise((r) => setTimeout(r, this.animationTime * 500));
     requestAnimationFrame(() => {
       currentEl.style.opacity = ".5";
-      currentEl.style.transform = `translateX(-10px)`
+      currentEl.style.transform = `translateX(-10px)`;
 
       element.style.transform = `translateX(0px)`;
       element.style.opacity = 1;
@@ -92,7 +92,7 @@ export class StackView extends LitElement {
     const bottom = this.#bottomElement;
     bottom.style.transform = "translateX(0px)";
     bottom.style.opacity = "1";
-    
+
     // Wait for the popout animation to finish.
     // then we pop out the element and re render with the new top element as top.
     await new Promise((r) => setTimeout(r, this.animationTime * 1000));
