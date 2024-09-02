@@ -129,11 +129,6 @@ export const ghostButtonStyles = css`
     justify-content: center;
     padding: 0;
   }
-
-  .ghost-icon-btn img {
-    filter: invert(1);
-  }
-
   .ghost-btn::before {
     content: " ";
     pointer-events: none;
@@ -155,5 +150,11 @@ export const ghostButtonStyles = css`
   .ghost-btn:active::before {
     background: lch(from var(--button-ghost-bg-color) l c h / 0.15);
     border: none;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .ghost-icon-btn img {
+      filter: invert(1);
+    }
   }
 `;
