@@ -118,6 +118,16 @@ export const ghostButtonStyles = css`
     border: none;
     border-radius: var(--button-border-radius);
     outline: none !important;
+    min-block-size: 40px;
+  }
+
+  .ghost-icon-btn {
+    inline-size: 40px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
   }
 
   .ghost-btn::before {

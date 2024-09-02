@@ -3,6 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { html, LitElement, css } from "../vendor/lit-all.min.js";
+import {
+  ghostButtonStyles
+} from "../components/styles.js";
 
 /**
  * `IconLinkButton`
@@ -25,21 +28,30 @@ export class IconLinkButton extends LitElement {
     href: { attribute: true },
     alt: { attribute: true },
     icon: { attribute: true },
+    onClicked: { attribute: true},
   };
   constructor() {
     super();
     this.href = "";
     this.alt = "";
     this.icon = "";
+    this.onClicked = "";
   }
   onClick() {
-    browser.tabs.create({
-      url: this.href,
-    });
+    switch (this.onClicked) {
+      case "open-link":
+        browser.tabs.create({
+          url: this.href,
+        });
+        break;
+      case "go-back":
+        document.dispatchEvent(new CustomEvent("goBack", { bubbles : true, cancelable: true, details: null }));
+    }
+
   }
   render() {
     return html`
-      <button title="${this.alt}">
+      <button title="${this.alt}" class="ghost-btn ghost-icon-btn">
         <img
           aria-hidden="true"
           @click=${() => {
@@ -52,10 +64,7 @@ export class IconLinkButton extends LitElement {
   }
 
   static styles = css`
-    button {
-      background: transparent;
-      border: transparent;
-    }
+  ${ghostButtonStyles}
   `;
 }
 customElements.define("mz-iconlink", IconLinkButton);

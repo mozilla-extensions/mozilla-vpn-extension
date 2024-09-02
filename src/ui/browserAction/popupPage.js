@@ -60,6 +60,14 @@ export class BrowserActionPopup extends LitElement {
     browser.tabs.onActivated.addListener(() => this.updatePage());
     vpnController.state.subscribe((s) => (this.vpnState = s));
     this.updatePage();
+
+    const back = () => {
+      this.stackView?.value?.pop().then(() => {
+        this.requestUpdate();
+      });
+    };
+
+    window.addEventListener("goBack", () => { back() });
   }
   updatePage() {
     /** @type {VPNState} */
@@ -108,12 +116,9 @@ export class BrowserActionPopup extends LitElement {
    */
   stackView = createRef();
 
+  
+
   render() {
-    const back = () => {
-      this.stackView?.value?.pop().then(() => {
-        this.requestUpdate();
-      });
-    };
     const canGoBack = (() => {
       if (!this.stackView.value) {
         return false;
@@ -137,10 +142,11 @@ export class BrowserActionPopup extends LitElement {
 
     return html`
       <vpn-titlebar title="${title}" ${ref(this.titleBar)}>
-        ${canGoBack ? BrowserActionPopup.backBtn(back) : null}
+        ${canGoBack ? BrowserActionPopup.backBtn() : null}
         <mz-iconlink
           alt=${tr("altTextOpenSettingsPage")}
           href="/ui/settingsPage/index.html"
+          onClicked="open-link"
           icon="settings-cog"
           slot="right"
         ></mz-iconlink>
@@ -270,12 +276,14 @@ export class BrowserActionPopup extends LitElement {
         : null}
     `;
   }
-  static backBtn(back) {
-    return html`<img
-      slot="left"
-      src="../../assets/img/arrow-icon-left.svg"
-      @click=${back}
-    />`;
+  static backBtn() {
+    return html`
+    <mz-iconlink
+    alt=${tr("altTextOpenSettingsPage")}
+    onClicked="go-back"
+    icon="arrow-icon-left"
+    slot="left"
+    ></mz-iconlink>`
   }
   /**
    *
