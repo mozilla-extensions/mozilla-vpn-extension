@@ -114,6 +114,7 @@ export class BrowserActionPopup extends LitElement {
         this.requestUpdate();
       });
     };
+
     const canGoBack = (() => {
       if (!this.stackView.value) {
         return false;
@@ -271,11 +272,13 @@ export class BrowserActionPopup extends LitElement {
     `;
   }
   static backBtn(back) {
-    return html`<img
+    return html` <mz-iconlink
+      @goBack=${back}
+      alt="${tr("back")}"
+      href=""
+      icon="arrow-icon-left"
       slot="left"
-      src="../../assets/img/arrow-icon-left.svg"
-      @click=${back}
-    />`;
+    ></mz-iconlink>`;
   }
   /**
    *

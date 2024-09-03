@@ -66,16 +66,6 @@ export class TitleBar extends LitElement {
       padding: 0px 16px;
       border-bottom: 1px solid var(--border-color);
     }
-    /**
-        * We expect inside the slots to be gray, 
-        * so given those svg do not react to prefers-color-scheme 
-        * let's just invert them and prey that looks okay :)
-        */
-    @media (prefers-color-scheme: dark) {
-      .slots {
-        filter: invert();
-      }
-    }
   `;
 }
 customElements.define("vpn-titlebar", TitleBar);

@@ -118,8 +118,17 @@ export const ghostButtonStyles = css`
     border: none;
     border-radius: var(--button-border-radius);
     outline: none !important;
+    min-block-size: 40px;
   }
 
+  .ghost-icon-btn {
+    inline-size: 40px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
   .ghost-btn::before {
     content: " ";
     pointer-events: none;
@@ -141,5 +150,11 @@ export const ghostButtonStyles = css`
   .ghost-btn:active::before {
     background: lch(from var(--button-ghost-bg-color) l c h / 0.15);
     border: none;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .ghost-icon-btn img {
+      filter: invert(1);
+    }
   }
 `;
