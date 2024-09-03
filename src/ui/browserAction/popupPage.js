@@ -372,6 +372,7 @@ export class BrowserActionPopup extends LitElement {
       height: 20px;
       border: 1px solid var(--border-color);
       background-color: var(--panel-bg-color);
+      margin-block: 0 auto;
     }
     input + p {
       margin-left: var(--padding-default);
