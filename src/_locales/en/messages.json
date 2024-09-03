@@ -8,7 +8,10 @@
     "message": "Integrate VPN into Firefox: Exclude Tabs, set Site locations and more!",
     "description": "Description of the extension."
   },
-
+  "back": {
+    "message": "Back",
+    "description": "Alt attribute text for back button"
+  },
   "notificationTitle": {
     "message": "Click notification",
     "description": "Title of the click notification."

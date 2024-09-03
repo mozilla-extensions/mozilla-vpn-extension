@@ -109,7 +109,6 @@ export class BrowserActionPopup extends LitElement {
   stackView = createRef();
 
   render() {
-
     const back = () => {
       this.stackView?.value?.pop().then(() => {
         this.requestUpdate();
@@ -273,13 +272,13 @@ export class BrowserActionPopup extends LitElement {
     `;
   }
   static backBtn(back) {
-    return html` 
-    <mz-iconlink 
-    @goBack=${back}
-    alt=""
-    href=""
-    icon="arrow-icon-left"
-    slot="left"></mz-iconlink>`;
+    return html` <mz-iconlink
+      @goBack=${back}
+      alt="${tr("back")}"
+      href=""
+      icon="arrow-icon-left"
+      slot="left"
+    ></mz-iconlink>`;
   }
   /**
    *
