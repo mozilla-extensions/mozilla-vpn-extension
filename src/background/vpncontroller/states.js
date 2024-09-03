@@ -4,8 +4,6 @@
 
 // @ts-check
 
-const MOZILLA_VPN_SERVERS_KEY = "mozillaVpnServers";
-
 /**
  * Commands we know we can send
  * to the vpn
@@ -46,62 +44,6 @@ export class VPNState {
    * Timestamp since the VPN connection was established
    */
   connectedSince = 0;
-  /**
-   * Constructs state of another state, moving
-   * non essential data.
-   *
-   * @param {VPNState?} other
-   */
-  constructor(other) {
-    if (!other) {
-      return;
-    }
-    if (other.servers) {
-      this.servers = [...other.servers];
-    }
-    if (other.isExcluded != null) {
-      this.isExcluded = other.isExcluded;
-    }
-    this.exitServerCity = other.exitServerCity;
-    this.exitServerCountry = other.exitServerCountry;
-  }
-
-  /**
-   * Takes a state, fetches data from storage and then
-   * constructs a copy with the data included.
-   *
-   * @param {VPNState} state - The state to replicate
-   * @param {browser.storage.StorageArea} storage - The storage area to look for
-   * @param {String} key - The key to put the state in
-   * @returns {Promise<VPNState>} - Returns a copy of the state, or the same in case of missing data.
-   */
-  static async fromStorage(
-    state = new StateVPNUnavailable(null),
-    storage = browser.storage.local,
-    key = MOZILLA_VPN_SERVERS_KEY
-  ) {
-    const { mozillaVpnServers } = await storage.get(MOZILLA_VPN_SERVERS_KEY);
-    if (typeof mozillaVpnServers === "undefined") {
-      await storage.set({ [MOZILLA_VPN_SERVERS_KEY]: [] });
-      return state;
-    }
-    // @ts-ignore
-    return new state.constructor({
-      servers: mozillaVpnServers,
-    });
-  }
-  /**  Puts a state's data into storage, to make sure we can recreate it next time using
-   * @param {VPNState} state - The state to replicate
-   * @param {browser.storage.StorageArea} storage - The storage area to look for
-   */
-  static putIntoStorage(
-    state = new StateVPNUnavailable(null),
-    storage = browser.storage.local,
-    key = MOZILLA_VPN_SERVERS_KEY
-  ) {
-    // @ts-ignore
-    storage.set({ [key]: state.servers });
-  }
 }
 
 /**
@@ -122,6 +64,17 @@ export class StateVPNDisabled extends VPNState {
   state = "Disabled";
   alive = true;
   connected = false;
+
+  /**
+   *
+   * @param {ServerCity | undefined} exitServerCity
+   * @param {ServerCountry | undefined } exitServerCountry
+   */
+  constructor(exitServerCity, exitServerCountry) {
+    super();
+    this.exitServerCity = exitServerCity;
+    this.exitServerCountry = exitServerCountry;
+  }
 }
 
 /**
@@ -131,25 +84,17 @@ export class StateVPNDisabled extends VPNState {
 export class StateVPNEnabled extends VPNState {
   /**
    *
-   * @param {VPNState} other -
    * @param {string|boolean} aloophole - False if loophole is not supported,
+   * @param {ServerCity | undefined} exitServerCity
+   * @param {ServerCountry | undefined } exitServerCountry
    */
-  constructor(other, aloophole, connectedSince) {
-    super(other);
-    if (other) {
-      this.loophole = other.loophole;
-      this.exitServerCity = other.exitServerCity;
-      this.exitServerCountry = other.exitServerCountry;
-      this.connectedSince = other.connectedSince;
-    }
-    if (aloophole) {
-      this.loophole = aloophole;
-    }
-    if (connectedSince) {
-      this.connectedSince = connectedSince;
-    }
+  constructor(exitServerCity, exitServerCountry, aloophole, connectedSince) {
+    super();
+    this.exitServerCity = exitServerCity;
+    this.exitServerCountry = exitServerCountry;
+    this.loophole = aloophole;
+    this.connectedSince = connectedSince;
   }
-
   state = "Enabled";
   alive = true;
   connected = true;
@@ -179,4 +124,25 @@ export class ServerCountry {
   cities = [];
   code = "";
   name = "";
+}
+
+// This is what the client response when calling status
+export class vpnStatusResponse {
+  t = "status";
+  status = {
+    location: {
+      exit_country_code: "",
+      exit_city_name: "",
+      entry_country_code: "",
+      entry_city_name: "",
+    },
+    authenticated: false,
+    connectedSince: "0",
+    app: "MozillaVPN::CustomState",
+    vpn: "Controller::StateOn",
+    localProxy: {
+      available: false,
+      url: "https://localhost:8080",
+    },
+  };
 }

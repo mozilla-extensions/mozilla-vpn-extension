@@ -40,7 +40,7 @@ export class IBindable {
  *
  * @template T
  */
-class Property extends IBindable {
+export class WritableProperty extends IBindable {
   /**
    * Constructs a Property<T> with an initial Value
    * @param {T} initialvalue
@@ -141,7 +141,7 @@ export class ReadOnlyProperty extends IBindable {
 class LazyComputedProperty {
   /**
    * Constructs a Bindable<T> from a Property
-   * @param {Property<P>} parent - The proptery to read from
+   * @param {WritableProperty<P>} parent - The proptery to read from
    * @param {(arg0: (P|null) )=>T} transform - The function to apply
    */
   constructor(parent, transform) {
@@ -189,7 +189,7 @@ class LazyComputedProperty {
   }
 
   /**
-   * @type {Property<P>}
+   * @type {WritableProperty<P>}
    * The Parent Property
    */
   #parent;
@@ -212,16 +212,16 @@ class LazyComputedProperty {
 /**
  * @template T
  * @param {T} value - Initial value of the Property
- * @returns {Property<T>} - A Property
+ * @returns {WritableProperty<T>} - A Property
  */
 export const property = (value) => {
-  return new Property(value);
+  return new WritableProperty(value);
 };
 
 /**
  * @template T
  * @template P
- * @param {Property<P>} property - Callback when the value changes
+ * @param {WritableProperty<P>} property - Callback when the value changes
  * @param {(arg0: P?)=>T} transform - Called with the Property Value, must return the transformed value
  * @returns {LazyComputedProperty<T,P>} - A Function to stop the subscription
  */
