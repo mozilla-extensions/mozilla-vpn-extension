@@ -81,9 +81,13 @@ export class VPNCard extends LitElement {
     const time = Date.now() - this.connectedSince;
     //console.log(`Elapsed Time: ${time}`)
 
-    const timeString = this.enabled ? html`<p class="timer">${formatTime(time)}</p>` : html``;
+    const timeString = this.enabled
+      ? html`<p class="timer">${formatTime(time)}</p>`
+      : html``;
 
-    const subLine = this.enabled ? html`` : html`<p class="subline">${tr("turnOnForPrivateConnection")}</p>`;
+    const subLine = this.enabled
+      ? html``
+      : html`<p class="subline">${tr("turnOnForPrivateConnection")}</p>`;
     const vpnHeader = this.enabled ? tr("vpnIsOn") : tr("vpnIsOff");
 
     return html`
@@ -92,8 +96,7 @@ export class VPNCard extends LitElement {
           <img src=${shieldURL} />
           <div class="infobox">
             <h1>${vpnHeader}</h1>
-            ${subLine}
-            ${timeString}
+            ${subLine} ${timeString}
           </div>
           <button class="pill" @click=${this.#toggle}></button>
         </main>
