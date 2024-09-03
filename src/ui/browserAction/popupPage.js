@@ -226,9 +226,6 @@ export class BrowserActionPopup extends LitElement {
     hasSiteContext = false
   ) {
     const pageLocationPicker = (() => {
-      if (siteContext.excluded) {
-        return null;
-      }
       return html`
         <h2 class="select-location-title">${tr("titleServerList")}</h2>
         <button
@@ -263,11 +260,9 @@ export class BrowserActionPopup extends LitElement {
         <p>${tr("exludePageFor", siteContext.origin)}</p>
       </div>
       ${pageLocationPicker}
-      ${hasSiteContext
-        ? html`<button id="selectLocation" @click=${removeSiteContext}>
-            ${tr("resetPageSettings")}
-          </button>`
-        : null}
+      <button id="reset-pref" @click=${removeSiteContext} class="${ hasSiteContext ? "" : "disabled"} ">
+        ${tr("resetPageSettings")}
+      </button>   
     `;
   }
   static backBtn(back) {
@@ -300,6 +295,22 @@ export class BrowserActionPopup extends LitElement {
 
   static styles = css`
     ${fontSizing}${resetSizing}${ghostButtonStyles}
+    :root {
+      --button-reset-border-default: rgba(0, 96, 223, 1);
+      --button-reset-border-hover: rgba(2, 80, 187, 1);
+      --button-reset-border-active: rgba(5, 64, 150, 1);
+      --button-reset-border-disabled: rgba(0, 96, 223, 1);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --button-reset-border-default: rgba(0, 221, 255, 1);
+        --button-reset-border-hover: rgba(128, 235, 255, 1);
+        --button-reset-border-active: rgba(170, 242, 255, 1);
+        --button-reset-border-disabled: rgba(0, 221, 255, 1);
+      }
+    }
+    
     section {
       background-color: var(--panel-bg-color);
     }
@@ -372,22 +383,47 @@ export class BrowserActionPopup extends LitElement {
       height: 20px;
       border: 1px solid var(--border-color);
       background-color: var(--panel-bg-color);
+      margin-block: 0 auto;
     }
+
     input + p {
       margin-left: var(--padding-default);
     }
 
     button {
       width: 100%;
-      border-radius: 4px;
+      border-radius: 4px; 
       padding: 8px, 16px, 8px, 16px;
       size: 16px;
       font-weight: 600;
-      border: 1px solid var(--action-button-color);
+      border-width: 2px;
+      border-style: solid;
       color: var(--action-button-color);
       background-color: transparent;
       padding: 10px;
-      margin-top: var(--padding-default);
+      margin-block: 0px var(--padding-default);
+    }
+
+    #reset-pref {
+      border-color: var(--button-reset-border-default);
+      transition: border-color 0.2s ease;
+    }
+
+    #reset-pref:hover {
+      border-color: var(--button-reset-border-hover);
+    }
+
+    #reset-pref:focus {
+      outline: var(--focus-outline);
+      outline-offset: var(--focus-outline-offset);
+    }
+
+    #reset-pref.disabled:focus {
+      outline: none;
+    }
+
+    #reset-pref:active {
+      border-color: var(--button-reset-border-active);
     }
 
     .disabled {

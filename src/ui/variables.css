@@ -32,7 +32,7 @@
 
 :root {
   --window-width: 352px;
-  --window-max-height: 399px;
+  --window-max-height: 454px;
 
   --font-family: "Inter Regular";
   --font-family-semi-bold: "Inter Semi Bold";
@@ -59,6 +59,8 @@
     --text-color-primary: white;
     --text-color-invert: #3d3d3d;
     --button-ghost-bg-color: #ffffff;
+
+    --focus-outline: 3px solid #007aff;
   }
 }
 
@@ -73,5 +75,8 @@
     --text-color-invert: white;
     --border-color: lch(from var(--panel-bg-color) calc(l - 15) c h);
     --button-ghost-bg-color: #3d3d3d;
+
+    --focus-outline: 3px solid #cbe5fc;
+    --focus-outline-offset: 1px; 
   }
 }

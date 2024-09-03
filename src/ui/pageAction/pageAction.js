@@ -140,7 +140,7 @@ export class PageActionPopup extends LitElement {
       margin-inline: auto 0;
       font-weight: 500;
       padding: 4px 16px;
-      min-block-size: 32px;
+      min-block-size: 40px;
       border-radius: 4px;
       border: none;
       background: none;
