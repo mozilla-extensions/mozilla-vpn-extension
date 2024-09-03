@@ -50,10 +50,6 @@
     "message": "Reset site preferences",
     "description": "Button Text to Reset all Site specific settings"
   },
-  "isPrivateConnection": {
-    "message": "Secure and private",
-    "description": "Subheader in the 'card' telling users their current connection is secured by the vpn"
-  },
   "turnOnForPrivateConnection": {
     "message": "Turn on to protect your browser",
     "description": "Call to Action for users to turn on the VPN"

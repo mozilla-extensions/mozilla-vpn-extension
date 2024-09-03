@@ -387,7 +387,7 @@ export class BrowserActionPopup extends LitElement {
       color: var(--action-button-color);
       background-color: transparent;
       padding: 10px;
-      margin-top: var(--padding-default);
+      margin-block: var(--padding-default);
     }
 
     .disabled {
