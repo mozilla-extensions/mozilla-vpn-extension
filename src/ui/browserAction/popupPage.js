@@ -157,12 +157,12 @@ export class BrowserActionPopup extends LitElement {
     if (!this.pageURL) {
       return null;
     }
-    const resetSitePrefrences = async () => {
+    const resetSitePreferences = async () => {
       this.currentSiteContext = null;
     };
     const toggleExcludeWebsite = async () => {
       if (this.currentSiteContext.excluded) {
-        resetSitePrefrences();
+        resetSitePreferences();
         return;
       }
       const new_cntxt = {
@@ -173,7 +173,7 @@ export class BrowserActionPopup extends LitElement {
       this.currentSiteContext = new_cntxt;
     };
 
-    return BrowserActionPopup.sitePrefrencesTemplate(
+    return BrowserActionPopup.sitePreferencesTemplate(
       this.currentSiteContext,
       this.openServerList.bind(this),
       toggleExcludeWebsite,
@@ -184,7 +184,7 @@ export class BrowserActionPopup extends LitElement {
           this.vpnState.servers
         );
       },
-      resetSitePrefrences,
+      resetSitePreferences,
       this._siteContext !== null
     );
   }
@@ -215,10 +215,10 @@ export class BrowserActionPopup extends LitElement {
     });
   }
 
-  static sitePrefrencesTemplate(
+  static sitePreferencesTemplate(
     siteContext = new SiteContext(),
     openServerList = () => {},
-    tooggleExcluded = () => {},
+    toggleExcluded = () => {},
     getNameForContext = (ctx = new SiteContext()) => {
       return "";
     },
@@ -258,7 +258,7 @@ export class BrowserActionPopup extends LitElement {
         <input
           type="checkbox"
           ?checked=${siteContext.excluded}
-          @click=${tooggleExcluded}
+          @click=${toggleExcluded}
         />
         <p>${tr("exludePageFor", siteContext.origin)}</p>
       </div>
