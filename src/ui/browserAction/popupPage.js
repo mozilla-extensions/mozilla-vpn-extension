@@ -46,6 +46,7 @@ import {
  */
 export class BrowserActionPopup extends LitElement {
   static properties = {
+    servers: { type: Object },
     vpnState: { type: Object },
     pageURL: { type: String },
     _siteContext: { type: Object },
@@ -59,6 +60,7 @@ export class BrowserActionPopup extends LitElement {
     browser.tabs.onUpdated.addListener(() => this.updatePage());
     browser.tabs.onActivated.addListener(() => this.updatePage());
     vpnController.state.subscribe((s) => (this.vpnState = s));
+    vpnController.servers.subscribe((s) => (this.servers = s));
     this.updatePage();
   }
   updatePage() {
@@ -181,7 +183,7 @@ export class BrowserActionPopup extends LitElement {
         return Utils.nameFor(
           ctx.countryCode,
           ctx.cityCode,
-          this.vpnState.servers
+          this.servers
         );
       },
       resetSitePrefrences,
@@ -207,7 +209,7 @@ export class BrowserActionPopup extends LitElement {
       }
     };
     const serverListElement = BrowserActionPopup.createServerList(
-      this.vpnState.servers,
+      this.servers,
       onSelectServerResult
     );
     this.stackView.value?.push(serverListElement).then(() => {

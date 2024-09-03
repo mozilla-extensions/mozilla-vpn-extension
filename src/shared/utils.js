@@ -60,9 +60,12 @@ export const Utils = {
   nameFor: (
     countryCode = "de",
     cityCode = "ber",
-    serverList = [new ServerCountry()]
+    serverList = []
   ) => {
     if (!serverList) {
+      return "";
+    }
+    if(serverList.length ===0){
       return "";
     }
     return serverList

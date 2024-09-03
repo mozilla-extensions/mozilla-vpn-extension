@@ -27,7 +27,7 @@ export class SettingsPage extends LitElement {
     this.contexts = new Map();
     this.vpnController = getExposedObject("VPNController");
     this.vpnController.then((c) => {
-      c.state.subscribe((state) => (this.serverList = state.servers));
+      c.servers.subscribe((servers) => (this.serverList = servers));
     });
     this.proxyHandler = getExposedObject("ProxyHandler");
     this.proxyHandler.then((p) => {
