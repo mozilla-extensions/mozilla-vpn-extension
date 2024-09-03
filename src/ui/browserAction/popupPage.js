@@ -180,11 +180,7 @@ export class BrowserActionPopup extends LitElement {
       this.openServerList.bind(this),
       toggleExcludeWebsite,
       (ctx = new SiteContext()) => {
-        return Utils.nameFor(
-          ctx.countryCode,
-          ctx.cityCode,
-          this.servers
-        );
+        return Utils.nameFor(ctx.countryCode, ctx.cityCode, this.servers);
       },
       resetSitePrefrences,
       this._siteContext !== null

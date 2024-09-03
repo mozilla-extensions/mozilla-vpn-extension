@@ -225,7 +225,7 @@ export function isSplitTunnled(
 const MOZILLA_VPN_SERVERS_KEY = "mozillaVpnServers";
 
 /**
-   * fetches data from storage and then
+   * fetches data from storage
  
    * @template T
    * @param {browser.storage.StorageArea} storage - The storage area to look for
