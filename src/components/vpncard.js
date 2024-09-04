@@ -81,11 +81,13 @@ export class VPNCard extends LitElement {
     const time = Date.now() - this.connectedSince;
     //console.log(`Elapsed Time: ${time}`)
 
-    const timeString = this.enabled ? html`<p>${formatTime(time)}</p>` : html``;
+    const timeString = this.enabled
+      ? html`<p class="timer">${formatTime(time)}</p>`
+      : html``;
 
     const subLine = this.enabled
-      ? tr("isPrivateConnection")
-      : tr("turnOnForPrivateConnection");
+      ? null
+      : html`<p class="subline">${tr("turnOnForPrivateConnection")}</p>`;
     const vpnHeader = this.enabled ? tr("vpnIsOn") : tr("vpnIsOff");
 
     return html`
@@ -94,8 +96,7 @@ export class VPNCard extends LitElement {
           <img src=${shieldURL} />
           <div class="infobox">
             <h1>${vpnHeader}</h1>
-            <p>${subLine}</p>
-            ${timeString}
+            ${subLine} ${timeString}
           </div>
           <button class="pill" @click=${this.#toggle}></button>
         </main>
@@ -149,6 +150,7 @@ export class VPNCard extends LitElement {
     main {
       justify-content: space-between;
       padding: var(--default-padding);
+      min-block-size: 114px;
     }
     footer {
       justify-content: flex-start;
@@ -189,6 +191,12 @@ export class VPNCard extends LitElement {
       color: var(--main-card-text-color);
       opacity: 0.7;
     }
+
+    .timer,
+    .subline {
+      margin-block-start: calc(var(--default-padding) / 2);
+    }
+
     .pill {
       width: 45px;
       height: 24px;
