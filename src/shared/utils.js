@@ -57,12 +57,11 @@ export const Utils = {
       return false;
     }
   },
-  nameFor: (
-    countryCode = "de",
-    cityCode = "ber",
-    serverList = [new ServerCountry()]
-  ) => {
+  nameFor: (countryCode = "de", cityCode = "ber", serverList = []) => {
     if (!serverList) {
+      return "";
+    }
+    if (serverList.length === 0) {
       return "";
     }
     return serverList

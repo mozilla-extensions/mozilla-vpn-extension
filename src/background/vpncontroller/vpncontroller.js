@@ -6,15 +6,21 @@
 import { Component } from "../component.js";
 import { Logger } from "../logger.js";
 
-import { property } from "../../shared/property.js";
+import {
+  IBindable,
+  WritableProperty,
+  property,
+} from "../../shared/property.js";
 import { PropertyType } from "../../shared/ipc.js";
 
 import {
   VPNState,
-  StateVPNEnabled,
   StateVPNUnavailable,
+  StateVPNEnabled,
   StateVPNDisabled,
   REQUEST_TYPES,
+  ServerCountry,
+  vpnStatusResponse,
 } from "./states.js";
 
 const log = Logger.logger("TabHandler");
@@ -29,14 +35,23 @@ const log = Logger.logger("TabHandler");
 export class VPNController extends Component {
   // Things to expose to the UI
   static properties = {
+    servers: PropertyType.Bindable,
+    isExcluded: PropertyType.Bindable,
     state: PropertyType.Bindable,
     postToApp: PropertyType.Function,
-    isolationKey: PropertyType.Value,
+    isolationKey: PropertyType.Bindable,
   };
 
   get state() {
     return this.#mState.readOnly;
   }
+  get servers() {
+    return this.#mServers;
+  }
+  get isExcluded() {
+    return this.#isExcluded;
+  }
+
   async initNativeMessaging() {
     log("initNativeMessaging");
     if (this.#port && this.#port.error === null) {
@@ -62,16 +77,29 @@ export class VPNController extends Component {
       // invalid proxy connection.
       this.#port.onDisconnect.addListener(() => {
         this.#increaseIsolationKey();
-        this.#mState.value = new StateVPNUnavailable(this.#mState.value);
+        this.#mState.value = new StateVPNUnavailable();
       });
     } catch (e) {
       log(e);
-      this.#mState.value = new StateVPNUnavailable(this.#mState.value);
+      this.#mState.value = new StateVPNUnavailable();
     }
   }
 
   async init() {
-    this.#mState.value = await VPNState.fromStorage();
+    this.#mState.value = new StateVPNUnavailable();
+    this.#mServers.value = await fromStorage(
+      browser.storage.local,
+      MOZILLA_VPN_SERVERS_KEY,
+      []
+    );
+    this.#mServers.subscribe((newServers) => {
+      putIntoStorage(
+        newServers,
+        browser.storage.local,
+        MOZILLA_VPN_SERVERS_KEY
+      );
+    });
+
     this.initNativeMessaging();
   }
   /**
@@ -88,7 +116,7 @@ export class VPNController extends Component {
       log(e);
       // @ts-ignore
       if (e.toString() === "Attempt to postMessage on disconnected port") {
-        this.#mState.value = new StateVPNUnavailable(this.#mState.value);
+        this.#mState.value = new StateVPNUnavailable();
       }
     }
   }
@@ -104,85 +132,18 @@ export class VPNController extends Component {
     }
     switch (response.t) {
       case "servers":
-        // @ts-ignore
-        const newState = new this.#mState.value.constructor({
-          ...this.#mState.value,
-          servers: response.servers.countries,
-        });
-        VPNState.putIntoStorage(newState);
-        this.#mState.value = newState;
+        this.#mServers.set(response.servers.countries);
         break;
       case "disabled_apps":
-        // Todo: THIS IS HACKY
-        // We need to find out if the excluded firefox
-        const app_paths = [
-          ["Firefox Nightly", "firefox.exe"],
-          ["Firefox", "firefox.exe"],
-          ["Firefox Developer Edition", "firefox.exe"],
-        ];
-        const intersects = (a, b) => {
-          return a.filter(Set.prototype.has, new Set(b)).length == 0;
-        };
-
-        let apps = response["disabled_apps"];
-        apps ??= [];
-        const isFirefoxExcluded = apps.some((path) => {
-          const path_components = path.split("[\\/]"); // Split \\ and /
-          return app_paths.some((searchPath) => {
-            return intersects(path_components, searchPath);
-          });
-        });
-        if (isFirefoxExcluded) {
-          this.#mState.value =
-            // @ts-ignore
-            new this.#mState.value.constructor({
-              ...this.#mState,
-              isExcluded: true,
-            });
-          return;
-        }
+        this.#isExcluded.set(isSplitTunnled(response));
         break;
       case "status":
-        const status = response.status;
-        const controllerState = status.vpn;
-        const connectedSince = (() => {
-          if (!status.connectedSince) {
-            return 0;
-          }
-          return parseInt(status.connectedSince);
-        })();
-        const exit_city_name = status.location["exit_city_name"];
-        const exit_country_code = status.location["exit_country_code"];
-        const exitServerCountry = this.#mState.value.servers.find(
-          (country) => country.code === exit_country_code
-        );
-        const exitServerCity = exitServerCountry?.cities.find(
-          (city) => city.name === exit_city_name
-        );
-
-        const next_state = {
-          ...this.#mState.value,
-          exitServerCity,
-          exitServerCountry,
-        };
-
-        if (controllerState === "StateOn") {
-          this.#mState.value = new StateVPNEnabled(
-            next_state,
-            status.localProxy?.url,
-            connectedSince
-          );
-          return;
+        const newStatus = fromVPNStatusResponse(response, this.#mServers.value);
+        if (newStatus) {
+          this.#mState.set(newStatus);
+          // Let's increase the network key isolation at any vpn status change.
+          this.#increaseIsolationKey();
         }
-        if (
-          controllerState === "StateOff" ||
-          controllerState === "StateDisconnecting"
-        ) {
-          this.#mState.value = new StateVPNDisabled(next_state);
-          return;
-        }
-        // Let's increase the network key isolation at any vpn status change.
-        this.#increaseIsolationKey();
         break;
       default:
         throw Error("Unexpeted Message type: " + response.t);
@@ -195,7 +156,7 @@ export class VPNController extends Component {
     // We can only get 2 types of messages right now: client-down/up
     if (response.status && response.status === "vpn-client-down") {
       if (this.#mState.value.alive) {
-        this.#mState.value = new StateVPNUnavailable(this.#mState.value);
+        this.#mState.value = new StateVPNUnavailable();
       }
       return;
     }
@@ -218,19 +179,131 @@ export class VPNController extends Component {
    * tcp handle (which is now invalid) is not reused.
    *
    * @readonly
-   * @type {number}
+   * @type {IBindable<Number>}
    */
   get isolationKey() {
     return this.#isolationKey;
   }
 
   #increaseIsolationKey() {
-    ++this.#isolationKey;
+    this.#isolationKey.set(this.#isolationKey.value++);
   }
 
   /** @type {browser.runtime.Port?} */
   #port = null;
-  #isolationKey = 0;
+  #isolationKey = property(0);
 
-  #mState = property(new VPNState(null));
+  #mState = property(new VPNState());
+  /** @type {WritableProperty<Array<ServerCountry>>} */
+  // @ts-ignore
+  #mServers = property([]);
+
+  #isExcluded = property(false);
+}
+
+export function isSplitTunnled(
+  response = {
+    t: "disabled_apps",
+    disabled_apps: [""],
+  }
+) {
+  if (response.t != "disabled_apps") {
+    throw new Error("passed an invalid response");
+  }
+  // Todo: THIS IS STILL HACKY
+  const search_terms = ["firefox.exe", "firefox"];
+  let apps = response.disabled_apps;
+  apps ??= [];
+  const isFirefoxExcluded = apps.some((path) => {
+    return search_terms.some((searchPath) => {
+      return path.endsWith(searchPath);
+    });
+  });
+  return isFirefoxExcluded;
+}
+
+const MOZILLA_VPN_SERVERS_KEY = "mozillaVpnServers";
+
+/**
+   * fetches data from storage
+ 
+   * @template T
+   * @param {browser.storage.StorageArea} storage - The storage area to look for
+   * @param {String} key - The key to put the state in
+   * @param {T} defaultValue - The Default value, in case it does not exist. 
+   * @returns {Promise<T>} - Returns a copy of the state, or the same in case of missing data.
+   */
+async function fromStorage(
+  storage = browser.storage.local,
+  key = MOZILLA_VPN_SERVERS_KEY,
+  defaultValue
+) {
+  const { mozillaVpnServers } = await storage.get(key);
+  if (typeof mozillaVpnServers === "undefined") {
+    return defaultValue;
+  }
+  // @ts-ignore
+  return mozillaVpnServers;
+}
+
+/**  data into storage, to make sure we can recreate it next time using
+ * @param {any} data - The state to replicate
+ * @param {browser.storage.StorageArea} storage - The storage area to look for
+ * @param {String} key - The key to put the state in
+ */
+function putIntoStorage(
+  data = {},
+  storage = browser.storage.local,
+  key = MOZILLA_VPN_SERVERS_KEY
+) {
+  // @ts-ignore
+  storage.set({ [key]: data });
+}
+
+/**
+ * Take a VPN Status Response message, and returns an Extension State Object.
+ * @param {vpnStatusResponse} response - What the VPN sent
+ * @param {Array<ServerCountry>} serverList - The Current Serverlist
+ * @returns
+ */
+
+export function fromVPNStatusResponse(
+  response = new vpnStatusResponse(),
+  serverList = []
+) {
+  if (response.t != "status") {
+    return;
+  }
+  const status = response.status;
+  const controllerState = status.vpn;
+  const connectedSince = (() => {
+    if (!status.connectedSince) {
+      return 0;
+    }
+    return parseInt(status.connectedSince);
+  })();
+  const exit_city_name = status.location["exit_city_name"];
+  const exit_country_code = status.location["exit_country_code"];
+  const exitServerCountry = serverList.find(
+    (country) => country.code === exit_country_code
+  );
+  const exitServerCity = exitServerCountry?.cities.find(
+    (city) => city.name === exit_city_name
+  );
+
+  if (controllerState === "StateOn") {
+    return new StateVPNEnabled(
+      exitServerCity,
+      exitServerCountry,
+      status.localProxy?.url,
+      connectedSince
+    );
+  }
+  if (
+    controllerState === "StateOff" ||
+    controllerState === "StateDisconnecting"
+  ) {
+    return new StateVPNDisabled(exitServerCity, exitServerCountry);
+  }
+  return;
 }

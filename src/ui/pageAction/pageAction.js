@@ -17,7 +17,7 @@ import { fontSizing, resetSizing } from "../../components/styles.js";
  */
 export class PageActionPopup extends LitElement {
   static properties = {
-    vpnState: { type: Object },
+    servers: { type: Object },
     pageURL: { type: String },
     _siteContext: { type: Object },
   };
@@ -38,7 +38,7 @@ export class PageActionPopup extends LitElement {
       }
     });
 
-    vpnController.state.subscribe((s) => (this.vpnState = s));
+    vpnController.servers.subscribe((s) => (this.servers = s));
   }
 
   render() {
@@ -57,7 +57,7 @@ export class PageActionPopup extends LitElement {
       if (excluded) {
         return "Off";
       }
-      const servers = this.vpnState?.servers;
+      const servers = this.servers;
       return servers
         .find((sc) => sc.code === this._siteContext?.countryCode)
         ?.cities.find((c) => c.code === this._siteContext?.cityCode)?.name;
