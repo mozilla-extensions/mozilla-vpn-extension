@@ -86,7 +86,7 @@ export class VPNCard extends LitElement {
       : html``;
 
     const subLine = this.enabled
-      ? html``
+      ? null
       : html`<p class="subline">${tr("turnOnForPrivateConnection")}</p>`;
     const vpnHeader = this.enabled ? tr("vpnIsOn") : tr("vpnIsOff");
 
