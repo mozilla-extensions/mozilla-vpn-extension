@@ -15,9 +15,18 @@
     <link rel="stylesheet" href="popup.css" />
     <link rel="stylesheet" href="../variables.css" />
     <script src="./popupPage.js" type="module"></script>
+    <script src="./popupConditional.js" type="module"></script>
+    <script src="../../components/message-screen.js" type="module"></script>
+    
     <title>Mozilla VPN</title>
   </head>
   <body>
-    <popup-browseraction> </popup-browseraction>
+    <popup-condview>
+      <message-screen slot="default"
+        title="Hello world"
+      ></message-screen>
+      <popup-browseraction > </popup-browseraction>
+    </popup-condview> 
+
   </body>
 </html>

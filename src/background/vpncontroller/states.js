@@ -25,6 +25,8 @@ export class VPNState {
   connected = false;
   // True if firefox is split-tunneled
   isExcluded = false;
+  // True if a subscription is found
+  subscribed = true;
   /**
    * A socks:// url to connect to
    * to bypass the vpn.
@@ -54,6 +56,12 @@ export class StateVPNUnavailable extends VPNState {
   state = "Unavailable";
   alive = false;
   connected = false;
+}
+
+export class StateVPNSubscriptionNeeded extends VPNState {
+  state = "SubscriptionNeeded";
+  alive = true;
+  subscribed = false;
 }
 
 /**

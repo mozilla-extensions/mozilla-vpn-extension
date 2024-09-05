@@ -18,6 +18,7 @@ import {
   StateVPNUnavailable,
   StateVPNEnabled,
   StateVPNDisabled,
+  StateVPNSubscriptionNeeded,
   REQUEST_TYPES,
   ServerCountry,
   vpnStatusResponse,
@@ -123,6 +124,7 @@ export class VPNController extends Component {
 
   // Handle responses from MozillaVPN client
   async handleResponse(response) {
+    console.log(response);
     if (!response.t) {
       // The VPN Client always sends a ".t : string"
       // to determing the message type.
@@ -275,6 +277,13 @@ export function fromVPNStatusResponse(
     return;
   }
   const status = response.status;
+  const appState = status.app;
+
+  if (appState === "StateSubscriptionNeeded") {
+    return new StateVPNSubscriptionNeeded();
+  }
+
+  //
   const controllerState = status.vpn;
   const connectedSince = (() => {
     if (!status.connectedSince) {

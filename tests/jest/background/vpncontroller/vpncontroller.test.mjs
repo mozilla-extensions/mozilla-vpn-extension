@@ -152,4 +152,25 @@ describe("fromVPNStatusResponse", () => {
     expect(result.connectedSince).toBe(0);
     expect(result.state).toBe("Enabled");
   });
+
+  it("It can Handle Subscription needed", () => {
+    const obj = {
+      status: {
+        app: "StateSubscriptionNeeded",
+        authenticated: true,
+        location: {
+          entry_city_name: "",
+          entry_country_code: "",
+          exit_city_name: "",
+          exit_country_code: "",
+        },
+        vpn: "StateInitializing",
+      },
+      t: "status",
+    };
+    const result = fromVPNStatusResponse(obj);
+    expect(result).not.toBeNull();
+    expect(result.state).toBe("SubscriptionNeeded");
+    expect(result.subscribed).toBe(false);
+  });
 });
