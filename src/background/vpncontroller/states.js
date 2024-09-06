@@ -14,6 +14,8 @@ export const REQUEST_TYPES = [
   "disabled_apps",
   "status",
   "deactivate",
+  "focus",
+  "openAuth",
 ];
 
 export class VPNState {
@@ -81,11 +83,10 @@ export class StateVPNSignedOut extends StateVPNOpened {
   authenticated = false;
 }
 
-
 export class StateVPNSubscriptionNeeded extends StateVPNSignedOut {
   state = "SubscriptionNeeded";
   subscribed = false;
-  authenticated = true; 
+  authenticated = true;
 }
 
 /**

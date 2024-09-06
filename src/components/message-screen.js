@@ -68,7 +68,12 @@ export class MessageScreen extends LitElement {
           ${when(
             this.primaryAction,
             () => html`
-              <button class="primarybtn" @click=${this.onPrimaryAction}>
+              <button
+                class="primarybtn"
+                @click=${(e) => {
+                  this.onPrimaryAction(this, e);
+                }}
+              >
                 ${this.primaryAction}
               </button>
             `
@@ -76,7 +81,10 @@ export class MessageScreen extends LitElement {
           ${when(
             this.secondaryAction,
             () => html`
-              <button class="secondarybtn" @click=${this.onSecondaryAction}>
+              <button
+                class="secondarybtn"
+                @click=${(e) => this.onSecondaryAction(this, e)}
+              >
                 ${this.secondaryAction}
               </button>
             `

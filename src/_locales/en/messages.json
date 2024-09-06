@@ -141,25 +141,25 @@
   "headerSignedOut": {
     "message": "Sign in to your Mozilla account"
   },
-  "bodySignedOut":{
+  "bodySignedOut": {
     "message": "You’re currently signed out of your Mozilla account. To use the Mozilla VPN extension, please open the desktop app to sign in first."
   },
-  "btnOpenVpn":{
+  "btnOpenVpn": {
     "message": "Open Mozilla VPN"
   },
-  "headerInstallMsg":{
+  "headerInstallMsg": {
     "message": "Install Mozilla VPN",
     "description": "Header if a VPN installation was not found"
   },
   "bodyInstallMsg": {
-    "message":"In order to use the Mozilla VPN extension, you must first download Mozilla VPN on your desktop." 
+    "message": "In order to use the Mozilla VPN extension, you must first download Mozilla VPN on your desktop."
   },
   "bodyInstallMsgFooter": {
     "message": "Note that Mozilla VPN is a paid subscription service.",
     "description": "This is a footnote for 'bodyInstallMsg' "
   },
-  "btnDownloadNow":{
+  "btnDownloadNow": {
     "message": "Download now",
-    "description":"This is a call to action button to download the VPN."
+    "description": "This is a call to action button to download the VPN."
   }
 }

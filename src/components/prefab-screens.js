@@ -20,11 +20,11 @@ const defineMessageScreen = (
   primaryAction,
   onPrimaryAction,
   secondarAction = tr("getHelp"),
-  onSecondaryAction = () => open("https://support.mozilla.org/products/firefox-private-network-vpn")
+  onSecondaryAction = () =>
+    open("https://support.mozilla.org/products/firefox-private-network-vpn")
 ) => {
-    const body = typeof bodyText === "string" ?
-        html`<p>${bodyText}</p>` : 
-        bodyText
+  const body =
+    typeof bodyText === "string" ? html`<p>${bodyText}</p>` : bodyText;
 
   class Temp extends MessageScreen {
     connectedCallback() {
@@ -42,30 +42,46 @@ const defineMessageScreen = (
   customElements.define(tag, Temp);
 };
 
-defineMessageScreen("subcribenow-message-screen",
+const sendToApp = (customElement, command = "") => {
+  customElement.dispatchEvent(
+    new CustomEvent("requestMessage", {
+      bubbles: true,
+      detail: command,
+    })
+  );
+};
+
+defineMessageScreen(
+  "subcribenow-message-screen",
   "message-header.svg",
   "Subscribe to Mozilla VPN",
   tr("bodySubscribeNow"),
   tr("btnSubscribeNow"),
-  () => open("https://vpn.mozilla.org"),
+  (elm) => sendToApp(elm, "focus")
 );
 
+defineMessageScreen(
+  "signin-message-screen",
+  "message-signin.svg",
+  tr("headerSignedOut"),
+  tr("bodySignedOut"),
+  tr("btnOpenVpn"),
+  (elm) => {
+    sendToApp(elm, "focus");
+    sendToApp(elm, "openAuth");
+  }
+);
 
-defineMessageScreen("signin-message-screen", 
-    "message-signin.svg",
-    tr("headerSignedOut"),
-    tr("bodySignedOut"),
-    tr("btnOpenVpn"),
-    () => { console.log("FOCUSSSS")},
-)
-
-defineMessageScreen("install-message-screen", 
-    "message-signin.svg",
-    tr("headerInstallMsg"),
-    html`
-        <p>${tr("bodyInstallMsg")}</p>
-        <p class="footnote">${tr("bodyInstallMsgFooter")}</p>
-    `,
-    tr("btnDownloadNow"),
-    () => { open("https://www.mozilla.org/products/vpn/download/")},
-)
+defineMessageScreen(
+  "install-message-screen",
+  "message-signin.svg",
+  tr("headerInstallMsg"),
+  html`
+    <p>${tr("bodyInstallMsg")}</p>
+    <p class="footnote">${tr("bodyInstallMsgFooter")}</p>
+  `,
+  tr("btnDownloadNow"),
+  () => {
+    open("https://www.mozilla.org/products/vpn/download/");
+  }
+);

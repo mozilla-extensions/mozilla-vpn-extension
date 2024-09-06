@@ -1,8 +1,8 @@
 import { getExposedObject } from "../../shared/ipc.js";
 
 /**
- * Import Types 
- * 
+ * Import Types
+ *
  * @typedef {import("../../shared/property.js").IBindable} IBindable
  * @typedef {import("../../background/vpncontroller/states.js").ServerCountry} ServerCountry
  * @typedef {import("../../background/vpncontroller/states.js").ServerCity} ServerCity
@@ -11,8 +11,8 @@ import { getExposedObject } from "../../shared/ipc.js";
  */
 
 /**
- * Manually define the types for convinence, please update if making changes :) 
- * 
+ * Manually define the types for convinence, please update if making changes :)
+ *
  * @typedef {Object} vpnController
  * @property {IBindable<ServerCountryList>} servers - A bindable property that contains the list or configuration of VPN servers.
  * @property {IBindable<Boolean>} isExcluded - A bindable property that indicates whether the VPN is excluded from certain operations.

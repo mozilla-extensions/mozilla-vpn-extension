@@ -15,6 +15,17 @@ export class PopUpConditionalView extends ConditionalView {
     vpnController.state.subscribe((s) => {
       this.slotName = PopUpConditionalView.toSlotname(s);
     });
+    // Messages may dispatch an event requesting to send a Command to the VPN
+    this.addEventListener("requestMessage", (e) => {
+      console.log(`Message requested ${e}`);
+      if (!e.detail) {
+        return;
+      }
+      if (typeof e.detail != "string") {
+        return;
+      }
+      vpnController.postToApp(e.detail);
+    });
   }
 
   /**

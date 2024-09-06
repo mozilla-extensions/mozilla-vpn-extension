@@ -281,7 +281,7 @@ export function fromVPNStatusResponse(
   }
   const status = response.status;
   const appState = status.app;
-  if(["StateInitialize", "StateAuthenticating"].includes(appState)){
+  if (["StateInitialize", "StateAuthenticating"].includes(appState)) {
     return new StateVPNSignedOut();
   }
 
