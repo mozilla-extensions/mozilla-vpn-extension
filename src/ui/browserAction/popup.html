@@ -23,10 +23,11 @@
   </head>
   <body>
     <popup-condview>
-      <install-message-screen slot="MessageStartVPN"> </install-message-screen>
-      <subcribenow-message-screen slot="MessageSubscription"></subcribenow-message-screen>
+      <install-message-screen slot="MessageInstallVPN"> </install-message-screen>
       <signin-message-screen slot="MessageSignIn"></signin-message-screen>
-      <vpn-card-placeholder ></vpn-card-placeholder>
+      <subcribenow-message-screen slot="MessageSubscription"></subcribenow-message-screen>
+      <vpn-card-placeholder slot="MessageStartVPN"></vpn-card-placeholder>
+      <!-- TODO: Split Tunnel Message, Onboarding, Update Message -->
       <popup-browseraction slot="default"> </popup-browseraction>
     </popup-condview>
   </body>

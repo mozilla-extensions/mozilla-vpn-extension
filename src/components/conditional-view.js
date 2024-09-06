@@ -6,7 +6,16 @@ import { html, LitElement } from "../vendor/lit-all.min.js";
 
 /**
  * `ConditionalView`
- *
+ *  
+ * Takes N elements each with a slot="" attribute,
+ * the active rendered view can be controlled using slotName="slot"
+ * if no view matches "slotName" the slot named "default" will be rendered. 
+ * 
+ * 
+ *  <conditional-view slotName="b">
+ *    <h1 slot="a">Hidden</h1>
+ *    <h1 slot="b">This is rendered</h1>
+ *  </conditional-view>
  */
 
 export class ConditionalView extends LitElement {
