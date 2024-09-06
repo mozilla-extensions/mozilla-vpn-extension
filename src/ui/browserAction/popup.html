@@ -17,16 +17,17 @@
     <script src="./popupPage.js" type="module"></script>
     <script src="./popupConditional.js" type="module"></script>
     <script src="../../components/message-screen.js" type="module"></script>
-    
+    <script src="../../components/prefab-screens.js" type="module"></script>
+
     <title>Mozilla VPN</title>
   </head>
   <body>
     <popup-condview>
-      <message-screen slot="default"
-        title="Hello world"
-      ></message-screen>
-      <popup-browseraction > </popup-browseraction>
-    </popup-condview> 
-
+      <install-message-screen slot="MessageStartVPN"> </install-message-screen>
+      <subcribenow-message-screen slot="MessageSubscription"></subcribenow-message-screen>
+      <signin-message-screen slot="MessageSignIn"></signin-message-screen>
+      <vpn-card-placeholder ></vpn-card-placeholder>
+      <popup-browseraction slot="default"> </popup-browseraction>
+    </popup-condview>
   </body>
 </html>

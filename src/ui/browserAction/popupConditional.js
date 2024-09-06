@@ -2,36 +2,46 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { ConditionalView } from "../../components/conditional-view.js"
+import { ConditionalView } from "../../components/conditional-view.js";
 import { vpnController } from "./backend.js";
- 
- export class PopUpConditionalView extends ConditionalView {
-   constructor() {
-     super();
-   }
 
-   connectedCallback(){
+export class PopUpConditionalView extends ConditionalView {
+  constructor() {
+    super();
+  }
+
+  connectedCallback() {
     super.connectedCallback();
-    vpnController.state.subscribe(s => {
+    vpnController.state.subscribe((s) => {
+      this.slotName = PopUpConditionalView.toSlotname(s);
+    });
+  }
 
-    })
-   }
-
-   /**
-    * @typedef {import("../../background/vpncontroller/states.js").VPNState} State
-    * @param {State} state 
-    * @returns {String}
-    */
-   static toSlotname(state){
-        if(!state.alive){
-            return "MessageStartVPN"
-        }
-        if(!state.subscribed){
-            return "MessageSubscription"
-        }
-        return "default"
-
-   }
- }
- customElements.define("popup-condview", PopUpConditionalView);
- 
+  /**
+   * @typedef {import("../../background/vpncontroller/states.js").VPNState} State
+   * @param {State} state
+   * @returns {String}
+   */
+  static toSlotname(state) {
+    if (!state.installed) {
+      return "MessageInstallVPN";
+    }
+    if (!state.alive) {
+      return "MessageStartVPN";
+    }
+    if (!state.authenticated) {
+      return "MessageSignIn";
+    }
+    if (!state.subscribed) {
+      return "MessageSubscription";
+    }
+    /**
+     * TODO:
+     * if( did not have onboarding){
+     *  return "onBoarding"
+     * }
+     */
+    return "default";
+  }
+}
+customElements.define("popup-condview", PopUpConditionalView);
