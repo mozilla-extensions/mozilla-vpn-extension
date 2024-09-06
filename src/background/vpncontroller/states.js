@@ -30,7 +30,7 @@ export class VPNState {
   // True if firefox is split-tunneled
   isExcluded = false;
   // True if a subscription is found
-  subscribed = false;
+  subscribed = true;
   // True if it is authenticated
   authenticated = false;
   /**
@@ -127,7 +127,7 @@ export class StateVPNEnabled extends StateVPNDisabled {
     this.connectedSince = connectedSince;
   }
   state = "Enabled";
-  subscribed = false;
+  subscribed = true;
   connected = true;
 }
 
