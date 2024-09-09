@@ -12,6 +12,8 @@ import {
 import { tr } from "../shared/i18n.js";
 import { resetSizing } from "./styles.js";
 
+import { VPNState } from "../background/vpncontroller/states.js";
+
 /**
  * @typedef {import("../background/vpncontroller/states.js").VPNState} VPNState
  */
@@ -31,7 +33,7 @@ export class VPNCard extends LitElement {
     this.cityName = "";
     this.countryFlag = "";
     this.connectedSince = 0;
-    this.stability = "stable";
+    this.stability = VPNState.Stable;
   }
   #intervalHandle = null;
 
@@ -56,12 +58,12 @@ export class VPNCard extends LitElement {
     const boxClasses = {
       box: true,
       on: this.enabled,
-      unstable: this.enabled && this.stability === "unstable",
-      noSignal: this.enabled && this.stability === "noSignal",
+      unstable: this.enabled && this.stability === VPNState.Unstable,
+      noSignal: this.enabled && this.stability === VPNState.NoSignal,
       stable:
         this.enabled &&
-        this.stability != "unstable" &&
-        this.stability != "noSignal",
+        this.stability != VPNState.Unstable &&
+        this.stability != VPNState.NoSignal,
     };
     function formatSingle(value) {
       if (value === 0) return "00";
@@ -85,9 +87,10 @@ export class VPNCard extends LitElement {
     const time = Date.now() - this.connectedSince;
     //console.log(`Elapsed Time: ${time}`)
 
-    const timeString = this.enabled && this.stability === "stable"
-      ? html`<p class="timer">${formatTime(time)}</p>`
-      : html``;
+    const timeString =
+      this.enabled && this.stability === VPNState.Stable
+        ? html`<p class="timer">${formatTime(time)}</p>`
+        : html``;
     const vpnHeader = this.enabled ? tr("vpnIsOn") : tr("vpnIsOff");
 
     return html`
@@ -130,9 +133,9 @@ export class VPNCard extends LitElement {
     `;
 
     switch (stability) {
-      case "noSignal":
+      case VPNState.NoSignal:
         return html`<p class="subline">${errorSvg} No Signal</p>`;
-      case "unstable":
+      case VPNState.Unstable:
         return html`<p class="subline">${errorSvg} Unstable</p>`;
       default:
         null;

@@ -33,6 +33,8 @@ export class VPNState {
   subscribed = true;
   // True if it is authenticated
   authenticated = false;
+  // Can be "Stable", "Unstable", "NoSignal"
+  connectionStability = "Stable";
   /**
    * A socks:// url to connect to
    * to bypass the vpn.
@@ -52,6 +54,10 @@ export class VPNState {
    * Timestamp since the VPN connection was established
    */
   connectedSince = 0;
+
+  static NoSignal = "NoSignal";
+  static Unstable = "Unstable";
+  static Stable = "Stable";
 }
 
 /**
@@ -121,10 +127,28 @@ export class StateVPNEnabled extends StateVPNDisabled {
    * @param {ServerCity | undefined} exitServerCity
    * @param {ServerCountry | undefined } exitServerCountry
    */
-  constructor(exitServerCity, exitServerCountry, aloophole, connectedSince) {
+  constructor(
+    exitServerCity,
+    exitServerCountry,
+    aloophole,
+    connectedSince,
+    connectionHealth = "Stable"
+  ) {
     super(exitServerCity, exitServerCountry);
+    this.exitServerCity = exitServerCity;
+    this.exitServerCountry = exitServerCountry;
     this.loophole = aloophole;
     this.connectedSince = connectedSince;
+    if (
+      ![VPNState.NoSignal, VPNState.Stable, VPNState.Unstable].includes(
+        connectionHealth
+      )
+    ) {
+      throw new Error(
+        `${connectionHealth} is not a Valid Value for ConnectionHealth`
+      );
+    }
+    this.connectionHealth = connectionHealth;
   }
   state = "Enabled";
   subscribed = true;
@@ -171,6 +195,7 @@ export class vpnStatusResponse {
     connectedSince: "0",
     app: "MozillaVPN::CustomState",
     vpn: "Controller::StateOn",
+    connectionHealth: "Stable",
     localProxy: {
       available: false,
       url: "https://localhost:8080",
