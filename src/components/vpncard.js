@@ -22,6 +22,7 @@ export class VPNCard extends LitElement {
     connectedSince: { type: Date },
     cityName: { type: String },
     countryFlag: { type: String },
+    stability: { type: String },
   };
 
   constructor() {
@@ -30,6 +31,7 @@ export class VPNCard extends LitElement {
     this.cityName = "";
     this.countryFlag = "";
     this.connectedSince = 0;
+    this.stability = "stable";
   }
   #intervalHandle = null;
 
@@ -54,11 +56,13 @@ export class VPNCard extends LitElement {
     const boxClasses = {
       box: true,
       on: this.enabled,
+      unstable: this.enabled && this.stability === "unstable",
+      noSignal: this.enabled && this.stability === "noSignal",
+      stable:
+        this.enabled &&
+        this.stability != "unstable" &&
+        this.stability != "noSignal",
     };
-    const shieldURL = this.enabled
-      ? "../../assets/img/globe-shield-on.svg"
-      : "../../assets/img/globe-shield-off.svg";
-
     function formatSingle(value) {
       if (value === 0) return "00";
       return (value < 10 ? "0" : "") + value;
@@ -81,22 +85,18 @@ export class VPNCard extends LitElement {
     const time = Date.now() - this.connectedSince;
     //console.log(`Elapsed Time: ${time}`)
 
-    const timeString = this.enabled
+    const timeString = this.enabled && this.stability === "stable"
       ? html`<p class="timer">${formatTime(time)}</p>`
       : html``;
-
-    const subLine = this.enabled
-      ? null
-      : html`<p class="subline">${tr("turnOnForPrivateConnection")}</p>`;
     const vpnHeader = this.enabled ? tr("vpnIsOn") : tr("vpnIsOff");
 
     return html`
       <div class="${classMap(boxClasses)}">
         <main>
-          <img src=${shieldURL} />
+          ${VPNCard.shield(this.enabled)}
           <div class="infobox">
             <h1>${vpnHeader}</h1>
-            ${subLine} ${timeString}
+            ${VPNCard.subline(this.enabled, this.stability)} ${timeString}
           </div>
           <button class="pill" @click=${this.#toggle}></button>
         </main>
@@ -116,6 +116,41 @@ export class VPNCard extends LitElement {
         <p>${name}</p>
         <span> In Use </span>
       </footer>
+    `;
+  }
+
+  static subline(enabled, stability) {
+    if (!enabled) {
+      return html`<p class="subline">${tr("turnOnForPrivateConnection")}</p>`;
+    }
+    const errorSvg = html`
+      <svg>
+        <use xlink:href="../../assets/img/error.svg#error"></use>
+      </svg>
+    `;
+
+    switch (stability) {
+      case "noSignal":
+        return html`<p class="subline">${errorSvg} No Signal</p>`;
+      case "unstable":
+        return html`<p class="subline">${errorSvg} Unstable</p>`;
+      default:
+        null;
+    }
+  }
+
+  static shield(enabled) {
+    if (!enabled) {
+      return html`
+        <svg>
+          <use xlink:href="../../assets/img/globe-shield-off.svg#globe"></use>
+        </svg>
+      `;
+    }
+    return html`
+      <svg>
+        <use xlink:href="../../assets/img/globe-shield-on.svg#globe"></use>
+      </svg>
     `;
   }
 
@@ -147,6 +182,9 @@ export class VPNCard extends LitElement {
       width: 100%;
       justify-content: baseline;
     }
+    footer img {
+      margin-right: 8px;
+    }
     main {
       justify-content: space-between;
       padding: var(--default-padding);
@@ -173,11 +211,20 @@ export class VPNCard extends LitElement {
     .box.on * {
       color: var(--main-card-text-color);
     }
+    .box.unstable {
+      --shield-color: orange;
+      --error-fill: orange;
+    }
+    .box.noSignal {
+      --shield-color: red;
+      --error-fill: red;
+    }
+    .box.stable {
+      --shield-color: var(--color-enabled);
+    }
+
     .infobox {
       flex: 4;
-    }
-    img {
-      margin-right: var(--default-padding);
     }
     h1 {
       font-size: 18px;
@@ -188,7 +235,6 @@ export class VPNCard extends LitElement {
       font-size: 14px;
       line-height: 21px;
       font-weight: 400;
-      color: var(--main-card-text-color);
       opacity: 0.7;
     }
 
@@ -196,7 +242,25 @@ export class VPNCard extends LitElement {
     .subline {
       margin-block-start: calc(var(--default-padding) / 2);
     }
+    .subline svg {
+      width: 14px;
+      height: 14px;
+      margin: 0px;
+      transform: scale(1.1);
+    }
+    .unstable .subline {
+      color: orange;
+    }
+    .noSignal .subline {
+      color: red;
+    }
 
+    svg {
+      height: 48px;
+      width: 48px;
+      transition: all 3s;
+      margin-right: var(--default-padding);
+    }
     .pill {
       width: 45px;
       height: 24px;
