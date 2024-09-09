@@ -14,6 +14,10 @@ export const ProxyUtils = {
     return "siteContexts";
   },
 
+  getDirectProxyInfoObject() {
+    return { type: "direct" }
+  },
+
   /**
    * Finds the servers available for provided location, orders them by weight,
    * and returns an array of proxyInfo objects.
