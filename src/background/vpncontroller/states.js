@@ -155,6 +155,12 @@ export class StateVPNEnabled extends StateVPNDisabled {
   connected = true;
 }
 
+export class StateVPNOnPartial extends StateVPNEnabled {
+  state = "OnPartial";
+  alive = true;
+  connected = true;
+}
+
 // Defining the Nested Serverlist
 // so people don't have to dig around <any>
 export class Server {

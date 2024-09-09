@@ -5,69 +5,103 @@
 import { Component } from "./component.js";
 import { Logger } from "./logger.js";
 import { Utils } from "../shared/utils.js";
-import { VPNController, VPNState } from "./vpncontroller/index.js";
-import { ProxyHandler } from "./proxyHandler/proxyHandler.js";
-import { ProxyUtils } from "./proxyHandler/proxyUtils.js";
-
+import {
+  ExtensionController,
+  FirefoxVPNState,
+} from "./extensionController/index.js";
+import { ProxyHandler,  ProxyUtils } from "./proxyHandler/index.js";
 import { propertySum } from "../shared/property.js";
 
 const log = Logger.logger("RequestHandler");
-let self;
+
 /**
- * RequestHandler is responsible for intercepting, inspecting,
- * and determining whether a Request should be proxied.
+ * Handles request interception, inspection, and determines whether a request should be proxied.
+ *
  */
 export class RequestHandler extends Component {
   /**
    *
-   * @param {*} receiver
-   * @param {VPNController} controller
-   *  @param {ProxyHandler} proxyHandler
+   * @param {*} receiver The message receiver for the RequestHandler.
+   * @param {ExtensionController} extController Instance of the ExtensionController that manages extension states.
+   * @param {ProxyHandler} proxyHandler Instance of the ProxyHandler to procure rules.
    */
-  constructor(receiver, controller, proxyHandler) {
+  constructor(receiver, extController, proxyHandler) {
     super(receiver);
-    this.controller = controller;
-    /** @type {ProxyHandler}  */
-    this.proxyHandler = proxyHandler;
     this.active = false;
+    this.localProxyInfo = [];
+    this.currentExitRelays = [];
+    this.defaultProxyInfo = ProxyUtils.getDirectProxyInfoObject();
+
+    /** @type {FirefoxVPNState | undefined} */
+    this.extState = {}
+
+    extController.state.subscribe((s) => {
+      this.extState = s;
+      this.handleExtensionStateChanges(s);
+    });
 
     propertySum(
-      controller.state,
-      proxyHandler.siteContexts,
-      (currentVPNState, currentSiteContextMap) => {
-        return resolveSiteContext(currentSiteContextMap, currentVPNState);
+      proxyHandler.localProxyInfo,
+      proxyHandler.currentExitRelays,
+      (loophole, exitRelays) => {
+        this.updateProxyInfoFromClient(loophole, exitRelays);
       }
-    ).subscribe((proxyMap) => {
-      console.log(proxyMap);
-      this.onNewProxyMap(proxyMap);
+    )
+
+    proxyHandler.proxyMap.subscribe((proxyMap) => {
+      this.proxyMap = proxyMap;
+      this.addOrRemoveRequestListener();
     });
   }
 
-  /**
-   *
-   * @param {Map<string, Array<browser.proxy.proxyInfo>>} proxyMap
-   */
-  onNewProxyMap(proxyMap) {
-    this.proxyMap = proxyMap;
-    if (proxyMap.size === 0 && this.active) {
-      this.removeRequestListener();
-      return;
-    }
-    if (!this.active && proxyMap.size > 0) {
-      this.addRequestListener();
-    }
+    updateProxyInfoFromClient(localProxy, exitRelays) {
+      console.log(`Updating proxy info. this.localProxyInfo: ${localProxy} this.currentExitRelays ${exitRelays}`);
+
+      this.localProxyInfo = localProxy;
+      this.currentExitRelay = exitRelays;
+
+      if (this.extState.useExitRelays) {
+        this.defaultProxyInfo = exitRelays;
+      } else {
+        this.defaultProxyInfo = ProxyUtils.getDirectProxyInfoObject();
+      }
   }
 
-  /** @type {VPNState | undefined} */
-  controllerState;
-  /** @type {Map<string, SiteContext>} */
-  siteContexts;
+  /**
+   * Handles changes in extension state and updates request listener.
+   * @param {FirefoxVPNState} extState
+   */
+  handleExtensionStateChanges(extState) {
+    if (extState.useExitRelays) {
+      this.defaultProxyInfo = this.currentExitRelays;
+    } else {
+      this.defaultProxyInfo = ProxyUtils.getDirectProxyInfoObject();
+    }
+
+    return this.addOrRemoveRequestListener();
+  }
 
   async init() {
     log("Initiating RequestHandler");
   }
 
+  addOrRemoveRequestListener() {
+    if (this.proxyAllReqsByDefault()) {
+      return this.addRequestListener();
+    }
+    if (!this.extState.enabled) {
+      return this.removeRequestListener();
+    }
+    
+    if (this.proxyMap.size > 0) {
+      return this.addRequestListener();
+    }
+  }
+
   addRequestListener() {
+    if (this.active) {
+      return;
+    }
     console.log(
       `Starting listening for requests, active rules ${this.proxyMap.size}`
     );
@@ -75,24 +109,44 @@ export class RequestHandler extends Component {
       urls: ["<all_urls>"],
     });
     this.active = true;
+    return;
+  }
+
+  removeRequestListener() {
+    if (!this.active) {
+      return;
+    }
+    console.log("Removing request listener");
+    const ok = browser.proxy.onRequest.removeListener(this.interceptRequests);
+    this.active = false;
+    return ok;
+  }
+
+  proxyAllReqsByDefault() {
+    return (this.extState.bypassTunnel || this.extState.useExitRelays);
   }
 
   /**
+   * Intercepts and processes requests to determine if they should be proxied.
    *
-   * @param { proxy.RequestDetails } requestInfo
-   * @returns
+   * @async
+   * @param {proxy.RequestDetails} requestInfo The details of the incoming request.
+   * @returns {browser.proxy.proxyInfo | undefined} Proxy information for the request, or undefined for default.
    */
   async interceptRequests(requestInfo) {
-    let { documentUrl } = requestInfo;
-    // If we load an iframe request the top level document.
-    if (requestInfo.frameId !== 0) {
-      let topLevelFrame = await browser.webNavigation.getFrame({
-        frameId: requestInfo.parentFrameId,
-        tabId: requestInfo.tabId,
-      });
-      documentUrl = topLevelFrame.url;
+    if (this.extState.bypassTunnel) {
+      return this.localProxyInfo;
     }
 
+    let { documentUrl } = requestInfo;
+    // If we load an iframe request the top level document.
+      // if (requestInfo.frameId !== 0) {
+      //   let topLevelFrame = await browser.webNavigation.getFrame({
+      //     frameId: requestInfo.parentFrameId,
+      //     tabId: requestInfo.tabId,
+      //   });
+      //   documentUrl = topLevelFrame.url;
+      // }
     for (let urlString of [documentUrl]) {
       if (urlString) {
         const parsedHostname = Utils.getFormattedHostname(urlString);
@@ -103,17 +157,11 @@ export class RequestHandler extends Component {
       }
     }
 
-    // No custom proxy for the site, return direct connection
-    return { direct: true };
-  }
-
-  removeRequestListener() {
-    log("Removing request listener");
-    const ok = browser.proxy.onRequest.removeListener(this.interceptRequests);
-    this.active = false;
-    return ok;
+    // No custom proxy for the site, return default connection
+    return this.defaultProxyInfo;
   }
 }
+
 
 /**
  * @typedef {Object} browser.proxy.proxyInfo
@@ -123,36 +171,8 @@ export class RequestHandler extends Component {
  * @property {string} host - The host for the connection (required).
  * @property {string} port - The port for the connection (required).
  *
- * @typedef {import("./proxyHandler/siteContext.js").SiteContext} SiteContext
- *
  */
 
-/**
- *
- * Maps (VPNState+SiteContextMap) to a Map<origin:selectedProxies>
- *
- * @param {Map<string, SiteContext>} siteContexts
- * @param {VPNState} vpnState
- * @returns {Map<string, Array<browser.proxy.proxyInfo>>}
- */
-export const resolveSiteContext = (siteContexts, vpnState) => {
-  /** @type {Map<string, Array<browser.proxy.proxyInfo>>} */
-  const result = new Map();
-  const localProxy = vpnState.loophole
-    ? [ProxyUtils.parseProxy(vpnState.loophole)]
-    : [];
-  siteContexts.forEach((ctx, origin) => {
-    if (ctx.excluded) {
-      result.set(origin, [...localProxy]);
-    } else {
-      result.set(
-        origin,
-        ProxyUtils.getProxies(ctx.countryCode, ctx.cityCode, vpnState.servers)
-      );
-    }
-  });
-  return result;
-};
 
 /**
  * Contains information about a web request. An instance of this object is passed into the proxy.onRequest listener.

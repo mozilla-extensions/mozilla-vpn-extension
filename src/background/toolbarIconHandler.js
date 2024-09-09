@@ -3,7 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { Component } from "./component.js";
-import { VPNController, VPNState } from "./vpncontroller/index.js";
+import {
+  ExtensionController,
+  FirefoxVPNState,
+} from "./extensionController/index.js";
 
 /**
  * ToolbarIconHandler updates the browserAction (toolbar) icon
@@ -14,20 +17,19 @@ export class ToolbarIconHandler extends Component {
   /**
    *
    * @param {*} receiver
-   * @param {VPNController} controller
+   * @param {ExtensionController} extController
    */
-  constructor(receiver, controller) {
+  constructor(receiver, extController) {
     super(receiver);
-    this.controller = controller;
+    this.extController = extController;
   }
 
-  // TODO Use TBD ExtensionState
-  /** @type {VPNState | undefined} */
-  controllerState;
+  /** @type {FirefoxVPNState | undefined} */
+  extState;
 
   async init() {
-    this.controller.state.subscribe((s) => {
-      this.controllerState = s;
+    this.extController.state.subscribe((s) => {
+      this.extState = s;
       this.maybeUpdateBrowserActionIcon();
     });
 
@@ -40,20 +42,20 @@ export class ToolbarIconHandler extends Component {
   }
 
   maybeUpdateBrowserActionIcon() {
-    // TODO: Checkl onboarding status
-    // and show icon with blue dot if
-    // onboarding is not complete...
-
     const scheme =
       window.matchMedia &&
       !!window.matchMedia("(prefers-color-scheme: dark)").matches
         ? "light"
         : "dark";
 
+    const status = ["Connecting", "Enabled"].includes(this.extState.state)
+      ? "enabled"
+      : "disabled";
+
     browser.browserAction.setIcon({
       path: {
-        16: `./../assets/logos/browserAction/logo-${scheme}-${this.controllerState.state.toLowerCase()}.svg`,
-        32: `./../assets/logos/browserAction/logo-${scheme}-${this.controllerState.state.toLowerCase()}.svg`,
+        16: `./../assets/logos/browserAction/logo-${scheme}-${status}.svg`,
+        32: `./../assets/logos/browserAction/logo-${scheme}-${status}.svg`,
       },
     });
   }
