@@ -86,11 +86,11 @@
     "description": "Table heading for the column listing websites."
   },
   "tableHeadingVpnStatus": {
-    "message": "VPN Status",
+    "message": "VPN status",
     "description": "Table heading for the column indicating whether the VPN is on or off for a website."
   },
   "tableHeadingLocation": {
-    "message": "Location",
+    "message": "VPN location",
     "description": "Table heading for the column showing the location of the website."
   },
   "headlineNoWebsitePreferences": {
