@@ -21,6 +21,7 @@ import { settingTypo } from "./styles.js";
 export class SettingsPage extends LitElement {
   static properties = {
     contexts: { type: Object },
+    serverList: { type: Object },
   };
   constructor() {
     super();
@@ -46,24 +47,11 @@ export class SettingsPage extends LitElement {
     // Let's render the view!
     return html`
       <header>
-        <picture class="icon" alt="${tr("productName")}">
-          <!-- User prefers light mode: -->
-          <source
-            srcset="../../assets/logos/logo-dark.svg"
-            media="(prefers-color-scheme: light)"
-          />
-          <!-- User prefers dark mode: -->
-          <source
-            srcset="../../assets/logos/logo-light.svg"
-            media="(prefers-color-scheme: dark)"
-          />
-          <!-- User has no color preference: -->
-          <img
-            src="../../assets/logos/logo-dark.svg"
-            alt="${tr("productName")}"
-          />
-        </picture>
-        <h1>${tr("productName")}</h1>
+        <img
+          class="invert_darkmode"
+          src="/assets/logos/logo-wide.svg"
+          alt="${tr("productName")}"
+        />
       </header>
       <main>
         <h2>${tr("headlineWebsitePreferences")}</h2>
@@ -130,7 +118,7 @@ export class SettingsPage extends LitElement {
       padding: 20px 30px;
       border-bottom: 1px solid var(--border-color);
       width: 100%;
-      margin-bottom: 16px;
+      margin-bottom: 32px;
     }
     main {
       width: calc(min(70%, 920px));
@@ -161,6 +149,19 @@ export class SettingsPage extends LitElement {
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      max-width: 640px;
+    }
+    @media (prefers-color-scheme: dark) {
+      .invert_darkmode {
+        filter: invert();
+      }
+    }
+
+    h3 {
+      margin-top: 32px;
+    }
+    .emptyState p {
+      opacity: 0.8;
     }
   `;
 }
