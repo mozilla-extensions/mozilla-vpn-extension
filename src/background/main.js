@@ -9,6 +9,7 @@ import { TabHandler } from "./tabHandler.js";
 import { ToolbarIconHandler } from "./toolbarIconHandler.js";
 
 import { VPNController } from "./vpncontroller/index.js";
+import { ExtensionController } from "./extensionController/index.js";
 
 import { expose } from "../shared/ipc.js";
 import { TabReloader } from "./tabReloader.js";
@@ -20,15 +21,17 @@ class Main {
 
   observers = new Set();
   vpnController = new VPNController(this);
+  extController = new ExtensionController(this, this.vpnController);
   logger = new Logger(this);
   proxyHandler = new ProxyHandler(this, this.vpnController);
   requestHandler = new RequestHandler(
     this,
     this.vpnController,
+    this.extController,
     this.proxyHandler
   );
-  tabHandler = new TabHandler(this, this.vpnController, this.proxyHandler);
-  toolbarIconHandler = new ToolbarIconHandler(this, this.vpnController);
+  tabHandler = new TabHandler(this, this.extController, this.proxyHandler);
+  toolbarIconHandler = new ToolbarIconHandler(this, this.extController);
   tabReloader = new TabReloader(this, this.proxyHandler);
 
   async init() {
@@ -38,7 +41,8 @@ class Main {
       await observer.init();
     }
     expose(this.vpnController);
-    expose(this.tabHandler);
+    expose(this.extController);
+    // expose(this.tabHandler);
     expose(this.proxyHandler);
 
     this.#handlingEvent = false;

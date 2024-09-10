@@ -11,7 +11,7 @@ import {
   ref,
 } from "../../vendor/lit-all.min.js";
 
-import { vpnController, proxyHandler } from "./backend.js";
+import { vpnController, proxyHandler, extController } from "./backend.js";
 
 import { Utils } from "../../shared/utils.js";
 import { tr } from "../../shared/i18n.js";
@@ -48,6 +48,7 @@ export class BrowserActionPopup extends LitElement {
   static properties = {
     servers: { type: Object },
     vpnState: { type: Object },
+    extState: { type: Object },
     pageURL: { type: String },
     _siteContext: { type: Object },
     hasSiteContext: { type: Boolean },
@@ -61,6 +62,7 @@ export class BrowserActionPopup extends LitElement {
     browser.tabs.onActivated.addListener(() => this.updatePage());
     vpnController.state.subscribe((s) => (this.vpnState = s));
     vpnController.servers.subscribe((s) => (this.servers = s));
+    extController.state.subscribe((s) => (this.extState = s));
     this.updatePage();
   }
   updatePage() {
@@ -111,6 +113,10 @@ export class BrowserActionPopup extends LitElement {
   stackView = createRef();
 
   render() {
+
+    const handleVPNToggle = () => {
+      extController.toggleConnectivity();
+    };
     const back = () => {
       this.stackView?.value?.pop().then(() => {
         this.requestUpdate();
@@ -128,13 +134,14 @@ export class BrowserActionPopup extends LitElement {
 
     let card = html`
       <vpn-card
-        .enabled=${this.vpnState?.connected}
+        @toggle=${handleVPNToggle}
+        .enabled=${this.extState?.enabled || this.extState.state == "Connecting"}
         .cityName=${this.vpnState?.exitServerCity?.name}
         .countryFlag=${this.vpnState?.exitServerCountry?.code}
         .connectedSince=${this.vpnState?.connectedSince}
       ></vpn-card>
     `;
-    if (!this.vpnState.alive) {
+    if (this.extState.idle) {
       card = html`<vpn-card-placeholder></vpn-card-placeholder>`;
     }
 
@@ -157,7 +164,7 @@ export class BrowserActionPopup extends LitElement {
   }
 
   locationSettings() {
-    if (!this.pageURL) {
+    if (!this.pageURL || !this.extState.enabled) {
       return null;
     }
     const resetSitePreferences = async () => {

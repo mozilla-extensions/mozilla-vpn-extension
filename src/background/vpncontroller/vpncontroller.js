@@ -274,6 +274,7 @@ export function fromVPNStatusResponse(
   if (response.t != "status") {
     return;
   }
+  const servers = serverList;
   const status = response.status;
   const controllerState = status.vpn;
   const connectedSince = (() => {
@@ -296,7 +297,8 @@ export function fromVPNStatusResponse(
       exitServerCity,
       exitServerCountry,
       status.localProxy?.url,
-      connectedSince
+      connectedSince,
+      servers,
     );
   }
   if (

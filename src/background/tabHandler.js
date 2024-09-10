@@ -5,8 +5,9 @@
 import { Component } from "./component.js";
 import { Logger } from "./logger.js";
 import { Utils } from "../shared/utils.js";
-import { VPNController, VPNState } from "./vpncontroller/index.js";
 import { PropertyType } from "../shared/ipc.js";
+import { ExtensionController, FirefoxVPNState } from "./extensionController/index.js";
+import { ProxyHandler } from "./proxyHandler/index.js";
 
 const log = Logger.logger("TabHandler");
 
@@ -27,16 +28,17 @@ export class TabHandler extends Component {
   /**
    *
    * @param {*} receiver
-   * @param {VPNController} controller
+   * @param {ExtensionController} extController
+   * @param {ProxyHandler} proxyHandler
    */
-  constructor(receiver, controller, proxyHandler) {
+  constructor(receiver, extController, proxyHandler) {
     super(receiver);
-    this.controller = controller;
+    this.extController = extController;
     this.proxyHandler = proxyHandler;
   }
 
-  /** @type {VPNState | undefined} */
-  controllerState;
+  /** @type {FirefoxVPNState | undefined} */
+  extState;
 
   siteContexts;
   currentHostname;
@@ -44,12 +46,9 @@ export class TabHandler extends Component {
 
   async init() {
     log("Initializing TabHandler");
-    this.controller.state.subscribe((s) => {
-      this.controllerState = s;
+    this.extController.state.subscribe((s) => {
+      this.extState = s;
       this.maybeShowIcon();
-      if (this.currentPort && this.currentPort.name === "pageAction") {
-        this.sendDataToCurrentPopup();
-      }
     });
 
     this.proxyHandler.siteContexts.subscribe((siteContexts) => {
@@ -64,7 +63,7 @@ export class TabHandler extends Component {
 
   async maybeShowIcon() {
     const currentTab = await Utils.getCurrentTab();
-    if (this.controllerState.state !== "Enabled") {
+    if (this.extState.state !== "Enabled") {
       return browser.pageAction.hide(currentTab.id);
     }
 
@@ -91,15 +90,5 @@ export class TabHandler extends Component {
     }
 
     return browser.pageAction.hide(currentTab.id);
-  }
-
-  popupData() {
-    return {
-      type: "tabInfo",
-      currentHostname: this.currentHostname,
-      siteContexts: this.siteContexts,
-      servers: this.controllerState.servers,
-      currentContext: this.currentContext,
-    };
   }
 }
