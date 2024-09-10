@@ -4,7 +4,7 @@
 
 // @ts-check
 
-import { ProxyRule,ProxyRuleDirect } from "../proxyHandler/proxyRules.js";
+import { ProxyRule, ProxyRuleDirect } from "../proxyHandler/proxyRules.js";
 
 export class FirefoxVPNState {
   // State name
@@ -13,7 +13,7 @@ export class FirefoxVPNState {
   // True if the Firefox VPN is On
   enabled = false;
 
-  /** @type {ProxyRule} */ 
+  /** @type {ProxyRule} */
   proxyRule = new ProxyRuleDirect();
 }
 
@@ -32,14 +32,13 @@ export class StateFirefoxVPNEnabled extends FirefoxVPNState {
   enabled = true;
 }
 
-
 /**
  * This state is used when Firefox VPN is Off
  */
 export class StateFirefoxVPNDisabled extends FirefoxVPNState {
- /**
+  /**
    * @param {ProxyRule} rule - How requests should be proxied by default
- */
+   */
   constructor(rule) {
     super();
     this.proxyRule = rule;
@@ -47,7 +46,6 @@ export class StateFirefoxVPNDisabled extends FirefoxVPNState {
   state = "Disabled";
   enabled = false;
 }
-
 
 export class StateFirefoxVPNIdle extends FirefoxVPNState {
   state = "Idle";

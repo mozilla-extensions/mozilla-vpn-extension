@@ -35,25 +35,29 @@ export class ProxyRuleDirect extends ProxyRule {
 
 /**
  * Bypass Tunnel Proxy Rule.
- * 
+ *
  * @param {Object} clientState - Client state containing city, country, and servers.
  */
 export class ProxyRuleBypassTunnel extends ProxyRule {
   constructor(clientState) {
-    const loophole = ProxyUtils.parseProxy(clientState.loophole)
+    const loophole = ProxyUtils.parseProxy(clientState.loophole);
     super(ProxyRules.BYPASS_TUNNEL, loophole);
   }
 }
 
 /**
  * Use Exit Relays Proxy Rule.
- * 
+ *
  * @param {Object} clientState - Client state containing city, country, and servers.
  */
 export class ProxyRuleUseExitRelays extends ProxyRule {
   constructor(clientState) {
     const { exitServerCity, exitServerCountry, servers } = clientState;
-    const proxies = ProxyUtils.getProxies(exitServerCountry.code, exitServerCity.code, servers);
+    const proxies = ProxyUtils.getProxies(
+      exitServerCountry.code,
+      exitServerCity.code,
+      servers
+    );
     super(ProxyRules.USE_EXIT_RELAYS, proxies);
   }
 }

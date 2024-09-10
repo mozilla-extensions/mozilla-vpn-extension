@@ -42,7 +42,6 @@ class Main {
     }
     expose(this.vpnController);
     expose(this.extController);
-    // expose(this.tabHandler);
     expose(this.proxyHandler);
 
     this.#handlingEvent = false;

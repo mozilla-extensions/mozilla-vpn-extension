@@ -3,7 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { Component } from "./component.js";
-import { ExtensionController, FirefoxVPNState } from "./extensionController/index.js";
+import {
+  ExtensionController,
+  FirefoxVPNState,
+} from "./extensionController/index.js";
 
 /**
  * ToolbarIconHandler updates the browserAction (toolbar) icon
@@ -21,7 +24,7 @@ export class ToolbarIconHandler extends Component {
     this.extController = extController;
   }
 
-/** @type {FirefoxVPNState | undefined} */
+  /** @type {FirefoxVPNState | undefined} */
   extState;
 
   async init() {
@@ -45,7 +48,9 @@ export class ToolbarIconHandler extends Component {
         ? "light"
         : "dark";
 
-    const status = ["Connecting", "Enabled"].includes(this.extState.state) ? "enabled" : "disabled";
+    const status = ["Connecting", "Enabled"].includes(this.extState.state)
+      ? "enabled"
+      : "disabled";
 
     browser.browserAction.setIcon({
       path: {

@@ -6,8 +6,11 @@ import { Component } from "./component.js";
 import { Logger } from "./logger.js";
 import { Utils } from "../shared/utils.js";
 import { VPNController, VPNState } from "./vpncontroller/index.js";
-import { ExtensionController, FirefoxVPNState } from "./extensionController/index.js";
-import { ProxyHandler, ProxyRules, ProxyUtils } from "./proxyHandler/index.js"
+import {
+  ExtensionController,
+  FirefoxVPNState,
+} from "./extensionController/index.js";
+import { ProxyHandler, ProxyRules, ProxyUtils } from "./proxyHandler/index.js";
 
 import { propertySum } from "../shared/property.js";
 
@@ -15,11 +18,11 @@ const log = Logger.logger("RequestHandler");
 
 /**
  * Handles request interception, inspection, and determines whether a request should be proxied.
- * 
+ *
  */
 export class RequestHandler extends Component {
   /**
-   * 
+   *
    * @param {*} receiver The message receiver for the RequestHandler.
    * @param {VPNController} controller Instance of the VPNController that manages VPN states.
    * @param {ExtensionController} extController Instance of the ExtensionController that manages extension states.
@@ -31,7 +34,7 @@ export class RequestHandler extends Component {
     this.cachedProxyRule = null;
     this.cachedDefaultProxyInfo = null;
 
-    extController.state.subscribe((s) => { 
+    extController.state.subscribe((s) => {
       this.handleExtensionStateChanges(s);
     });
 
@@ -46,8 +49,7 @@ export class RequestHandler extends Component {
     });
   }
 
-
-   /**
+  /**
    * Handles changes in extension state and updates request listener.
    * @param {FirefoxVPNState} extState
    * @param {Object} proxyRule
@@ -57,9 +59,13 @@ export class RequestHandler extends Component {
     this.cachedProxyRule = proxyRule.type;
     this.cachedDefaultProxyInfo = proxyRule.defaultProxyInfo;
 
-    if ([ProxyRules.BYPASS_TUNNEL, ProxyRules.USE_EXIT_RELAYS].includes(proxyRule.type)) {
+    if (
+      [ProxyRules.BYPASS_TUNNEL, ProxyRules.USE_EXIT_RELAYS].includes(
+        proxyRule.type
+      )
+    ) {
       return this.maybeAddRequestListener();
-    } 
+    }
 
     switch (extState.state) {
       case "Idle":
@@ -112,16 +118,19 @@ export class RequestHandler extends Component {
     this.active = true;
   }
 
-
   /**
    * Intercepts and processes requests to determine if they should be proxied.
-   * 
+   *
    * @async
    * @param {proxy.RequestDetails} requestInfo The details of the incoming request.
    * @returns {browser.proxy.proxyInfo | undefined} Proxy information for the request, or undefined for default.
    */
   async interceptRequests(requestInfo) {
-    if ([ProxyRules.DIRECT, ProxyRules.USE_EXIT_RELAYS].includes(this.cachedProxyRule)) {
+    if (
+      [ProxyRules.DIRECT, ProxyRules.USE_EXIT_RELAYS].includes(
+        this.cachedProxyRule
+      )
+    ) {
       let { documentUrl } = requestInfo;
       // If we load an iframe request the top level document.
       if (requestInfo.frameId !== 0) {
@@ -131,7 +140,7 @@ export class RequestHandler extends Component {
         });
         documentUrl = topLevelFrame.url;
       }
-  
+
       for (let urlString of [documentUrl]) {
         if (urlString) {
           const parsedHostname = Utils.getFormattedHostname(urlString);
@@ -188,7 +197,6 @@ export const resolveSiteContext = (siteContexts, vpnState) => {
   const localProxy = vpnState.loophole
     ? [ProxyUtils.parseProxy(vpnState.loophole)]
     : [];
-
 
   siteContexts.forEach((ctx, origin) => {
     if (ctx.excluded) {

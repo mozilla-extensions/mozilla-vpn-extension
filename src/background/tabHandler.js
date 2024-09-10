@@ -6,7 +6,10 @@ import { Component } from "./component.js";
 import { Logger } from "./logger.js";
 import { Utils } from "../shared/utils.js";
 import { PropertyType } from "../shared/ipc.js";
-import { ExtensionController, FirefoxVPNState } from "./extensionController/index.js";
+import {
+  ExtensionController,
+  FirefoxVPNState,
+} from "./extensionController/index.js";
 import { ProxyHandler } from "./proxyHandler/index.js";
 
 const log = Logger.logger("TabHandler");

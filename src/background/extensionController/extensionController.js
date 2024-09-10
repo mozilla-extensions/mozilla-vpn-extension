@@ -4,35 +4,33 @@
 
 // @ts-check
 
-
 import { Component } from "../component.js";
-import { VPNController} from "../vpncontroller/index.js";
+import { VPNController } from "../vpncontroller/index.js";
 import { property } from "../../shared/property.js";
 import { PropertyType } from "../../shared/ipc.js";
-import { 
-  FirefoxVPNState, 
-  StateFirefoxVPNIdle, 
-  StateFirefoxVPNDisabled, 
-  StateFirefoxVPNEnabled 
+import {
+  FirefoxVPNState,
+  StateFirefoxVPNIdle,
+  StateFirefoxVPNDisabled,
+  StateFirefoxVPNEnabled,
 } from "./states.js";
-import { 
-  ProxyRuleBypassTunnel, 
-  ProxyRuleDirect, 
-  ProxyRuleUseExitRelays, 
-  ProxyRules 
+import {
+  ProxyRuleBypassTunnel,
+  ProxyRuleDirect,
+  ProxyRuleUseExitRelays,
+  ProxyRules,
 } from "../proxyHandler/proxyRules.js";
 
-
 /**
- * 
- * ExtensionController 
- * 
+ *
+ * ExtensionController
+ *
  */
 
 export class ExtensionController extends Component {
   static properties = {
     state: PropertyType.Bindable,
-    toggleConnectivity: PropertyType.Function
+    toggleConnectivity: PropertyType.Function,
   };
 
   /**
@@ -44,16 +42,20 @@ export class ExtensionController extends Component {
     super(receiver);
     this.vpnController = vpnController;
     this.#mState.value = new StateFirefoxVPNIdle();
-    this.vpnController.state.subscribe(this.handleClientStateChanges.bind(this));
+    this.vpnController.state.subscribe(
+      this.handleClientStateChanges.bind(this)
+    );
   }
 
   clientState;
-  
+
   async init() {}
 
   toggleConnectivity() {
     if (this.#mState.value.enabled) {
-      return this.#mState.set(new StateFirefoxVPNDisabled(new ProxyRuleBypassTunnel(this.clientState)));
+      return this.#mState.set(
+        new StateFirefoxVPNDisabled(new ProxyRuleBypassTunnel(this.clientState))
+      );
     }
     this.vpnController.postToApp("activate");
   }
@@ -66,20 +68,23 @@ export class ExtensionController extends Component {
     const currentExtState = this.#mState.value;
     this.clientState = newClientState;
 
-    switch(newClientState.state) {
+    switch (newClientState.state) {
       case "Enabled":
         if (currentExtState.proxyRule.type !== ProxyRules.BYPASS_TUNNEL) {
-          this.#mState.set(new StateFirefoxVPNEnabled(new ProxyRuleDirect()))}
+          this.#mState.set(new StateFirefoxVPNEnabled(new ProxyRuleDirect()));
+        }
         break;
-      
+
       case "Disabled":
         this.#mState.set(new StateFirefoxVPNDisabled(new ProxyRuleDirect()));
         break;
-        
-        case "StateOnPartial":
-          this.#mState.set(new StateFirefoxVPNEnabled(new ProxyRuleUseExitRelays(newClientState)));
-          break;
-      
+
+      case "StateOnPartial":
+        this.#mState.set(
+          new StateFirefoxVPNEnabled(new ProxyRuleUseExitRelays(newClientState))
+        );
+        break;
+
       default:
         this.#mState.set(new StateFirefoxVPNIdle());
     }

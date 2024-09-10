@@ -15,7 +15,7 @@ export const ProxyUtils = {
   },
 
   getDirectProxyInfoObject() {
-    return { type: "direct" }
+    return { type: "direct" };
   },
 
   /**
