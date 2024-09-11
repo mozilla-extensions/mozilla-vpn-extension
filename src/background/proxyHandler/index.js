@@ -5,3 +5,4 @@
 export { SiteContext } from "./siteContext.js";
 export { ProxyHandler } from "./proxyHandler.js";
 export { ProxyRule, ProxyRules } from "./proxyRules.js";
+export { ProxyUtils } from "./proxyUtils.js";

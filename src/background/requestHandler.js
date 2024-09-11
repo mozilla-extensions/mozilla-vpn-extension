@@ -32,7 +32,7 @@ export class RequestHandler extends Component {
     super(receiver);
     this.active = false;
     this.cachedProxyRule = null;
-    this.cachedDefaultProxyInfo = null;
+    this.cachedDefaultProxyInfo = ProxyUtils.getDirectProxyInfoObject();
 
     extController.state.subscribe((s) => {
       this.handleExtensionStateChanges(s);
@@ -55,7 +55,7 @@ export class RequestHandler extends Component {
    * @param {Object} proxyRule
    */
   handleExtensionStateChanges(extState) {
-    const proxyRule = ext.proxyRule;
+    const proxyRule = extState.proxyRule;
     this.cachedProxyRule = proxyRule.type;
     this.cachedDefaultProxyInfo = proxyRule.defaultProxyInfo;
 
