@@ -33,7 +33,7 @@ export class ConditionalView extends LitElement {
     });
   }
   getTargetSlot() {
-    let slot = this.slotName;
+    const slot = this.slotName;
     if (slot == "") {
       return "default";
     }

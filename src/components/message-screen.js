@@ -40,21 +40,6 @@ export class MessageScreen extends LitElement {
     this.onSecondaryAction = () => {};
   }
 
-  hasSlot(slotName) {
-    return Array.from(this.children).some((e) => {
-      e.slot === slotName;
-    });
-  }
-  getTargetSlot() {
-    let slot = this.slotName;
-    if (slot == "") {
-      return "default";
-    }
-    if (!this.hasSlot(slot)) {
-      return "default";
-    }
-    return slot;
-  }
   render() {
     return html`
       <vpn-titlebar title=${this.titleHeader}></vpn-titlebar>
