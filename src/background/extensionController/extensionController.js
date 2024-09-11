@@ -57,6 +57,12 @@ export class ExtensionController extends Component {
         new StateFirefoxVPNDisabled(new ProxyRuleBypassTunnel(this.clientState))
       );
     }
+  
+    if (this.clientState.state == "Enabled") {
+      this.#mState.set(new StateFirefoxVPNEnabled(new ProxyRuleDirect()));
+      return;
+    }
+
     this.vpnController.postToApp("activate");
   }
 
