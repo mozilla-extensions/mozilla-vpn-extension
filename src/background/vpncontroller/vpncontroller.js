@@ -18,6 +18,7 @@ import {
   StateVPNUnavailable,
   StateVPNEnabled,
   StateVPNDisabled,
+  StateVPNOnPartial,
   REQUEST_TYPES,
   ServerCountry,
   vpnStatusResponse,
@@ -169,7 +170,7 @@ export class VPNController extends Component {
       });
       return;
     }
-  }
+  }   
 
   /**
    * The isolation key is used to make sure
@@ -300,6 +301,15 @@ export function fromVPNStatusResponse(
       connectedSince,
       servers
     );
+  }
+  if (controllerState === "StateOnPartial") {
+    return new StateVPNOnPartial(
+      exitServerCity,
+      exitServerCountry,
+      status.localProxy?.url,
+      connectedSince,
+      servers
+    )
   }
   if (
     controllerState === "StateOff" ||

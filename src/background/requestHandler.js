@@ -105,17 +105,23 @@ export class RequestHandler extends Component {
   }
 
   maybeAddRequestListener() {
-    if (this.active || !this.cachedProxyRule) {
+    if (this.active) {
       return;
     }
+
     log(
       `Starting listening for requests, active rules ${this.proxyMap?.size}, active proxy rule ${this.cachedProxyRule.type}`
     );
+
     browser.proxy.onRequest.addListener(this.interceptRequests.bind(this), {
       urls: ["<all_urls>"],
     });
 
     this.active = true;
+  }
+
+  proxyAllReqsByDefault(ruleType) {
+    return [ProxyRules.BYPASS_TUNNEL, ProxyRules.USE_EXIT_RELAYS].includes(ruleType);
   }
 
   /**
@@ -126,13 +132,11 @@ export class RequestHandler extends Component {
    * @returns {browser.proxy.proxyInfo | undefined} Proxy information for the request, or undefined for default.
    */
   async interceptRequests(requestInfo) {
-    if (
-      [ProxyRules.DIRECT, ProxyRules.USE_EXIT_RELAYS].includes(
-        this.cachedProxyRule
-      )
-    ) {
-      let { documentUrl } = requestInfo;
-      // If we load an iframe request the top level document.
+    if (this.cachedProxyRule == ProxyRules.BYPASS_TUNNEL ) {
+      return this.cachedDefaultProxyInfo;
+    }
+    let { documentUrl } = requestInfo;
+    // If we load an iframe request the top level document.
       if (requestInfo.frameId !== 0) {
         let topLevelFrame = await browser.webNavigation.getFrame({
           frameId: requestInfo.parentFrameId,
@@ -141,22 +145,26 @@ export class RequestHandler extends Component {
         documentUrl = topLevelFrame.url;
       }
 
-      for (let urlString of [documentUrl]) {
-        if (urlString) {
-          const parsedHostname = Utils.getFormattedHostname(urlString);
-          const proxyInfo = this.proxyMap.get(parsedHostname);
-          if (proxyInfo) {
-            return proxyInfo;
-          }
+    for (let urlString of [documentUrl]) {
+      if (urlString) {
+        const parsedHostname = Utils.getFormattedHostname(urlString);
+        const proxyInfo = this.proxyMap.get(parsedHostname);
+        if (proxyInfo) {
+          return proxyInfo;
         }
       }
     }
+  
     // No custom proxy for the site, return default connection
+
     return this.cachedDefaultProxyInfo;
   }
 
   maybeRemoveRequestListener() {
     if (!this.active) {
+      return;
+    }
+    if (this.proxyAllReqsByDefault(this.cachedProxyRule)) {
       return;
     }
     log("Removing request listener");

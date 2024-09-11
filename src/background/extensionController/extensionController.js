@@ -79,7 +79,7 @@ export class ExtensionController extends Component {
         this.#mState.set(new StateFirefoxVPNDisabled(new ProxyRuleDirect()));
         break;
 
-      case "StateOnPartial":
+      case "OnPartial":
         this.#mState.set(
           new StateFirefoxVPNEnabled(new ProxyRuleUseExitRelays(newClientState))
         );

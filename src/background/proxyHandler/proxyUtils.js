@@ -57,6 +57,8 @@ export const ProxyUtils = {
     if (!matches) {
       return null;
     }
+    matches.groups.proxyDNS = true;
+
     return { ...matches.groups };
   },
 };
