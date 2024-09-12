@@ -6,6 +6,7 @@ import {
   styleMap,
   createRef,
   ref,
+  when,
 } from "../vendor/lit-all.min.js";
 import { ghostButtonStyles, resetSizing } from "./styles.js";
 
@@ -126,6 +127,29 @@ export class ServerList extends LitElement {
         @change=${() => this.requestUpdate()}
         @input=${() => this.requestUpdate()}
       />
+      <label
+        class="default-location-item"
+        @click=${() =>
+          when(this.selectedCity != null, () => {
+            this.dispatchEvent(this.#changeCityEvent(null));
+          })}
+      >
+        <input
+          class="default-location-btn"
+          type="radio"
+          .checked=${this.selectedCity == null}
+        />
+        <span class="defaultCitySection">
+          <span class="default-location-headline"
+            >Use default Mozilla VPN Location</span
+          >
+          <span class="default-location-subline">
+            This is always the same location as selected in your Mozilla VPN
+            desktop app.
+          </span>
+        </span>
+      </label>
+      <hr />
       ${countrylistHolder(filteredList, countryListProvider)}
     `;
   }
@@ -159,21 +183,28 @@ export class ServerList extends LitElement {
       pointer-events: none;
     }
 
+    .default-location-headline,
+    .server-country-name {
+      font-family: var(--font-family);
+      font-weight: 600;
+      font-size: 16px;
+      line-height: 24px;
+    }
+
     .server-country-name {
       padding-block: 0;
       padding-inline-end: 0;
       padding-inline-start: 20px;
-      font-family: var(--font-family);
-      font-weight: bold;
       pointer-events: none;
       color: var(--text-color-primary);
     }
 
+    .default-location-item,
     .server-city-list-item,
     .server-city-list-visibility-btn {
       display: flex;
       flex-direction: row;
-      block-size: 40px;
+
       border-radius: 4px;
       margin-block-start: 4px;
       margin-block-end: 4px;
@@ -181,6 +212,20 @@ export class ServerList extends LitElement {
       margin-inline-end: 8px;
       inline-size: calc(100% - 16px);
       position: relative;
+    }
+    .server-city-list-item,
+    .server-city-list-visibility-btn {
+      block-size: 40px;
+    }
+
+    .default-location-item {
+      padding: 0px 16px;
+      border-bottom: 1px solid var(--border-color);
+      border-radius: 0px;
+      padding-bottom: 16px;
+    }
+    .default-location-item input {
+      margin-right: 16px;
     }
 
     /* We need to temporarily use !important for this button to make sure the right color applies */
@@ -217,6 +262,14 @@ export class ServerList extends LitElement {
       margin-left: 48px;
     }
 
+    .default-location-subline,
+    .server-city-name {
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 21px;
+      opacity: 0.875;
+    }
+
     .opened .server-city-list {
       opacity: 1;
       visibility: visible;
@@ -251,11 +304,11 @@ export class ServerList extends LitElement {
 
     input.search {
       margin-block: 16px;
-      padding: 10px 20px 10px 30px;
+      padding: 10px 20px 10px 32px;
       color: var(--text-color-invert);
       width: calc(max(50%, 312px));
       background-image: url("../../assets/img/search-icon.svg");
-      background-position: 2.5px 6px;
+      background-position: 5px 6px;
       background-repeat: no-repeat;
       border: 2px solid var(--border-color);
       border-radius: var(--button-border-radius);
@@ -292,7 +345,7 @@ export const cityItem = (city, selectedCity, selectCity) => {
         <input
           class="server-radio-btn"
           type="radio"
-          .checked=${city.name === selectedCity.name}
+          .checked=${city.name === selectedCity?.name}
           data-country-code="${city.code}"
           data-city-name="${city.name}"
         />

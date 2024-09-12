@@ -57,7 +57,11 @@ export const Utils = {
       return false;
     }
   },
-  nameFor: (countryCode = "de", cityCode = "ber", serverList = []) => {
+  nameFor: (countryCode = "", cityCode = "", serverList = []) => {
+    return Utils.getCity(countryCode, cityCode, serverList)?.name;
+  },
+
+  getCity: (countryCode = "", cityCode = "", serverList = []) => {
     if (!serverList) {
       return "";
     }
@@ -66,6 +70,6 @@ export const Utils = {
     }
     return serverList
       .find((sc) => sc.code === countryCode)
-      ?.cities.find((c) => c.code === cityCode)?.name;
+      ?.cities.find((c) => c.code === cityCode);
   },
 };
