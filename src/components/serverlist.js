@@ -244,6 +244,11 @@ export class ServerList extends LitElement {
       inline-size: 24px;
       height: 24px;
     }
+    @media (prefers-color-scheme: dark) {
+      .toggle {
+        filter: invert(1);
+      }
+    }
 
     .opened .toggle {
       transform: rotate(0deg);
