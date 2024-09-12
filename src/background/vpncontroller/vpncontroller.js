@@ -147,7 +147,7 @@ export class VPNController extends Component {
         }
         break;
       default:
-        throw Error("Unexpeted Message type: " + response.t);
+       console.log("Unexpected Message type: " + response.t);
     }
   }
 

@@ -31,7 +31,7 @@ export class RequestHandler extends Component {
   constructor(receiver, controller, extController, proxyHandler) {
     super(receiver);
     this.active = false;
-    this.cachedProxyRule = null;
+    this.cachedProxyRule = ProxyRules.DIRECT;
     this.cachedDefaultProxyInfo = ProxyUtils.getDirectProxyInfoObject();
 
     extController.state.subscribe((s) => {
@@ -48,6 +48,7 @@ export class RequestHandler extends Component {
       this.onNewProxyMap(proxyMap);
     });
   }
+
 
   /**
    * Handles changes in extension state and updates request listener.
@@ -109,10 +110,9 @@ export class RequestHandler extends Component {
       return;
     }
 
-    log(
-      `Starting listening for requests, active rules ${this.proxyMap?.size}, active proxy rule ${this.cachedProxyRule.type}`
+    console.log(
+      `Starting listening for requests, active rules ${this.proxyMap?.size}, active proxy rule ${this.cachedProxyRule}`
     );
-
     browser.proxy.onRequest.addListener(this.interceptRequests.bind(this), {
       urls: ["<all_urls>"],
     });
@@ -137,14 +137,13 @@ export class RequestHandler extends Component {
     }
     let { documentUrl } = requestInfo;
     // If we load an iframe request the top level document.
-      if (requestInfo.frameId !== 0) {
-        let topLevelFrame = await browser.webNavigation.getFrame({
-          frameId: requestInfo.parentFrameId,
-          tabId: requestInfo.tabId,
-        });
-        documentUrl = topLevelFrame.url;
-      }
-
+      // if (requestInfo.frameId !== 0) {
+      //   let topLevelFrame = await browser.webNavigation.getFrame({
+      //     frameId: requestInfo.parentFrameId,
+      //     tabId: requestInfo.tabId,
+      //   });
+      //   documentUrl = topLevelFrame.url;
+      // }
     for (let urlString of [documentUrl]) {
       if (urlString) {
         const parsedHostname = Utils.getFormattedHostname(urlString);
@@ -154,20 +153,16 @@ export class RequestHandler extends Component {
         }
       }
     }
-  
-    // No custom proxy for the site, return default connection
 
+    // No custom proxy for the site, return default connection
     return this.cachedDefaultProxyInfo;
   }
 
   maybeRemoveRequestListener() {
-    if (!this.active) {
+    if (!this.active || this.proxyAllReqsByDefault(this.cachedProxyRule)) {
       return;
     }
-    if (this.proxyAllReqsByDefault(this.cachedProxyRule)) {
-      return;
-    }
-    log("Removing request listener");
+    console.log("Removing request listener");
     const ok = browser.proxy.onRequest.removeListener(this.interceptRequests);
     this.active = false;
     return ok;

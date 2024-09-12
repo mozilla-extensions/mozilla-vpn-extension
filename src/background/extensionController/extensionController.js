@@ -53,16 +53,26 @@ export class ExtensionController extends Component {
 
   toggleConnectivity() {
     if (this.#mState.value.enabled) {
+      // We are turning off the extension
+      
+      if (this.clientState.state == "OnPartial") {
+        // Send deactivation to client and wait for response
+        this.vpnController.postToApp("deactivate");
+        return 
+      }
       return this.#mState.set(
         new StateFirefoxVPNDisabled(new ProxyRuleBypassTunnel(this.clientState))
       );
     }
-  
+    
+    // We are turning the extension on... 
     if (this.clientState.state == "Enabled") {
+      // Client is already enabled
       this.#mState.set(new StateFirefoxVPNEnabled(new ProxyRuleDirect()));
       return;
     }
 
+    // Send activation to client and wait for response
     this.vpnController.postToApp("activate");
   }
 

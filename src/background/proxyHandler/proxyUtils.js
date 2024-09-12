@@ -58,6 +58,7 @@ export const ProxyUtils = {
       return null;
     }
     matches.groups.proxyDNS = true;
+    matches.groups.connectionIsolationKey = "";
 
     return { ...matches.groups };
   },
