@@ -141,11 +141,10 @@ export class ServerList extends LitElement {
         />
         <span class="defaultCitySection">
           <span class="default-location-headline"
-            >Use default Mozilla VPN Location</span
+            >${tr("defaultLocationHeader")}</span
           >
           <span class="default-location-subline">
-            This is always the same location as selected in your Mozilla VPN
-            desktop app.
+            ${tr("useDefaultLocationExplainer")}
           </span>
         </span>
       </label>

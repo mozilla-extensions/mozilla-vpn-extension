@@ -116,7 +116,7 @@
     "description": "Alt text for the button that opens the Extensions Settings page"
   },
   "searchServer": {
-    "message": "Search Server",
+    "message": "Search Location",
     "description": "Placeholder for the Input field Where users can search the Serverlist"
   },
   "titleSubscribeNow": {
@@ -157,5 +157,13 @@
   "btnDownloadNow": {
     "message": "Download now",
     "description": "This is a call to action button to download the VPN."
+  },
+  "defaultLocationHeader": {
+    "message": "Use default Mozilla VPN Location",
+    "description": "Header for useDefaultLocationExplainer"
+  },
+  "useDefaultLocationExplainer": {
+    "message": "This is always the same location as selected in your Mozilla VPN desktop app.",
+    "description": "Explanation of what 'Use default Mozilla VPN Location' means."
   }
 }
