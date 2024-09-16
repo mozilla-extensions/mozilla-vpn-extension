@@ -14,17 +14,25 @@ export const REQUEST_TYPES = [
   "disabled_apps",
   "status",
   "deactivate",
+  "focus",
+  "openAuth",
 ];
 
 export class VPNState {
   // Name of the current state
   state = "";
+  // Whether the Native Message adapter exists
+  installed = true;
   // If the Native Message adapter is alive
   alive = false;
   // True if the VPN is enabled.
   connected = false;
   // True if firefox is split-tunneled
   isExcluded = false;
+  // True if a subscription is found
+  subscribed = true;
+  // True if it is authenticated
+  authenticated = false;
   /**
    * A socks:// url to connect to
    * to bypass the vpn.
@@ -53,17 +61,42 @@ export class VPNState {
 export class StateVPNUnavailable extends VPNState {
   state = "Unavailable";
   alive = false;
+  installed = false;
+}
+export class StateVPNClosed extends VPNState {
+  state = "Closed";
+  alive = false;
+  installed = true;
   connected = false;
+}
+
+/**
+ * Helper base class to imply the vpn process is installed and
+ * running
+ */
+class StateVPNOpened extends VPNState {
+  alive = true;
+  installed = true;
+}
+export class StateVPNSignedOut extends StateVPNOpened {
+  state = "SignedOut";
+  authenticated = false;
+}
+
+export class StateVPNSubscriptionNeeded extends StateVPNSignedOut {
+  state = "SubscriptionNeeded";
+  subscribed = false;
+  authenticated = true;
 }
 
 /**
  * This state is used if the VPN Client is
  * alive but the Connection is Disabled
  */
-export class StateVPNDisabled extends VPNState {
+export class StateVPNDisabled extends StateVPNSubscriptionNeeded {
   state = "Disabled";
-  alive = true;
   connected = false;
+  subscribed = true;
 
   /**
    *
@@ -81,7 +114,7 @@ export class StateVPNDisabled extends VPNState {
  * This state is used if the VPN Client is
  * alive but the Connection is Disabled
  */
-export class StateVPNEnabled extends VPNState {
+export class StateVPNEnabled extends StateVPNDisabled {
   /**
    *
    * @param {string|boolean} aloophole - False if loophole is not supported,
@@ -89,14 +122,12 @@ export class StateVPNEnabled extends VPNState {
    * @param {ServerCountry | undefined } exitServerCountry
    */
   constructor(exitServerCity, exitServerCountry, aloophole, connectedSince) {
-    super();
-    this.exitServerCity = exitServerCity;
-    this.exitServerCountry = exitServerCountry;
+    super(exitServerCity, exitServerCountry);
     this.loophole = aloophole;
     this.connectedSince = connectedSince;
   }
   state = "Enabled";
-  alive = true;
+  subscribed = true;
   connected = true;
 }
 

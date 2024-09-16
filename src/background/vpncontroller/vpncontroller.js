@@ -18,9 +18,12 @@ import {
   StateVPNUnavailable,
   StateVPNEnabled,
   StateVPNDisabled,
+  StateVPNSubscriptionNeeded,
   REQUEST_TYPES,
   ServerCountry,
   vpnStatusResponse,
+  StateVPNClosed,
+  StateVPNSignedOut,
 } from "./states.js";
 
 const log = Logger.logger("TabHandler");
@@ -77,16 +80,17 @@ export class VPNController extends Component {
       // invalid proxy connection.
       this.#port.onDisconnect.addListener(() => {
         this.#increaseIsolationKey();
-        this.#mState.value = new StateVPNUnavailable();
+        this.#mState.value = new StateVPNClosed();
       });
     } catch (e) {
+      // If we get an exception here it is super likely the VPN is simply not installed.
       log(e);
       this.#mState.value = new StateVPNUnavailable();
     }
   }
 
   async init() {
-    this.#mState.value = new StateVPNUnavailable();
+    this.#mState.value = new StateVPNClosed();
     this.#mServers.value = await fromStorage(
       browser.storage.local,
       MOZILLA_VPN_SERVERS_KEY,
@@ -116,13 +120,14 @@ export class VPNController extends Component {
       log(e);
       // @ts-ignore
       if (e.toString() === "Attempt to postMessage on disconnected port") {
-        this.#mState.value = new StateVPNUnavailable();
+        this.#mState.value = new StateVPNClosed();
       }
     }
   }
 
   // Handle responses from MozillaVPN client
   async handleResponse(response) {
+    console.log(response);
     if (!response.t) {
       // The VPN Client always sends a ".t : string"
       // to determing the message type.
@@ -156,7 +161,7 @@ export class VPNController extends Component {
     // We can only get 2 types of messages right now: client-down/up
     if (response.status && response.status === "vpn-client-down") {
       if (this.#mState.value.alive) {
-        this.#mState.value = new StateVPNUnavailable();
+        this.#mState.value = new StateVPNClosed();
       }
       return;
     }
@@ -275,6 +280,16 @@ export function fromVPNStatusResponse(
     return;
   }
   const status = response.status;
+  const appState = status.app;
+  if (["StateInitialize", "StateAuthenticating"].includes(appState)) {
+    return new StateVPNSignedOut();
+  }
+
+  if (appState === "StateSubscriptionNeeded") {
+    return new StateVPNSubscriptionNeeded();
+  }
+
+  //
   const controllerState = status.vpn;
   const connectedSince = (() => {
     if (!status.connectedSince) {

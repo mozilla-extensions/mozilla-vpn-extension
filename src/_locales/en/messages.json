@@ -118,5 +118,44 @@
   "searchServer": {
     "message": "Search Server",
     "description": "Placeholder for the Input field Where users can search the Serverlist"
+  },
+  "titleSubscribeNow": {
+    "message": "Subscribe to Mozilla VPN"
+  },
+  "bodySubscribeNow": {
+    "message": "No subscription found. Click the button below to subscribe to Mozilla VPN.",
+    "description": "Body of an Error Message, shown if the user is trying to use the Extension without a Subscription."
+  },
+  "btnSubscribeNow": {
+    "message": "Subscribe now",
+    "description": "Call to Action button for users to subscribe to Mozilla VPN"
+  },
+  "getHelp": {
+    "message": "Get Help",
+    "description": "Text of a link pointing to a relevant help page"
+  },
+  "headerSignedOut": {
+    "message": "Sign in to your Mozilla account"
+  },
+  "bodySignedOut": {
+    "message": "You’re currently signed out of your Mozilla account. To use the Mozilla VPN extension, please open the desktop app to sign in first."
+  },
+  "btnOpenVpn": {
+    "message": "Open Mozilla VPN"
+  },
+  "headerInstallMsg": {
+    "message": "Install Mozilla VPN",
+    "description": "Header if a VPN installation was not found"
+  },
+  "bodyInstallMsg": {
+    "message": "In order to use the Mozilla VPN extension, you must first download Mozilla VPN on your desktop."
+  },
+  "bodyInstallMsgFooter": {
+    "message": "Note that Mozilla VPN is a paid subscription service.",
+    "description": "This is a footnote for 'bodyInstallMsg' "
+  },
+  "btnDownloadNow": {
+    "message": "Download now",
+    "description": "This is a call to action button to download the VPN."
   }
 }
