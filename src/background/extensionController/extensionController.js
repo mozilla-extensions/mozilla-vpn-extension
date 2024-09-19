@@ -5,7 +5,7 @@
 // @ts-check
 
 import { Component } from "../component.js";
-import { VPNController } from "../vpncontroller/index.js";
+import { VPNController, VPNState } from "../vpncontroller/index.js";
 import { property } from "../../shared/property.js";
 import { PropertyType } from "../../shared/ipc.js";
 import {
@@ -18,10 +18,10 @@ import {
 
 /**
  *
- * ExtensionController
- *
+ * ExtensionController manages extension state and
+ * provides a method to the popup for disabling and enabling
+ * the "Firefox VPN".
  */
-
 export class ExtensionController extends Component {
   static properties = {
     state: PropertyType.Bindable,
@@ -36,12 +36,14 @@ export class ExtensionController extends Component {
   constructor(receiver, vpnController) {
     super(receiver);
     this.vpnController = vpnController;
+    /** @type {FirefoxVPNState} */
     this.#mState.value = new StateFirefoxVPNIdle();
     this.vpnController.state.subscribe(
       this.handleClientStateChanges.bind(this)
     );
   }
 
+  /** @type {VPNState} */
   clientState;
 
   async init() {}
@@ -75,6 +77,11 @@ export class ExtensionController extends Component {
     return this.#mState.readOnly;
   }
 
+  /**
+   * 
+   * @param {VPNState} newClientState 
+   * @returns {Promise<Void>}
+   */
   async handleClientStateChanges(newClientState) {
     const currentExtState = this.#mState.value;
     this.clientState = newClientState;
