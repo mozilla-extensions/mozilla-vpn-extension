@@ -5,25 +5,46 @@
 // @ts-check
 
 export class FirefoxVPNState {
-  // State name
+  /**
+   *
+   * The current state of the extension.
+   * @type {string}
+   */
   state = "";
 
-  // True if the Firefox VPN is On
+  /**
+   * True when Firefox VPN is enabled.
+   * @type {boolean}
+   */
   enabled = false;
 
-  // True if we need to send all Firefox traffic to the local socks proxy
+  /**
+   * True when the Firefox VPN has been deactivated
+   * but the client VPN is connected.
+   * Determines whether all traffic should be proxied
+   * through the local socks proxy.
+   *
+   * @type {boolean}
+   */
   bypassTunnel = false;
 
-  // True when the VPN client is in StateOnPartial and we need to proxy all
-  // traffic through proxy servers in the client's current server location
-  // unless otherwise indicated by a per-site proxy settings.
+  /**
+   * True when the VPN is in StateOnPartial
+   * Determines whether all Firefox traffic should be routed
+   * through an exit relay
+   *
+   * @type {boolean}
+   */
   useExitRelays = false;
 }
 
 /**
- * Used when Firefox VPN is On
+ * When Firefox VPN is On
  */
 export class StateFirefoxVPNEnabled extends FirefoxVPNState {
+  /**
+   * @param {boolean} useExitRelays
+   */
   constructor(useExitRelays) {
     super();
     this.useExitRelays = useExitRelays;
@@ -34,9 +55,12 @@ export class StateFirefoxVPNEnabled extends FirefoxVPNState {
 }
 
 /**
- * Used when Firefox VPN is Off
+ * When Firefox VPN is Off
  */
 export class StateFirefoxVPNDisabled extends FirefoxVPNState {
+  /**s
+   * @param {boolean} bypassTunnel
+   */
   constructor(bypassTunnel) {
     super();
     this.bypassTunnel = bypassTunnel;
@@ -47,7 +71,7 @@ export class StateFirefoxVPNDisabled extends FirefoxVPNState {
 }
 
 /**
- * Used when the client is unavailable
+ * When the client is unavailable
  */
 export class StateFirefoxVPNIdle extends FirefoxVPNState {
   state = "Idle";
@@ -57,7 +81,7 @@ export class StateFirefoxVPNIdle extends FirefoxVPNState {
 }
 
 /**
- * Used when the FirefoxVPN is enabled from the popup
+ * When the FirefoxVPN is enabled from the popup
  * and we're waiting for the client response and state change
  * to StateOnPartial.
  */
