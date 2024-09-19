@@ -49,29 +49,26 @@ export class ExtensionController extends Component {
   toggleConnectivity() {
     if (this.#mState.value.enabled) {
       // We are turning off the extension
-      
+
       if (this.clientState.state == "OnPartial") {
         // Send deactivation to client and wait for response
         this.vpnController.postToApp("deactivate");
-        return 
+        return;
       }
 
-      return this.#mState.set(
-        new StateFirefoxVPNDisabled(true)
-      );
+      return this.#mState.set(new StateFirefoxVPNDisabled(true));
     }
-    
-    // We are turning the extension on... 
+
+    // We are turning the extension on...
     if (this.clientState.state == "Enabled") {
       // Client is already enabled
       this.#mState.set(new StateFirefoxVPNEnabled(false));
       return;
     }
 
-    this.#mState.set(new StateFirefoxVPNConnecting())
+    this.#mState.set(new StateFirefoxVPNConnecting());
     // Send activation to client and wait for response
     this.vpnController.postToApp("activate");
-
   }
 
   get state() {
@@ -94,9 +91,7 @@ export class ExtensionController extends Component {
         break;
 
       case "OnPartial":
-        this.#mState.set(
-          new StateFirefoxVPNEnabled(true)
-        );
+        this.#mState.set(new StateFirefoxVPNEnabled(true));
         break;
 
       default:

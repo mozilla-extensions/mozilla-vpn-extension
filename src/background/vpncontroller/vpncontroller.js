@@ -152,7 +152,7 @@ export class VPNController extends Component {
         }
         break;
       default:
-       console.log("Unexpected Message type: " + response.t);
+        console.log("Unexpected Message type: " + response.t);
     }
   }
 
@@ -175,7 +175,7 @@ export class VPNController extends Component {
       });
       return;
     }
-  }   
+  }
 
   /**
    * The isolation key is used to make sure

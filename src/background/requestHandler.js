@@ -9,7 +9,7 @@ import {
   ExtensionController,
   FirefoxVPNState,
 } from "./extensionController/index.js";
-import { ProxyHandler,  ProxyUtils } from "./proxyHandler/index.js";
+import { ProxyHandler, ProxyUtils } from "./proxyHandler/index.js";
 import { propertySum } from "../shared/property.js";
 
 const log = Logger.logger("RequestHandler");
@@ -33,7 +33,7 @@ export class RequestHandler extends Component {
     this.defaultProxyInfo = ProxyUtils.getDirectProxyInfoObject();
 
     /** @type {FirefoxVPNState | undefined} */
-    this.extState = {}
+    this.extState = {};
 
     extController.state.subscribe((s) => {
       this.extState = s;
@@ -46,7 +46,7 @@ export class RequestHandler extends Component {
       (loophole, exitRelays) => {
         this.updateProxyInfoFromClient(loophole, exitRelays);
       }
-    )
+    );
 
     proxyHandler.proxyMap.subscribe((proxyMap) => {
       this.proxyMap = proxyMap;
@@ -54,17 +54,19 @@ export class RequestHandler extends Component {
     });
   }
 
-    updateProxyInfoFromClient(localProxy, exitRelays) {
-      console.log(`Updating proxy info. this.localProxyInfo: ${localProxy} this.currentExitRelays ${exitRelays}`);
+  updateProxyInfoFromClient(localProxy, exitRelays) {
+    console.log(
+      `Updating proxy info. this.localProxyInfo: ${localProxy} this.currentExitRelays ${exitRelays}`
+    );
 
-      this.localProxyInfo = localProxy;
-      this.currentExitRelay = exitRelays;
+    this.localProxyInfo = localProxy;
+    this.currentExitRelay = exitRelays;
 
-      if (this.extState.useExitRelays) {
-        this.defaultProxyInfo = exitRelays;
-      } else {
-        this.defaultProxyInfo = ProxyUtils.getDirectProxyInfoObject();
-      }
+    if (this.extState.useExitRelays) {
+      this.defaultProxyInfo = exitRelays;
+    } else {
+      this.defaultProxyInfo = ProxyUtils.getDirectProxyInfoObject();
+    }
   }
 
   /**
@@ -92,7 +94,7 @@ export class RequestHandler extends Component {
     if (!this.extState.enabled) {
       return this.removeRequestListener();
     }
-    
+
     if (this.proxyMap.size > 0) {
       return this.addRequestListener();
     }
@@ -123,7 +125,7 @@ export class RequestHandler extends Component {
   }
 
   proxyAllReqsByDefault() {
-    return (this.extState.bypassTunnel || this.extState.useExitRelays);
+    return this.extState.bypassTunnel || this.extState.useExitRelays;
   }
 
   /**
@@ -140,13 +142,13 @@ export class RequestHandler extends Component {
 
     let { documentUrl } = requestInfo;
     // If we load an iframe request the top level document.
-      // if (requestInfo.frameId !== 0) {
-      //   let topLevelFrame = await browser.webNavigation.getFrame({
-      //     frameId: requestInfo.parentFrameId,
-      //     tabId: requestInfo.tabId,
-      //   });
-      //   documentUrl = topLevelFrame.url;
-      // }
+    // if (requestInfo.frameId !== 0) {
+    //   let topLevelFrame = await browser.webNavigation.getFrame({
+    //     frameId: requestInfo.parentFrameId,
+    //     tabId: requestInfo.tabId,
+    //   });
+    //   documentUrl = topLevelFrame.url;
+    // }
     for (let urlString of [documentUrl]) {
       if (urlString) {
         const parsedHostname = Utils.getFormattedHostname(urlString);
@@ -162,7 +164,6 @@ export class RequestHandler extends Component {
   }
 }
 
-
 /**
  * @typedef {Object} browser.proxy.proxyInfo
  * @property {string} type - The connection type
@@ -172,7 +173,6 @@ export class RequestHandler extends Component {
  * @property {string} port - The port for the connection (required).
  *
  */
-
 
 /**
  * Contains information about a web request. An instance of this object is passed into the proxy.onRequest listener.

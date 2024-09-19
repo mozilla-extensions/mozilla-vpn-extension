@@ -16,7 +16,7 @@ const log = Logger.logger("ProxyHandler");
 /**
  * This class manages tasks related to creating and storing
  * proxy information to be used by the UI and RequestHandler.
- * 
+ *
  */
 export class ProxyHandler extends Component {
   // Things to expose to the UI
@@ -32,7 +32,7 @@ export class ProxyHandler extends Component {
 
   /**
    *
-   * @param {*} receiver 
+   * @param {*} receiver
    * @param {VPNController} controller Instance of the VPNController that manages VPN states.
    */
   constructor(receiver, controller) {
@@ -63,22 +63,20 @@ export class ProxyHandler extends Component {
     return this.#mLocalProxyInfo.readOnly;
   }
 
-
-  /** 
+  /**
    * Returns a map of origins and proxy information
    * for sites with special proxy settings.
-   * @type {IBindable<Map<String, Map>>} 
+   * @type {IBindable<Map<String, Map>>}
    * */
   get proxyMap() {
     return this.#mProxyMap.readOnly;
   }
 
-
   /**
    * Returns the array of proxyInfo objects,
    * in the VPN client's current server
-   * location. 
-   * @type {IBindable<Map<String, Array>>} 
+   * location.
+   * @type {IBindable<Map<String, Array>>}
    * */
   get currentExitRelays() {
     return this.#mCurrentExitRelays.readOnly;
@@ -105,7 +103,9 @@ export class ProxyHandler extends Component {
 
   processClientStateChanges(vpnState) {
     console.log(`Processing client state change ${vpnState}`);
-    this.#mLocalProxyInfo.value = vpnState.loophole ? [ ProxyUtils.parseProxy(vpnState.loophole)] : [];
+    this.#mLocalProxyInfo.value = vpnState.loophole
+      ? [ProxyUtils.parseProxy(vpnState.loophole)]
+      : [];
 
     if (vpnState.servers?.length > 0) {
       console.log(`No servers, unable to set #mCurrentExitRelays`);
@@ -128,9 +128,12 @@ export class ProxyHandler extends Component {
     const result = new Map();
     newProxyMap.forEach((ctx, origin) => {
       if (ctx.excluded) {
-        result.set(origin, [...this.#mLocalProxyInfo.value]); 
+        result.set(origin, [...this.#mLocalProxyInfo.value]);
       } else {
-        result.set(origin, ProxyUtils.getProxies(ctx.countryCode, ctx.cityCode, servers));
+        result.set(
+          origin,
+          ProxyUtils.getProxies(ctx.countryCode, ctx.cityCode, servers)
+        );
       }
     });
     this.#mProxyMap.value = result;
@@ -191,7 +194,10 @@ export class ProxyHandler extends Component {
   async #setSiteContexts(siteContexts) {
     try {
       this.#mSiteContexts.value = siteContexts;
-      this.updateProxyMap(this.#mSiteContexts.value, this.controllerState.servers );
+      this.updateProxyMap(
+        this.#mSiteContexts.value,
+        this.controllerState.servers
+      );
       await browser.storage.local.set({
         [ProxyUtils.getSiteContextsStorageKey()]: siteContexts,
       });

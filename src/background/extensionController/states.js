@@ -14,7 +14,7 @@ export class FirefoxVPNState {
   // True if we need to send all Firefox traffic to the local socks proxy
   bypassTunnel = false;
 
-  // True when the VPN client is in StateOnPartial and we need to proxy all 
+  // True when the VPN client is in StateOnPartial and we need to proxy all
   // traffic through proxy servers in the client's current server location
   // unless otherwise indicated by a per-site proxy settings.
   useExitRelays = false;
@@ -39,7 +39,7 @@ export class StateFirefoxVPNEnabled extends FirefoxVPNState {
 export class StateFirefoxVPNDisabled extends FirefoxVPNState {
   constructor(bypassTunnel) {
     super();
-    this.bypassTunnel = bypassTunnel
+    this.bypassTunnel = bypassTunnel;
   }
   state = "Disabled";
   enabled = false;
@@ -57,7 +57,7 @@ export class StateFirefoxVPNIdle extends FirefoxVPNState {
 }
 
 /**
- * Used when the FirefoxVPN is enabled from the popup 
+ * Used when the FirefoxVPN is enabled from the popup
  * and we're waiting for the client response and state change
  * to StateOnPartial.
  */
