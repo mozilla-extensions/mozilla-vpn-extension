@@ -123,6 +123,7 @@ export class BrowserActionPopup extends LitElement {
     const handleVPNToggle = () => {
       extController.toggleConnectivity();
     };
+
     const back = () => {
       this.stackView?.value?.pop().then(() => {
         this.requestUpdate();
@@ -152,7 +153,8 @@ export class BrowserActionPopup extends LitElement {
         <section data-title="Mozilla VPN">
           <main>
             <vpn-card
-              .enabled=${this.vpnState?.connected}
+              @toggle=${handleVPNToggle}
+              .enabled=${this.extState?.enabled}
               .cityName=${this.vpnState?.exitServerCity?.name}
               .countryFlag=${this.vpnState?.exitServerCountry?.code}
               .connectedSince=${this.vpnState?.connectedSince}
