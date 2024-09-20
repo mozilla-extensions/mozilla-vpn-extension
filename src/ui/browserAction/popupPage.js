@@ -9,7 +9,7 @@ import {
   render,
   createRef,
   ref,
-  live
+  live,
 } from "../../vendor/lit-all.min.js";
 
 import { vpnController, proxyHandler } from "./backend.js";
@@ -52,7 +52,7 @@ export class BrowserActionPopup extends LitElement {
     pageURL: { type: String },
     _siteContext: { type: Object },
     hasSiteContext: { type: Boolean },
-    _siteContexts: {type: Array}
+    _siteContexts: { type: Array },
   };
 
   constructor() {
@@ -65,7 +65,10 @@ export class BrowserActionPopup extends LitElement {
       this.vpnState = s;
     });
     vpnController.servers.subscribe((s) => (this.servers = s));
-    proxyHandler.siteContexts.subscribe((s) => { this._siteContexts = s; console.log(this._siteContexts) })
+    proxyHandler.siteContexts.subscribe((s) => {
+      this._siteContexts = s;
+      console.log(this._siteContexts);
+    });
     this.updatePage();
   }
   updatePage() {
@@ -96,7 +99,7 @@ export class BrowserActionPopup extends LitElement {
 
   get currentSiteContext() {
     if (this._siteContext) {
-      return this._siteContext;   
+      return this._siteContext;
     }
     return defaultSiteContext(this.vpnState, this.pageURL);
   }
@@ -278,17 +281,21 @@ export class BrowserActionPopup extends LitElement {
         ${getExclusionStringElem(siteContext.origin)}
       </div>
       ${pageLocationPicker}
-      <button id="selectLocation" class=${hasSiteContext ? "" : "disabled"} @click=${removeSiteContext}>
+      <button
+        id="selectLocation"
+        class=${hasSiteContext ? "" : "disabled"}
+        @click=${removeSiteContext}
+      >
         ${tr("resetPageSettings")}
       </button>
     `;
   }
   static styles = css`
-  #reset-context.disabled {
-    opacity: .7;
-    pointer-events: none;
-  }
-  `
+    #reset-context.disabled {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+  `;
   static backBtn(back) {
     return html` <mz-iconlink
       @goBack=${back}
