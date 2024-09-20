@@ -11,7 +11,8 @@
     "addonslinter": "addons-linter --privileged src/",
     "typecheck": "tsc --noEmit",
     "build": "web-ext build --source-dir src --filename mozilla-vpn-extension.xpi",
-    "start": "web-ext run --verbose --source-dir src --pref=ui.popup.disable_autohide=true ",
+    "start-dev": "web-ext run --verbose --source-dir src --pref=ui.popup.disable_autohide=true",
+    "start": "web-ext run --verbose --source-dir src",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --collect-coverage --detectOpenHandles"
   },
   "repository": {
