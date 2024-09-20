@@ -59,13 +59,15 @@ export class BrowserActionPopup extends LitElement {
     this._siteContext = null;
     browser.tabs.onUpdated.addListener(() => this.updatePage());
     browser.tabs.onActivated.addListener(() => this.updatePage());
-    vpnController.state.subscribe((s) => (this.vpnState = s));
+    vpnController.state.subscribe((s) => {
+      this.vpnState = null;
+      /** @type {VPNState} */
+      this.vpnState = s;
+    });
     vpnController.servers.subscribe((s) => (this.servers = s));
     this.updatePage();
   }
   updatePage() {
-    /** @type {VPNState} */
-    this.vpnState = null;
     Utils.getCurrentTab().then(async (tab) => {
       if (!Utils.isValidForProxySetting(tab.url)) {
         this.pageURL = null;
@@ -153,7 +155,7 @@ export class BrowserActionPopup extends LitElement {
   }
 
   locationSettings() {
-    if (!this.pageURL) {
+    if (!this.pageURL || !this.vpnState?.connected) {
       return null;
     }
     const resetSitePreferences = async () => {
@@ -239,14 +241,17 @@ export class BrowserActionPopup extends LitElement {
     hasSiteContext = false,
     getExclusionStringElem = () => {}
   ) {
+    const getResetButtonClasslist = () => {
+      return hasSiteContext ? "" : "disabled";
+    };
+    const siteIsExcluded = () => {
+      return siteContext.isExcluded ? "disabled" : "";
+    }
     const pageLocationPicker = (() => {
-      if (siteContext.excluded) {
-        return null;
-      }
       return html`
         <h2 class="select-location-title">${tr("titleServerList")}</h2>
         <button
-          class="row ghost-btn"
+          class="row ghost-btn "
           id="selectPageLocation"
           @click=${openServerList}
         >
@@ -277,13 +282,18 @@ export class BrowserActionPopup extends LitElement {
         ${getExclusionStringElem(siteContext.origin)}
       </div>
       ${pageLocationPicker}
-      ${hasSiteContext
-        ? html`<button id="selectLocation" @click=${removeSiteContext}>
-            ${tr("resetPageSettings")}
-          </button>`
-        : null}
+      <button id="reset-context" class=${getResetButtonClasslist()}>
+        ${tr("resetPageSettings")}
+      </button>
+        
     `;
   }
+  static styles = css`
+  #selectLocation.disabled {
+    opacity: .7;
+    pointer-events: none;
+  }
+  `
   static backBtn(back) {
     return html` <mz-iconlink
       @goBack=${back}
@@ -352,7 +362,7 @@ export class BrowserActionPopup extends LitElement {
     #selectPageLocation {
       padding: calc(var(--padding-default) / 2) 0px;
       position: relative;
-      margin-block: 0px var(--padding-default);
+      margin-block: 0px;
     }
 
     #selectPageLocation:hover {
