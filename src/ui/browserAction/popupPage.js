@@ -172,6 +172,27 @@ export class BrowserActionPopup extends LitElement {
       this.currentSiteContext = new_cntxt;
     };
 
+    const getExclusionStringElem = (origin) => {
+      const originPlaceholder = "dummyString";
+      const localizedString = tr("exludePageFor", originPlaceholder);
+      // Create a new <p> element
+      const el = document.createElement("p");
+
+      // Replace "dummyString" with <span>origin</span>
+      const parts = localizedString.split(originPlaceholder);
+      parts.forEach((part, index) => {
+        if (index > 0) {
+          const span = document.createElement("span");
+          span.classList.add("bold");
+          span.textContent = origin;
+          el.appendChild(span);
+        }
+        el.append(part);
+      });
+
+      return el;
+    };
+
     return BrowserActionPopup.sitePreferencesTemplate(
       this.currentSiteContext,
       this.openServerList.bind(this),
@@ -180,7 +201,8 @@ export class BrowserActionPopup extends LitElement {
         return Utils.nameFor(ctx.countryCode, ctx.cityCode, this.servers);
       },
       resetSitePreferences,
-      this._siteContext !== null
+      this._siteContext !== null,
+      getExclusionStringElem
     );
   }
 
@@ -218,7 +240,8 @@ export class BrowserActionPopup extends LitElement {
       return "";
     },
     removeSiteContext = () => {},
-    hasSiteContext = false
+    hasSiteContext = false,
+    getExclusionStringElem = () => {}
   ) {
     const pageLocationPicker = (() => {
       if (siteContext.excluded) {
@@ -255,7 +278,7 @@ export class BrowserActionPopup extends LitElement {
           ?checked=${siteContext.excluded}
           @click=${toggleExcluded}
         />
-        <p>${tr("exludePageFor", siteContext.origin)}</p>
+        ${getExclusionStringElem(siteContext.origin)}
       </div>
       ${pageLocationPicker}
       ${hasSiteContext
