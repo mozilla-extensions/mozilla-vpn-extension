@@ -78,8 +78,8 @@ export class ExtensionController extends Component {
   }
 
   /**
-   * 
-   * @param {VPNState} newClientState 
+   *
+   * @param {VPNState} newClientState
    * @returns {Promise<Void>}
    */
   async handleClientStateChanges(newClientState) {
