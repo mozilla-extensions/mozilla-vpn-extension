@@ -67,7 +67,6 @@ export class BrowserActionPopup extends LitElement {
     vpnController.servers.subscribe((s) => (this.servers = s));
     proxyHandler.siteContexts.subscribe((s) => {
       this._siteContexts = s;
-      console.log(this._siteContexts);
     });
     this.updatePage();
   }
