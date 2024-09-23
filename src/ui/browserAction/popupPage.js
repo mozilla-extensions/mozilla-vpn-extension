@@ -9,6 +9,7 @@ import {
   render,
   createRef,
   ref,
+  live,
 } from "../../vendor/lit-all.min.js";
 
 import { vpnController, proxyHandler } from "./backend.js";
@@ -51,30 +52,34 @@ export class BrowserActionPopup extends LitElement {
     pageURL: { type: String },
     _siteContext: { type: Object },
     hasSiteContext: { type: Boolean },
+    _siteContexts: { type: Array },
   };
 
   constructor() {
     super();
     this.pageURL = null;
     this._siteContext = null;
-    browser.tabs.onUpdated.addListener(() => this.updatePage());
-    browser.tabs.onActivated.addListener(() => this.updatePage());
-    vpnController.state.subscribe((s) => (this.vpnState = s));
+    vpnController.state.subscribe((s) => {
+      /** @type {VPNState} */
+      this.vpnState = s;
+    });
     vpnController.servers.subscribe((s) => (this.servers = s));
+    proxyHandler.siteContexts.subscribe((s) => {
+      this._siteContexts = s;
+    });
     this.updatePage();
   }
   updatePage() {
-    /** @type {VPNState} */
-    this.vpnState = null;
     Utils.getCurrentTab().then(async (tab) => {
       if (!Utils.isValidForProxySetting(tab.url)) {
         this.pageURL = null;
         this._siteContext = null;
+        this.hasSiteContext = false;
         return;
       }
       const hostname = Utils.getFormattedHostname(tab.url);
       this.pageURL = hostname;
-      if (proxyHandler.siteContexts.value.has(this.pageURL)) {
+      if (this._siteContexts.has(this.pageURL)) {
         this._siteContext = proxyHandler.siteContexts.value.get(this.pageURL);
       }
     });
@@ -100,7 +105,7 @@ export class BrowserActionPopup extends LitElement {
     if (value) {
       proxyHandler.addSiteContext(value);
     } else {
-      proxyHandler.removeContextForOrigin(this._siteContext.origin);
+      proxyHandler.removeContextForOrigin(this.pageURL);
     }
     this._siteContext = value;
   }
@@ -153,7 +158,7 @@ export class BrowserActionPopup extends LitElement {
   }
 
   locationSettings() {
-    if (!this.pageURL) {
+    if (!this.pageURL || !this.vpnState?.connected) {
       return null;
     }
     const resetSitePreferences = async () => {
@@ -240,13 +245,10 @@ export class BrowserActionPopup extends LitElement {
     getExclusionStringElem = () => {}
   ) {
     const pageLocationPicker = (() => {
-      if (siteContext.excluded) {
-        return null;
-      }
       return html`
         <h2 class="select-location-title">${tr("titleServerList")}</h2>
         <button
-          class="row ghost-btn"
+          class="row ghost-btn "
           id="selectPageLocation"
           @click=${openServerList}
         >
@@ -271,19 +273,27 @@ export class BrowserActionPopup extends LitElement {
       <div class="row">
         <input
           type="checkbox"
-          ?checked=${siteContext.excluded}
+          .checked=${live(siteContext.excluded)}
           @click=${toggleExcluded}
         />
         ${getExclusionStringElem(siteContext.origin)}
       </div>
       ${pageLocationPicker}
-      ${hasSiteContext
-        ? html`<button id="selectLocation" @click=${removeSiteContext}>
-            ${tr("resetPageSettings")}
-          </button>`
-        : null}
+      <button
+        id="selectLocation"
+        class=${hasSiteContext ? "" : "disabled"}
+        @click=${removeSiteContext}
+      >
+        ${tr("resetPageSettings")}
+      </button>
     `;
   }
+  static styles = css`
+    #reset-context.disabled {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+  `;
   static backBtn(back) {
     return html` <mz-iconlink
       @goBack=${back}
@@ -352,7 +362,7 @@ export class BrowserActionPopup extends LitElement {
     #selectPageLocation {
       padding: calc(var(--padding-default) / 2) 0px;
       position: relative;
-      margin-block: 0px var(--padding-default);
+      margin-block: 0px;
     }
 
     #selectPageLocation:hover {
