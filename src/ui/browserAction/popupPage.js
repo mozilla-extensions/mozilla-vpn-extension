@@ -60,7 +60,6 @@ export class BrowserActionPopup extends LitElement {
     this.pageURL = null;
     this._siteContext = null;
     vpnController.state.subscribe((s) => {
-      this.vpnState = null;
       /** @type {VPNState} */
       this.vpnState = s;
     });
