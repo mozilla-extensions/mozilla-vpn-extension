@@ -43,20 +43,24 @@ export class IconLinkButton extends LitElement {
   }
   render() {
     return html`
-      <button title="${this.alt}" class="ghost-btn ghost-icon-btn">
-        <img
-          aria-hidden="true"
-          @click=${() => {
-            this.onClick();
-          }}
-          src="../../assets/img/${this.icon}.svg"
-        />
+      <button
+        title="${this.alt}"
+        @click=${() => {
+          this.onClick();
+        }}
+        class="ghost-btn ghost-icon-btn"
+      >
+        <img aria-hidden="true" src="../../assets/img/${this.icon}.svg" />
       </button>
     `;
   }
 
   static styles = css`
     ${ghostButtonStyles}
+
+    img {
+      pointer-events: none;
+    }
   `;
 }
 customElements.define("mz-iconlink", IconLinkButton);
