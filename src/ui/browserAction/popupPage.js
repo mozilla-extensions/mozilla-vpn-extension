@@ -180,17 +180,13 @@ export class BrowserActionPopup extends LitElement {
 
       // Replace "dummyString" with <span>origin</span>
       const parts = localizedString.split(originPlaceholder);
-      parts.forEach((part, index) => {
-        if (index > 0) {
-          const span = document.createElement("span");
-          span.classList.add("bold");
-          span.textContent = origin;
-          el.appendChild(span);
-        }
-        el.append(part);
-      });
-
-      return el;
+      return html`
+        <p>
+          ${parts.at(0)}
+          <span class="bold">${origin}</span>
+          ${parts.at(-1)}
+        </p>
+      `;
     };
 
     return BrowserActionPopup.sitePreferencesTemplate(
