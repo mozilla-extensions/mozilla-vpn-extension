@@ -30,6 +30,7 @@ import "./../../components/titlebar.js";
 import "./../../components/iconbutton.js";
 import { SiteContext } from "../../background/proxyHandler/siteContext.js";
 import {
+  ServerCity,
   ServerCountry,
   VPNState,
 } from "../../background/vpncontroller/states.js";
@@ -59,10 +60,11 @@ export class BrowserActionPopup extends LitElement {
     super();
     this.pageURL = null;
     this._siteContext = null;
-    vpnController.state.subscribe((s) => {
-      /** @type {VPNState} */
-      this.vpnState = s;
-    });
+    /** @type {VPNState} */
+    this.vpnState = null;
+    browser.tabs.onUpdated.addListener(() => this.updatePage());
+    browser.tabs.onActivated.addListener(() => this.updatePage());
+    vpnController.state.subscribe((s) => (this.vpnState = s));
     vpnController.servers.subscribe((s) => (this.servers = s));
     proxyHandler.siteContexts.subscribe((s) => {
       this._siteContexts = s;
@@ -207,30 +209,43 @@ export class BrowserActionPopup extends LitElement {
     );
   }
 
-  openServerList() {
-    const onSelectServerResult = (event) => {
-      this.stackView.value?.pop().then(() => {
-        this.requestUpdate();
-      });
-      const city = event?.detail?.city;
-      const country = event?.detail?.country;
-      if (city) {
-        const newSiteContext = new SiteContext({
-          cityCode: city.code,
-          countryCode: country.code,
-          origin: this.pageURL,
-          excluded: false,
-        });
-        this.currentSiteContext = newSiteContext;
-      }
-    };
-    const serverListElement = BrowserActionPopup.createServerList(
-      this.servers,
-      onSelectServerResult
+  async openServerList() {
+    let serverListResult = Promise.withResolvers();
+
+    const ctx = this._siteContext;
+    const serverListSelectedCity = Utils.getCity(
+      ctx?.countryCode,
+      ctx?.cityCode,
+      this.servers
     );
-    this.stackView.value?.push(serverListElement).then(() => {
+    console.log(serverListSelectedCity);
+    const serverListElement = BrowserActionPopup.createServerList(
+      serverListSelectedCity,
+      this.servers,
+      (e) => serverListResult.resolve(e.detail)
+    );
+    // Push onto the Stackview and request an update as the
+    // we read the stackview's top for the titlebar
+    await this.stackView.value?.push(serverListElement);
+    this.requestUpdate();
+
+    const { city, country } = await serverListResult.promise;
+    // We're done with the server list, pop it off the stackview
+    this.stackView.value?.pop().then(() => {
       this.requestUpdate();
     });
+    if (!city) {
+      // Remove the site context
+      this.currentSiteContext = null;
+      return;
+    }
+    const newSiteContext = new SiteContext({
+      cityCode: city.code,
+      countryCode: country.code,
+      origin: this.pageURL,
+      excluded: false,
+    });
+    this.currentSiteContext = newSiteContext;
   }
 
   static sitePreferencesTemplate(
@@ -304,19 +319,23 @@ export class BrowserActionPopup extends LitElement {
     ></mz-iconlink>`;
   }
   /**
-   *
+   * @param {ServerCity?} currentCity
    * @param { import("./../../components/serverlist.js").ServerCountryList } list - The ServerList to Render
    * @param {($0: Event)=>{} } onResult - A callback fired when a city or "back" is clicked.
    *                                    - Contains an HTML Event with Optinal
    *                                    - { detail.city : ServerCity }
    * @returns {HTMLElement} - An already rendered Element, ready to put into the DOM
    */
-  static createServerList(list = [], onResult = () => {}) {
+  static createServerList(currentCity = null, list = [], onResult = () => {}) {
     const viewElement = document.createElement("section");
     viewElement.dataset.title = "Select Location";
     render(
       html`
-        <server-list .serverList=${list} @selectedCityChanged=${onResult}>
+        <server-list
+          .selectedCity=${currentCity}
+          .serverList=${list}
+          @selectedCityChanged=${onResult}
+        >
         </server-list>
       `,
       viewElement
