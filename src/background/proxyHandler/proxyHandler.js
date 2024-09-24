@@ -24,10 +24,6 @@ export class ProxyHandler extends Component {
     siteContexts: PropertyType.Bindable,
     addSiteContext: PropertyType.Function,
     removeContextForOrigin: PropertyType.Function,
-
-    localProxyInfo: PropertyType.Bindable,
-    proxyMap: PropertyType.Bindable,
-    currentExitRelays: PropertyType.Bindable,
   };
 
   /**
@@ -42,6 +38,8 @@ export class ProxyHandler extends Component {
 
   /** @type {VPNState | undefined} */
   controllerState;
+  /** @type {Array <ServerCountry> } */
+  servers;
 
   #mSiteContexts = property(new Map());
   #lastChangedOrigin = property("");
@@ -92,6 +90,8 @@ export class ProxyHandler extends Component {
 
   async init() {
     log("Initializing ProxyHandler");
+    
+    this.controller.servers.subscribe((s) => this.servers = s);
 
     this.controller.state.subscribe((s) => {
       this.controllerState = s;
@@ -101,26 +101,40 @@ export class ProxyHandler extends Component {
     this.#mSiteContexts.value = await this.#getSiteContexts();
   }
 
+  /**
+   * 
+   * @param {VPNState} vpnState 
+   * @returns 
+   */
   processClientStateChanges(vpnState) {
     console.log(`Processing client state change ${vpnState}`);
     this.#mLocalProxyInfo.value = vpnState.loophole
       ? [ProxyUtils.parseProxy(vpnState.loophole)]
       : [];
 
-    if (vpnState.servers?.length > 0) {
-      console.log(`No servers, unable to set #mCurrentExitRelays`);
-      const { exitServerCity, exitServerCountry, servers } = vpnState;
-      const proxies = ProxyUtils.getProxies(
-        exitServerCountry.code,
-        exitServerCity.code,
-        servers
-      );
-      this.#mCurrentExitRelays.value = proxies;
-      console.log(`Updated #mCurrentExitRelays to ${this.#mCurrentExitRelays}`);
+    if (this.servers.length == 0) {
+      console.log("No servers, unable to get exit location proxy info");
+      return;
     }
 
+    const { exitServerCity, exitServerCountry} = vpnState;
+    if (exitServerCountry.code == "") {
+      console.log("No exit location information available, unable to get exit location proxy info");
+      return;
+    }
+
+    const proxies = ProxyUtils.getProxies(
+      exitServerCountry.code,
+      exitServerCity.code,
+      this.servers
+    );
+
+    this.#mCurrentExitRelays.value = proxies;
+
+    console.log(`Updated #mCurrentExitRelays to ${this.#mCurrentExitRelays}`);
+
     if (this.#mSiteContexts.value.size > 0) {
-      this.updateProxyMap(this.#mSiteContexts.value, vpnState.servers);
+      this.updateProxyMap(this.#mSiteContexts.value, this.servers);
     }
   }
 
@@ -196,7 +210,7 @@ export class ProxyHandler extends Component {
       this.#mSiteContexts.value = siteContexts;
       this.updateProxyMap(
         this.#mSiteContexts.value,
-        this.controllerState.servers
+        this.servers
       );
       await browser.storage.local.set({
         [ProxyUtils.getSiteContextsStorageKey()]: siteContexts,

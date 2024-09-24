@@ -42,8 +42,6 @@ export class VPNState {
    * @type {string | boolean}
    */
   loophole = false;
-  /** @type {Array <ServerCountry> } */
-  servers = [];
 
   /** @type {ServerCity | undefined } */
   exitServerCity = new ServerCity();
