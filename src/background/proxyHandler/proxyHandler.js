@@ -90,8 +90,8 @@ export class ProxyHandler extends Component {
 
   async init() {
     log("Initializing ProxyHandler");
-    
-    this.controller.servers.subscribe((s) => this.servers = s);
+
+    this.controller.servers.subscribe((s) => (this.servers = s));
 
     this.controller.state.subscribe((s) => {
       this.controllerState = s;
@@ -102,9 +102,9 @@ export class ProxyHandler extends Component {
   }
 
   /**
-   * 
-   * @param {VPNState} vpnState 
-   * @returns 
+   *
+   * @param {VPNState} vpnState
+   * @returns
    */
   processClientStateChanges(vpnState) {
     console.log(`Processing client state change ${vpnState}`);
@@ -117,9 +117,11 @@ export class ProxyHandler extends Component {
       return;
     }
 
-    const { exitServerCity, exitServerCountry} = vpnState;
+    const { exitServerCity, exitServerCountry } = vpnState;
     if (exitServerCountry.code == "") {
-      console.log("No exit location information available, unable to get exit location proxy info");
+      console.log(
+        "No exit location information available, unable to get exit location proxy info"
+      );
       return;
     }
 
@@ -208,10 +210,7 @@ export class ProxyHandler extends Component {
   async #setSiteContexts(siteContexts) {
     try {
       this.#mSiteContexts.value = siteContexts;
-      this.updateProxyMap(
-        this.#mSiteContexts.value,
-        this.servers
-      );
+      this.updateProxyMap(this.#mSiteContexts.value, this.servers);
       await browser.storage.local.set({
         [ProxyUtils.getSiteContextsStorageKey()]: siteContexts,
       });

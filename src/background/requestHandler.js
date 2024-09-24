@@ -55,9 +55,7 @@ export class RequestHandler extends Component {
   }
 
   updateProxyInfoFromClient(localProxy, exitRelays) {
-    console.log(
-      `Updating proxy info`
-    );
+    console.log(`Updating proxy info`);
 
     this.localProxyInfo = localProxy;
     this.currentExitRelay = exitRelays;
