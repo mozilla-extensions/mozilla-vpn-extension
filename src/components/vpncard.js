@@ -112,7 +112,7 @@ export class VPNCard extends LitElement {
     return html`
       <footer>
         <img
-          src="../../assets/flags/${countryFlag}.png"
+          src="../../assets/flags/${countryFlag.toUpperCase()}.png"
           width="24"
           height="24"
         />

@@ -66,7 +66,7 @@ export class PageActionPopup extends LitElement {
     const getSrc = () => {
       return excluded
         ? `./../../assets/logos/logo-${scheme}-excluded.svg`
-        : `./../../assets/flags/${this._siteContext?.countryCode}.png`;
+        : `./../../assets/flags/${this._siteContext?.countryCode.toUpperCase()}.png`;
     };
 
     const removeContext = () => {
