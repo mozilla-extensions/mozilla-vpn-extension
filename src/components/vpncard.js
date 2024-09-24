@@ -124,7 +124,7 @@ export class VPNCard extends LitElement {
 
   static subline(enabled, stability) {
     if (!enabled) {
-      return html`<p class="subline">${tr("turnOnForPrivateConnection")}</p>`;
+      return null;
     }
     const errorSvg = html`
       <svg>
