@@ -215,12 +215,12 @@ export class VPNCard extends LitElement {
       color: var(--main-card-text-color);
     }
     .box.unstable {
-      --shield-color: orange;
-      --error-fill: orange;
+      --shield-color: var(--color-warning);
+      --error-fill: var(--color-warning);
     }
     .box.noSignal {
-      --shield-color: red;
-      --error-fill: red;
+      --shield-color: var(--color-fatal-error);
+      --error-fill: var(--color-fatal-error);
     }
     .box.stable {
       --shield-color: var(--color-enabled);
@@ -252,10 +252,10 @@ export class VPNCard extends LitElement {
       transform: scale(1.1);
     }
     .unstable .subline {
-      color: orange;
+      color: var(--color-warning);
     }
     .noSignal .subline {
-      color: red;
+      color: var(--color-fatal-error);
     }
 
     svg {
