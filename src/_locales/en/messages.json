@@ -53,10 +53,6 @@
     "message": "Reset site preferences",
     "description": "Button Text to Reset all Site specific settings"
   },
-  "turnOnForPrivateConnection": {
-    "message": "Protection for Firefox is off.",
-    "description": "Call to Action for users to turn on the VPN"
-  },
   "vpnIsOn": {
     "message": "VPN protection for Firefox is on",
     "description": "Header to signal that VPN connection is enabled"
