@@ -38,6 +38,8 @@
   --font-family-semi-bold: "Inter Semi Bold";
   --font-family-bold: "Inter Bold";
   --color-enabled: #3fe1b0;
+  --color-warning: #ffa436;
+  --color-fatal-error: #ff6a75;
   --main-card-background: #321c64;
   --main-card-text-color: white;
   --main-card--pill-background: lch(

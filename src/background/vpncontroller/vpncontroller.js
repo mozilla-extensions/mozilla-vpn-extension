@@ -311,7 +311,8 @@ export function fromVPNStatusResponse(
       exitServerCity,
       exitServerCountry,
       status.localProxy?.url,
-      connectedSince
+      connectedSince,
+      status.connectionHealth
     );
   }
   if (
