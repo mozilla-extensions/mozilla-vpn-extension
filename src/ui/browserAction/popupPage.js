@@ -277,9 +277,9 @@ export class BrowserActionPopup extends LitElement {
             width="16"
           />
           <p>${getNameForContext(siteContext)}</p>
-          ${hasSiteContext && !siteContext.excluded ?
-          html`<span class="in-use in-use-light"> In Use </span>` : null
-          }
+          ${hasSiteContext && !siteContext.excluded
+            ? html`<span class="in-use in-use-light"> In Use </span>`
+            : null}
           <img
             src="../../assets/img/arrow-icon-right.svg"
             height="12"
@@ -370,7 +370,7 @@ export class BrowserActionPopup extends LitElement {
     .row img:first-child {
       margin: auto 12px auto 0px;
     }
-    
+
     .in-use {
       margin: auto auto auto 8px;
     }
@@ -385,7 +385,7 @@ export class BrowserActionPopup extends LitElement {
       margin-block: 0px;
       display: flex;
       height: 40;
-      justify-content: flex-start
+      justify-content: flex-start;
     }
 
     #selectPageLocation:hover {
