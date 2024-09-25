@@ -8,7 +8,7 @@ import {
   ref,
   when,
 } from "../vendor/lit-all.min.js";
-import { ghostButtonStyles, resetSizing } from "./styles.js";
+import { fontStyling, ghostButtonStyles, resetSizing } from "./styles.js";
 
 import { tr } from "../shared/i18n.js";
 
@@ -121,7 +121,7 @@ export class ServerList extends LitElement {
     return html`
       <input
         type="text"
-        class="search"
+        class="search text-light"
         placeholder="${tr("searchServer")}"
         ${ref(this.filterInput)}
         @change=${() => this.requestUpdate()}
@@ -143,7 +143,7 @@ export class ServerList extends LitElement {
           <span class="default-location-headline"
             >${tr("defaultLocationHeader")}</span
           >
-          <span class="default-location-subline">
+          <span class="default-location-subline text-secondary">
             ${tr("useDefaultLocationExplainer")}
           </span>
         </span>
@@ -154,12 +154,21 @@ export class ServerList extends LitElement {
   }
 
   static styles = css`
-    ${resetSizing} ${ghostButtonStyles}
+    ${resetSizing} ${ghostButtonStyles} ${fontStyling}
 
     :host {
       display: flex;
       flex-direction: column;
       align-items: center;
+    }
+
+    .default-location-btn {
+      margin-block: 4px auto;
+    }
+
+    .defaultCitySection {
+      display: flex;
+      flex-direction: column;
     }
 
     #moz-vpn-server-list-panel {
@@ -184,8 +193,7 @@ export class ServerList extends LitElement {
 
     .default-location-headline,
     .server-country-name {
-      font-family: var(--font-family);
-      font-weight: 600;
+      font-family: "Inter Semi Bold";
       font-size: 16px;
       line-height: 24px;
     }
@@ -218,11 +226,13 @@ export class ServerList extends LitElement {
     }
 
     .default-location-item {
-      padding: 0px 16px;
-      border-bottom: 1px solid var(--border-color);
+      padding: 8px 8px 24px;
+      border-bottom: 1px solid var(--divider-color);
       border-radius: 0px;
-      padding-bottom: 16px;
+      margin-inline: 16px;
+      width: calc(var(--window-width) - 32px);
     }
+
     .default-location-item input {
       margin-right: 16px;
     }
@@ -268,7 +278,6 @@ export class ServerList extends LitElement {
 
     .default-location-subline,
     .server-city-name {
-      font-weight: 400;
       font-size: 14px;
       line-height: 21px;
       opacity: 0.875;
@@ -301,7 +310,6 @@ export class ServerList extends LitElement {
 
     .server-city-name {
       font-family: var(--fontMetropolisLight);
-      font-weight: 300;
       color: var(--text-color-primary);
       padding-inline-start: 18px;
     }
@@ -314,9 +322,9 @@ export class ServerList extends LitElement {
       background-image: url("../../assets/img/search-icon.svg");
       background-position: 5px 6px;
       background-repeat: no-repeat;
-      border: 2px solid var(--border-color);
+      border: 1px solid var(--input-border);
       border-radius: var(--button-border-radius);
-      color: black;
+      font-size: 14px;
     }
   `;
 }

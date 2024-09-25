@@ -10,7 +10,7 @@ import {
   styleMap,
 } from "../vendor/lit-all.min.js";
 import { tr } from "../shared/i18n.js";
-import { resetSizing } from "./styles.js";
+import { resetSizing, fontStyling } from "./styles.js";
 
 import { VPNState } from "../background/vpncontroller/states.js";
 
@@ -158,7 +158,7 @@ export class VPNCard extends LitElement {
   }
 
   static styles = css`
-    ${resetSizing}
+    ${resetSizing}${fontStyling}
 
     :host {
       font-size: 1rem;
@@ -205,7 +205,7 @@ export class VPNCard extends LitElement {
     }
     footer span {
       font-size: 11px;
-      font-weight: bold;
+      font-family: "Inter Semi Bold";
     }
 
     .box * {
@@ -230,14 +230,13 @@ export class VPNCard extends LitElement {
       flex: 4;
     }
     h1 {
-      font-size: 18px;
-      line-height: 20px;
-      font-weight: 700;
+      font-size: 16px;
+      line-height: 24px;
+      font-family: "Inter Semi Bold";
     }
     p {
       font-size: 14px;
       line-height: 21px;
-      font-weight: 400;
       opacity: 0.7;
     }
 
@@ -377,14 +376,13 @@ export class VPNCardPlaceHolder extends LitElement {
       border-radius: 5px;
     }
     h1 {
-      font-size: 18px;
-      line-height: 20px;
-      font-weight: 700;
+      font-size: 16px;
+      line-height: 24px;
+      font-family: "Inter Semi Bold";
     }
     p {
       font-size: 14px;
       line-height: 21px;
-      font-weight: 400;
       opacity: 0.7;
     }
     .pill {

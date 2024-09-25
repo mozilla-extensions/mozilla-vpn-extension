@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { html, LitElement, when, css } from "../vendor/lit-all.min.js";
-import { fontSizing } from "./styles.js";
+import { fontStyling } from "./styles.js";
 import "./titlebar.js";
 
 /**
@@ -79,7 +79,7 @@ export class MessageScreen extends LitElement {
     `;
   }
   static styles = css`
-    ${fontSizing}
+    ${fontStyling}
     :host {
       width: var(--window-width);
       height: var(--window-max-height);
@@ -126,7 +126,6 @@ export class MessageScreen extends LitElement {
       font-family: var(--font-family);
       font-size: 15px;
       font-style: normal;
-      font-weight: 400;
     }
     ::slotted(.footnote) {
       margin-top: 8px;

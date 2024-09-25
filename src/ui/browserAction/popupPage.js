@@ -17,7 +17,7 @@ import { vpnController, proxyHandler } from "./backend.js";
 import { Utils } from "../../shared/utils.js";
 import { tr } from "../../shared/i18n.js";
 import {
-  fontSizing,
+  fontStyling,
   ghostButtonStyles,
   resetSizing,
 } from "../../components/styles.js";
@@ -189,7 +189,7 @@ export class BrowserActionPopup extends LitElement {
       // Replace "dummyString" with <span>origin</span>
       const parts = localizedString.split(originPlaceholder);
       return html`
-        <p>
+        <p class="text-secondary">
           ${parts.at(0)}
           <span class="bold">${origin}</span>
           ${parts.at(-1)}
@@ -273,7 +273,7 @@ export class BrowserActionPopup extends LitElement {
             height="24"
             width="24"
           />
-          <p>${getNameForContext(siteContext)}</p>
+          <p class="text-secondary">${getNameForContext(siteContext)}</p>
           <img
             src="../../assets/img/arrow-icon-right.svg"
             height="12"
@@ -304,12 +304,6 @@ export class BrowserActionPopup extends LitElement {
       </button>
     `;
   }
-  static styles = css`
-    #reset-context.disabled {
-      opacity: 0.7;
-      pointer-events: none;
-    }
-  `;
   static backBtn(back) {
     return html` <mz-iconlink
       @goBack=${back}
@@ -345,7 +339,7 @@ export class BrowserActionPopup extends LitElement {
   }
 
   static styles = css`
-    ${fontSizing}${resetSizing}${ghostButtonStyles}
+    ${fontStyling}${resetSizing}${ghostButtonStyles}
     section {
       background-color: var(--panel-bg-color);
     }
@@ -383,6 +377,7 @@ export class BrowserActionPopup extends LitElement {
       padding: calc(var(--padding-default) / 2) 0px;
       position: relative;
       margin-block: 0px;
+      color: var(--text-secondary-color);
     }
 
     #selectPageLocation:hover {
@@ -428,13 +423,14 @@ export class BrowserActionPopup extends LitElement {
       width: 100%;
       border-radius: 4px;
       padding: 8px, 16px, 8px, 16px;
-      size: 16px;
-      font-weight: 600;
-      border: 1px solid var(--action-button-color);
+      font-size: 16px;
+      border: 2px solid var(--action-button-color);
       color: var(--action-button-color);
       background-color: transparent;
       padding: 10px;
       margin-block: var(--padding-default);
+      font-weight: normal;
+      font-family: "Inter Semi Bold";
     }
 
     .disabled {
