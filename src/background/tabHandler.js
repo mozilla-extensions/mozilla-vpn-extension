@@ -84,7 +84,7 @@ export class TabHandler extends Component {
 
     if (this.currentContext && this.currentContext.countryCode) {
       browser.pageAction.setIcon({
-        path: `../assets/flags/${this.currentContext.countryCode}.png`,
+        path: `../assets/flags/${this.currentContext.countryCode.toUpperCase()}.png`,
         tabId: currentTab.id,
       });
       return browser.pageAction.show(currentTab.id);

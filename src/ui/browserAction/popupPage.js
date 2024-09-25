@@ -272,7 +272,7 @@ export class BrowserActionPopup extends LitElement {
           @click=${openServerList}
         >
           <img
-            src="../../assets//flags/${siteContext.countryCode}.png"
+            src="../../assets//flags/${siteContext.countryCode.toUpperCase()}.png"
             height="16"
             width="16"
           />
