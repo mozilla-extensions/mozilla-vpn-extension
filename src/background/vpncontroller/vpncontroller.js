@@ -323,7 +323,7 @@ export function fromVPNStatusResponse(
       exitServerCountry,
       status.localProxy?.url,
       connectedSince
-    )
+    );
   }
   if (
     controllerState === "StateOff" ||
