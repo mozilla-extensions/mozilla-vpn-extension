@@ -441,7 +441,7 @@ export class BrowserActionPopup extends LitElement {
     }
 
     #selectPageLocation:disabled,
-    #reset-context.disabled {
+    #selectLocation.disabled {
       opacity: 0.5;
       pointer-events: none;
     }
