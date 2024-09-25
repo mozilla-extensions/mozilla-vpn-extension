@@ -63,11 +63,11 @@
   :root {
     --panel-bg-color: #2b2a33;
     --border-color: lch(from var(--panel-bg-color) calc(l + 15) c h);
-    --text-secondary-color: rbga(255, 255, 255, .6);
+    --text-secondary-color: rbga(255, 255, 255, 0.6);
     --text-color-primary: white;
     --text-color-invert: #3d3d3d;
     --button-ghost-bg-color: #ffffff;
-    --divider-color: lch(from var(--color-divider) l c h / .2);
+    --divider-color: lch(from var(--color-divider) l c h / 0.2);
   }
 }
 
@@ -80,8 +80,8 @@
     --panel-bg-color: #f9f9fb;
     --text-color-primary: #3d3d3d;
     --text-color-invert: white;
-    --border-color: lch(from var(--panel-bg-color) calc(l - 15) c h / .3);
+    --border-color: lch(from var(--panel-bg-color) calc(l - 15) c h / 0.3);
     --button-ghost-bg-color: #3d3d3d;
-    --input-border: #8F8F9D;
+    --input-border: #8f8f9d;
   }
 }
