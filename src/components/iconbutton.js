@@ -40,6 +40,8 @@ export class IconLinkButton extends LitElement {
     browser.tabs.create({
       url: this.href,
     });
+    window.close();
+    
   }
   render() {
     return html`
