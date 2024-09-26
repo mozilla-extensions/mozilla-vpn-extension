@@ -11,6 +11,8 @@ const open = (url) => {
     url,
   });
 };
+const sumoLink =
+  "https://support.mozilla.org/products/firefox-private-network-vpn";
 
 const defineMessageScreen = (
   tag,
@@ -20,8 +22,7 @@ const defineMessageScreen = (
   primaryAction,
   onPrimaryAction,
   secondarAction = tr("getHelp"),
-  onSecondaryAction = () =>
-    open("https://support.mozilla.org/products/firefox-private-network-vpn")
+  onSecondaryAction = () => open(sumoLink)
 ) => {
   const body =
     typeof bodyText === "string" ? html`<p>${bodyText}</p>` : bodyText;
@@ -84,4 +85,16 @@ defineMessageScreen(
   () => {
     open("https://www.mozilla.org/products/vpn/download/");
   }
+);
+
+defineMessageScreen(
+  "unsupported-os-message-screen",
+  "message-os.svg",
+  tr("headerUnsupportedOSMessage"),
+  html`
+    <p>${tr("bodyUnsupportedOSMessage")}</p>
+    <p class="footnote">${tr("footnoteUnsupportedOSMessage")}</p>
+  `,
+  null,
+  null
 );

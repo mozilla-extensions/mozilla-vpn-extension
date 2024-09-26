@@ -14,6 +14,7 @@ import { getExposedObject } from "../../shared/ipc.js";
  * Manually define the types for convinence, please update if making changes :)
  *
  * @typedef {Object} vpnController
+ * @property {IBindable<any>} featureList - A bindable property that contains the list or configuration of VPN servers.
  * @property {IBindable<ServerCountryList>} servers - A bindable property that contains the list or configuration of VPN servers.
  * @property {IBindable<Boolean>} isExcluded - A bindable property that indicates whether the VPN is excluded from certain operations.
  * @property {IBindable<State>} state - A bindable property representing the current state of the VPN controller (e.g., connected, disconnected).
