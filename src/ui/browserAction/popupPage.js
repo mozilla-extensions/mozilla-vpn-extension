@@ -20,6 +20,7 @@ import {
   fontStyling,
   ghostButtonStyles,
   resetSizing,
+  inUseLabel,
 } from "../../components/styles.js";
 
 // Other components used
@@ -152,6 +153,7 @@ export class BrowserActionPopup extends LitElement {
               .countryFlag=${this.vpnState?.exitServerCountry?.code}
               .connectedSince=${this.vpnState?.connectedSince}
               .stability=${this.vpnState?.connectionStability}
+              .hasContext=${this._siteContext}
             ></vpn-card>
             ${this.locationSettings()}
           </main>
@@ -266,14 +268,18 @@ export class BrowserActionPopup extends LitElement {
         <button
           class="row ghost-btn "
           id="selectPageLocation"
+          .disabled=${live(siteContext.excluded)}
           @click=${openServerList}
         >
           <img
-            src="../../assets//flags/${siteContext.countryCode.toUpperCase()}.png"
-            height="24"
-            width="24"
+            src="../../assets/flags/${siteContext.countryCode.toUpperCase()}.png"
+            height="16"
+            width="16"
           />
           <p class="text-secondary">${getNameForContext(siteContext)}</p>
+          ${hasSiteContext && !siteContext.excluded
+            ? html`<span class="in-use in-use-light"> In Use </span>`
+            : null}
           <img
             src="../../assets/img/arrow-icon-right.svg"
             height="12"
@@ -339,7 +345,7 @@ export class BrowserActionPopup extends LitElement {
   }
 
   static styles = css`
-    ${fontStyling}${resetSizing}${ghostButtonStyles}
+    ${fontStyling}${resetSizing}${ghostButtonStyles}${inUseLabel}
     section {
       background-color: var(--panel-bg-color);
     }
@@ -360,24 +366,26 @@ export class BrowserActionPopup extends LitElement {
       align-items: center;
     }
 
-    .row p {
-      flex: 1;
-      flex-grow: 1;
+    .row img:first-child {
+      margin: auto 12px auto 0px;
     }
 
-    .row img:first-child {
-      margin-right: var(--padding-default);
+    .in-use {
+      margin: auto auto auto 8px;
     }
 
     .row img:last-of-type {
-      margin-left: var(--padding-default);
+      margin: auto 0 auto auto;
     }
 
     #selectPageLocation {
-      padding: calc(var(--padding-default) / 2) 0px;
+      padding: 0;
       position: relative;
       margin-block: 0px;
       color: var(--text-secondary-color);
+      display: flex;
+      height: 40;
+      justify-content: flex-start;
     }
 
     #selectPageLocation:hover {
@@ -433,10 +441,10 @@ export class BrowserActionPopup extends LitElement {
       font-family: "Inter Semi Bold";
     }
 
-    .disabled {
-      cursor: not-allowed;
-      pointer-events: none;
+    #selectPageLocation:disabled,
+    #selectLocation.disabled {
       opacity: 0.5;
+      pointer-events: none;
     }
 
     @media (prefers-color-scheme: dark) {
