@@ -25,6 +25,7 @@ export class VPNCard extends LitElement {
     cityName: { type: String },
     countryFlag: { type: String },
     stability: { type: String },
+    hasContext: { type: Boolean },
   };
 
   constructor() {
@@ -113,11 +114,10 @@ export class VPNCard extends LitElement {
       <footer>
         <img
           src="../../assets/flags/${countryFlag.toUpperCase()}.png"
-          width="24"
-          height="24"
+          width="16"
+          height="16"
         />
         <p>${name}</p>
-        <span> In Use </span>
       </footer>
     `;
   }
@@ -186,7 +186,7 @@ export class VPNCard extends LitElement {
       justify-content: baseline;
     }
     footer img {
-      margin-right: 8px;
+      margin-right: 12px;
     }
     main {
       justify-content: space-between;
@@ -197,15 +197,12 @@ export class VPNCard extends LitElement {
       justify-content: flex-start;
       width: 100%;
       border-top: 1px solid var(--border-color);
-      padding: 10px var(--default-padding);
+      padding: 0px var(--default-padding);
+      height: 40px;
     }
     footer p {
       color: var(--text-color-primary);
       font-size: 14px;
-    }
-    footer span {
-      font-size: 11px;
-      font-weight: bold;
     }
 
     .box * {
@@ -290,15 +287,6 @@ export class VPNCard extends LitElement {
     .on .pill::before {
       top: 3px;
       left: 24px;
-    }
-
-    span {
-      margin: 0px 10px;
-      color: var(--text-color-primary);
-      padding: 6px 10px;
-      background: var(--main-card--pill-background);
-      opacity: 0.9;
-      border-radius: 6px;
     }
   `;
 }

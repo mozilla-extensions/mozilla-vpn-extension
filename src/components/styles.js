@@ -158,3 +158,20 @@ export const ghostButtonStyles = css`
     }
   }
 `;
+
+export const inUseLabel = css`
+  .in-use {
+    font-size: 11px;
+    font-weight: bold;
+    margin: 0px 10px;
+    padding: 6px 10px;
+    background: var(--main-card--pill-background);
+    opacity: 0.9;
+    border-radius: 6px;
+    line-height: inherit;
+  }
+
+  .in-use-light {
+    background-color: #e7e7e7;
+  }
+`;
