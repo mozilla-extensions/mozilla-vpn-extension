@@ -161,5 +161,14 @@
   "useDefaultLocationExplainer": {
     "message": "This is always the same location as selected in your Mozilla VPN desktop app.",
     "description": "Explanation of what 'Use default Mozilla VPN Location' means."
+  },
+  "headerUnsupportedOSMessage": {
+    "message": "Unsupported platform"
+  },
+  "bodyUnsupportedOSMessage": {
+    "message": "Currently, the Mozilla VPN extension is only available on Windows devices."
+  },
+  "footnoteUnsupportedOSMessage": {
+    "message": "We’re working to bring support to macOS and Linux soon!"
   }
 }
