@@ -126,7 +126,7 @@ export class ServerList extends LitElement {
     return html`
       <input
         type="text"
-        class="search text-light"
+        class="search"
         placeholder="${tr("searchServer")}"
         ${ref(this.filterInput)}
         @change=${() => this.requestUpdate()}
@@ -322,7 +322,6 @@ export class ServerList extends LitElement {
     input.search {
       margin-block: 16px;
       padding: 10px 20px 10px 32px;
-      color: var(--text-color-invert);
       width: calc(max(50%, 312px));
       background-image: url("../../assets/img/search-icon.svg");
       background-position: 5px 6px;
@@ -330,6 +329,11 @@ export class ServerList extends LitElement {
       border: 1px solid var(--input-border);
       border-radius: var(--button-border-radius);
       font-size: 14px;
+      color: var(--grey40);
+    }
+
+    input.search::placeholder {
+      opacity: 1;
     }
   `;
 }
