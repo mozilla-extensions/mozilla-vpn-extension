@@ -17,7 +17,7 @@ import { vpnController, proxyHandler } from "./backend.js";
 import { Utils } from "../../shared/utils.js";
 import { tr } from "../../shared/i18n.js";
 import {
-  fontSizing,
+  fontStyling,
   ghostButtonStyles,
   resetSizing,
   inUseLabel,
@@ -191,7 +191,7 @@ export class BrowserActionPopup extends LitElement {
       // Replace "dummyString" with <span>origin</span>
       const parts = localizedString.split(originPlaceholder);
       return html`
-        <p>
+        <p class="text-secondary">
           ${parts.at(0)}
           <span class="bold">${origin}</span>
           ${parts.at(-1)}
@@ -276,7 +276,7 @@ export class BrowserActionPopup extends LitElement {
             height="16"
             width="16"
           />
-          <p>${getNameForContext(siteContext)}</p>
+          <p class="text-secondary">${getNameForContext(siteContext)}</p>
           ${hasSiteContext && !siteContext.excluded
             ? html`<span class="in-use in-use-light"> In Use </span>`
             : null}
@@ -310,7 +310,6 @@ export class BrowserActionPopup extends LitElement {
       </button>
     `;
   }
-
   static backBtn(back) {
     return html` <mz-iconlink
       @goBack=${back}
@@ -346,7 +345,7 @@ export class BrowserActionPopup extends LitElement {
   }
 
   static styles = css`
-    ${fontSizing}${resetSizing}${ghostButtonStyles}${inUseLabel}
+    ${fontStyling}${resetSizing}${ghostButtonStyles}${inUseLabel}
     section {
       background-color: var(--panel-bg-color);
     }
@@ -383,6 +382,7 @@ export class BrowserActionPopup extends LitElement {
       padding: 0;
       position: relative;
       margin-block: 0px;
+      color: var(--text-secondary-color);
       display: flex;
       height: 40;
       justify-content: flex-start;
@@ -431,13 +431,14 @@ export class BrowserActionPopup extends LitElement {
       width: 100%;
       border-radius: 4px;
       padding: 8px, 16px, 8px, 16px;
-      size: 16px;
-      font-weight: 600;
-      border: 1px solid var(--action-button-color);
+      font-size: 16px;
+      border: 2px solid var(--action-button-color);
       color: var(--action-button-color);
       background-color: transparent;
       padding: 10px;
       margin-block: var(--padding-default);
+      font-weight: normal;
+      font-family: "Inter Semi Bold";
     }
 
     #selectPageLocation:disabled,

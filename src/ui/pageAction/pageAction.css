@@ -48,7 +48,7 @@ body {
 
 h1 {
   font-size: 13px;
-  font-weight: 600;
+  font-family: "Inter Semi Bold";
   margin-block: 0px 0.5rem;
   padding-block-end: 1rem;
   text-align: center;
@@ -80,7 +80,6 @@ p {
 button {
   margin-block-start: 1rem;
   margin-inline: auto 0;
-  font-weight: 500;
   padding: 4px 16px;
   min-block-size: 32px;
   border-radius: 4px;

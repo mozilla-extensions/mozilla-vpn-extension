@@ -9,7 +9,7 @@ import { vpnController, proxyHandler } from "../browserAction/backend.js";
 import { Utils } from "../../shared/utils.js";
 import { tr } from "../../shared/i18n.js";
 
-import { fontSizing, resetSizing } from "../../components/styles.js";
+import { fontStyling, resetSizing } from "../../components/styles.js";
 
 /**
  * This is the Component for the Page Action Popup.
@@ -102,15 +102,15 @@ export class PageActionPopup extends LitElement {
   }
 
   static styles = css`
-    ${fontSizing}${resetSizing}
+    ${fontStyling}${resetSizing}
 
     h1 {
       font-size: 13px;
-      font-weight: 600;
       margin-block: 0px 0.5rem;
       padding-block-end: 1rem;
       text-align: center;
       border-bottom: 1px solid rgb(173, 173, 173, 0.8);
+      font-family: "Inter Semi Bold";
     }
 
     .flex {
@@ -138,7 +138,6 @@ export class PageActionPopup extends LitElement {
     button {
       margin-block-start: 1rem;
       margin-inline: auto 0;
-      font-weight: 500;
       padding: 4px 16px;
       min-block-size: 32px;
       border-radius: 4px;

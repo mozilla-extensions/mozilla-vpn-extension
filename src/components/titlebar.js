@@ -50,8 +50,9 @@ export class TitleBar extends LitElement {
       margin: 0;
       font-size: 16px;
       line-height: 24px;
-      font-weight: 600;
+      font-family: "Inter Semi Bold";
       grid-column: 2/3;
+      font-weight: normal;
     }
     nav {
       display: grid;
@@ -64,7 +65,7 @@ export class TitleBar extends LitElement {
       align-items: center;
       height: 48px;
       padding: 0px 16px;
-      border-bottom: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--divider-color);
     }
   `;
 }

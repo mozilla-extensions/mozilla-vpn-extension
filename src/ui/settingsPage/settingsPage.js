@@ -9,7 +9,7 @@ import {
   createRef,
   ref,
 } from "../../vendor/lit-all.min.js";
-import { fontSizing, resetSizing } from "../../components/styles.js";
+import { fontStyling, resetSizing } from "../../components/styles.js";
 import { getExposedObject } from "../../shared/ipc.js";
 import "./tableElement.js";
 import { tr } from "../../shared/i18n.js";
@@ -87,7 +87,7 @@ export class SettingsPage extends LitElement {
   }
 
   static styles = css`
-    ${fontSizing}
+    ${fontStyling}
     ${resetSizing}
     ${settingTypo}
 

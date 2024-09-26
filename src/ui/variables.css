@@ -33,13 +33,14 @@
 :root {
   --window-width: 352px;
   --window-max-height: 468px;
-
   --font-family: "Inter Regular";
   --font-family-semi-bold: "Inter Semi Bold";
   --font-family-bold: "Inter Bold";
   --color-enabled: #3fe1b0;
   --color-warning: #ffa436;
   --color-fatal-error: #ff6a75;
+  --color-divider: #e7e7e7;
+  --grey40: #6d6d6e;
   --main-card-background: #321c64;
   --main-card-text-color: white;
   --main-card--pill-background: lch(
@@ -53,16 +54,19 @@
   --button-border-radius: 5px;
   --box-shadow-on: rgba(0, 0, 0, 0.28) 2px 2px 4px;
   --box-shadow-off: rgba(0, 0, 0, 0.06) 2px 2px 7px;
+  --divider-color: var(--color-divider);
+  --text-secondary-color: var(--grey40);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --panel-bg-color: #2b2a33;
     --border-color: lch(from var(--panel-bg-color) calc(l + 15) c h);
-
+    --text-secondary-color: rbga(255, 255, 255, 0.6);
     --text-color-primary: white;
     --text-color-invert: #3d3d3d;
     --button-ghost-bg-color: #ffffff;
+    --divider-color: lch(from var(--color-divider) l c h / 0.2);
   }
 }
 
@@ -75,7 +79,8 @@
     --panel-bg-color: #f9f9fb;
     --text-color-primary: #3d3d3d;
     --text-color-invert: white;
-    --border-color: lch(from var(--panel-bg-color) calc(l - 15) c h);
+    --border-color: lch(from var(--panel-bg-color) calc(l - 15) c h / 0.3);
     --button-ghost-bg-color: #3d3d3d;
+    --input-border: #8f8f9d;
   }
 }
