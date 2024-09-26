@@ -41,7 +41,6 @@ export class IconLinkButton extends LitElement {
       url: this.href,
     });
     window.close();
-    
   }
   render() {
     return html`
