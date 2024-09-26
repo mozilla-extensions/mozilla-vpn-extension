@@ -92,7 +92,12 @@ export class ServerList extends LitElement {
      * @property {ServerCity} detail.city - The new City
      * @property {ServerCountry} detail.country - The City's country
      */
-    const country = this.openedCountries.find((c) => c.cities.includes(city));
+    let country = this.openedCountries.find((c) => c.cities.includes(city));
+    if (!country) {
+      // Find country for cities selected from a search filtered list
+      // where this.openedCountries is []
+      country = this.serverList.find((c) => c.cities.includes(city));
+    }
     return new CustomEvent("selectedCityChanged", {
       detail: { city, country },
     });
