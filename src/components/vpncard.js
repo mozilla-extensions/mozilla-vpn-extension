@@ -265,12 +265,30 @@ export class VPNCard extends LitElement {
       height: 24px;
       border-radius: 30px;
       border: none;
-      background: #6d6d6e;
+      background-color: var(--color-disabled);
       position: relative;
+      transition: background-color 0.2s ease;
+    }
+
+    .pill:hover {
+      background-color: var(--color-disabled-hover);
+    }
+
+    .pill:active {
+      background-color: var(--color-disabled-active);
     }
     .on .pill {
-      background: var(--color-enabled);
+      background-color: var(--color-enabled);
     }
+
+    .on .pill:hover {
+      background-color: var(--color-enabled-hover);
+    }
+
+    .on .pill:active {
+      background-color: var(--color-enabled-active);
+    }
+
     .pill::before {
       content: " ";
       background: white;
