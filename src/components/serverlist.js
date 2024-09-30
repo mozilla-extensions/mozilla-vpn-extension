@@ -92,7 +92,12 @@ export class ServerList extends LitElement {
      * @property {ServerCity} detail.city - The new City
      * @property {ServerCountry} detail.country - The City's country
      */
-    const country = this.openedCountries.find((c) => c.cities.includes(city));
+    let country = this.openedCountries.find((c) => c.cities.includes(city));
+    if (!country) {
+      // Find country for cities selected from a search filtered list
+      // where this.openedCountries is []
+      country = this.serverList.find((c) => c.cities.includes(city));
+    }
     return new CustomEvent("selectedCityChanged", {
       detail: { city, country },
     });
@@ -121,7 +126,7 @@ export class ServerList extends LitElement {
     return html`
       <input
         type="text"
-        class="search text-light"
+        class="search"
         placeholder="${tr("searchServer")}"
         ${ref(this.filterInput)}
         @change=${() => this.requestUpdate()}
@@ -317,7 +322,6 @@ export class ServerList extends LitElement {
     input.search {
       margin-block: 16px;
       padding: 10px 20px 10px 32px;
-      color: var(--text-color-invert);
       width: calc(max(50%, 312px));
       background-image: url("../../assets/img/search-icon.svg");
       background-position: 5px 6px;
@@ -325,6 +329,11 @@ export class ServerList extends LitElement {
       border: 1px solid var(--input-border);
       border-radius: var(--button-border-radius);
       font-size: 14px;
+      color: var(--grey40);
+    }
+
+    input.search::placeholder {
+      opacity: 1;
     }
   `;
 }
