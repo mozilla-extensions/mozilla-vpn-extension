@@ -95,7 +95,7 @@ export class BrowserActionPopup extends LitElement {
   }
 
   // Hackfix for FXVPN-178
-  // Extension's height does not respond when elements leave the DOM 
+  // Extension's height does not respond when elements leave the DOM
   resizePopup() {
     const conditionalView = document.getElementById("conditional-view");
     if (!conditionalView) {
