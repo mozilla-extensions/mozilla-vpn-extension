@@ -10,7 +10,7 @@ export const resetSizing = css`
     box-sizing: border-box;
   }
   /* Remove default margin for body */
-  body {
+  body {n
     margin: 0;
   }
   h1,
@@ -82,33 +82,45 @@ export const resetSizing = css`
   }
 `;
 
-export const fontSizing = css`
+export const fontStyling = css`
   * {
     font-family: var(--font-family);
   }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  p,
+  span,
+  button {
+    font-weight: normal;
+  }
   h1 {
-    font-weight: 600;
     font-size: 18px;
     line-height: 27px;
+    font-family: "Inter Semi Bold";
   }
   h2 {
-    font-weight: 600;
-    font-size: 16px;
-    line-height: 24px;
+    font-size: 14px;
+    line-height: 21px;
+    font-family: "Inter Semi Bold";
   }
   h3 {
-    font-weight: normal;
     font-size: 16px;
   }
   p,
   em,
   span {
-    font-weight: 400;
     font-size: 14px;
     line-height: 21px;
   }
   .bold {
-    font-weight: 600;
+    font-family: "Inter Semi Bold";
+  }
+
+  .text-secondary {
+    color: var(--text-secondary-color);
   }
 `;
 
@@ -156,5 +168,22 @@ export const ghostButtonStyles = css`
     .ghost-icon-btn img {
       filter: invert(1);
     }
+  }
+`;
+
+export const inUseLabel = css`
+  .in-use {
+    font-size: 11px;
+    font-weight: bold;
+    margin: 0px 10px;
+    padding: 6px 10px;
+    background: var(--main-card--pill-background);
+    opacity: 0.9;
+    border-radius: 6px;
+    line-height: inherit;
+  }
+
+  .in-use-light {
+    background-color: #e7e7e7;
   }
 `;

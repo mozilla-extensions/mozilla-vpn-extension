@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { ConditionalView } from "../../components/conditional-view.js";
+import { propertySum } from "../../shared/property.js";
 import { vpnController } from "./backend.js";
 
 export class PopUpConditionalView extends ConditionalView {
@@ -12,9 +13,14 @@ export class PopUpConditionalView extends ConditionalView {
 
   connectedCallback() {
     super.connectedCallback();
-    vpnController.state.subscribe((s) => {
-      this.slotName = PopUpConditionalView.toSlotname(s);
-    });
+    propertySum(
+      vpnController.state,
+      vpnController.featureList,
+      (state, features) => {
+        this.slotName = PopUpConditionalView.toSlotname(state, features);
+      }
+    );
+
     // Messages may dispatch an event requesting to send a Command to the VPN
     this.addEventListener("requestMessage", (e) => {
       console.log(`Message requested ${e}`);
@@ -29,16 +35,21 @@ export class PopUpConditionalView extends ConditionalView {
   }
 
   /**
+   * @typedef {import("../../background/vpncontroller/vpncontroller.js").FeatureFlags} FeatureFlags
    * @typedef {import("../../background/vpncontroller/states.js").VPNState} State
    * @param {State} state
+   * @param {FeatureFlags} features
    * @returns {String}
    */
-  static toSlotname(state) {
+  static toSlotname(state, features) {
     if (!state.installed) {
       return "MessageInstallVPN";
     }
     if (!state.alive) {
       return "MessageStartVPN";
+    }
+    if (!features.webExtension) {
+      return "MessageOSNotSupported";
     }
     if (!state.authenticated) {
       return "MessageSignIn";

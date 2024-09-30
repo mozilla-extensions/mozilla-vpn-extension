@@ -44,6 +44,7 @@ export class VPNController extends Component {
     state: PropertyType.Bindable,
     postToApp: PropertyType.Function,
     isolationKey: PropertyType.Bindable,
+    featureList: PropertyType.Bindable,
   };
 
   get state() {
@@ -54,6 +55,10 @@ export class VPNController extends Component {
   }
   get isExcluded() {
     return this.#isExcluded;
+  }
+  /** @type {IBindable<FeatureFlags>} */
+  get featureList() {
+    return this.#mFeaturelist;
   }
 
   async initNativeMessaging() {
@@ -151,6 +156,11 @@ export class VPNController extends Component {
           this.#increaseIsolationKey();
         }
         break;
+      case "featurelist":
+        this.#mFeaturelist.set({
+          ...new FeatureFlags(),
+          ...response.featurelist,
+        });
       default:
         console.log("Unexpected Message type: " + response.t);
     }
@@ -172,6 +182,7 @@ export class VPNController extends Component {
         this.postToApp("status");
         this.postToApp("servers");
         this.postToApp("disabled_apps");
+        this.postToApp("featurelist");
       });
       return;
     }
@@ -203,6 +214,8 @@ export class VPNController extends Component {
   /** @type {WritableProperty<Array<ServerCountry>>} */
   // @ts-ignore
   #mServers = property([]);
+
+  #mFeaturelist = property(new FeatureFlags());
 
   #isExcluded = property(false);
 }
@@ -332,4 +345,9 @@ export function fromVPNStatusResponse(
     return new StateVPNDisabled(exitServerCity, exitServerCountry);
   }
   return;
+}
+
+export class FeatureFlags {
+  localProxy = true;
+  webExtension = true;
 }

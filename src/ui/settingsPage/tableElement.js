@@ -9,7 +9,7 @@ import {
   createRef,
   ref,
 } from "../../vendor/lit-all.min.js";
-import { fontSizing, resetSizing } from "../../components/styles.js";
+import { fontStyling, resetSizing } from "../../components/styles.js";
 import { Utils } from "../../shared/utils.js";
 import { tr } from "../../shared/i18n.js";
 import { settingTypo } from "./styles.js";
@@ -73,7 +73,7 @@ export class ContextTable extends LitElement {
   }
 
   static styles = css`
-    ${fontSizing}
+    ${fontStyling}
     ${resetSizing}
     ${settingTypo}
       * {

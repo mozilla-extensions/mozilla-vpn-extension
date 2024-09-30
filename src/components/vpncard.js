@@ -10,7 +10,7 @@ import {
   styleMap,
 } from "../vendor/lit-all.min.js";
 import { tr } from "../shared/i18n.js";
-import { resetSizing } from "./styles.js";
+import { resetSizing, fontStyling } from "./styles.js";
 
 import { VPNState } from "../background/vpncontroller/states.js";
 
@@ -25,6 +25,7 @@ export class VPNCard extends LitElement {
     cityName: { type: String },
     countryFlag: { type: String },
     stability: { type: String },
+    hasContext: { type: Boolean },
   };
 
   constructor() {
@@ -112,12 +113,11 @@ export class VPNCard extends LitElement {
     return html`
       <footer>
         <img
-          src="../../assets/flags/${countryFlag}.png"
-          width="24"
-          height="24"
+          src="../../assets/flags/${countryFlag.toUpperCase()}.png"
+          width="16"
+          height="16"
         />
         <p>${name}</p>
-        <span> In Use </span>
       </footer>
     `;
   }
@@ -158,7 +158,7 @@ export class VPNCard extends LitElement {
   }
 
   static styles = css`
-    ${resetSizing}
+    ${resetSizing}${fontStyling}
 
     :host {
       font-size: 1rem;
@@ -186,7 +186,7 @@ export class VPNCard extends LitElement {
       justify-content: baseline;
     }
     footer img {
-      margin-right: 8px;
+      margin-right: 12px;
     }
     main {
       justify-content: space-between;
@@ -197,15 +197,12 @@ export class VPNCard extends LitElement {
       justify-content: flex-start;
       width: 100%;
       border-top: 1px solid var(--border-color);
-      padding: 10px var(--default-padding);
+      padding: 0px var(--default-padding);
+      height: 40px;
     }
     footer p {
       color: var(--text-color-primary);
       font-size: 14px;
-    }
-    footer span {
-      font-size: 11px;
-      font-weight: bold;
     }
 
     .box * {
@@ -230,14 +227,13 @@ export class VPNCard extends LitElement {
       flex: 4;
     }
     h1 {
-      font-size: 18px;
-      line-height: 20px;
-      font-weight: 700;
+      font-size: 16px;
+      line-height: 24px;
+      font-family: "Inter Semi Bold";
     }
     p {
       font-size: 14px;
       line-height: 21px;
-      font-weight: 400;
       opacity: 0.7;
     }
 
@@ -269,12 +265,30 @@ export class VPNCard extends LitElement {
       height: 24px;
       border-radius: 30px;
       border: none;
-      background: #6d6d6e;
+      background-color: var(--color-disabled);
       position: relative;
+      transition: background-color 0.2s ease;
+    }
+
+    .pill:hover {
+      background-color: var(--color-disabled-hover);
+    }
+
+    .pill:active {
+      background-color: var(--color-disabled-active);
     }
     .on .pill {
-      background: var(--color-enabled);
+      background-color: var(--color-enabled);
     }
+
+    .on .pill:hover {
+      background-color: var(--color-enabled-hover);
+    }
+
+    .on .pill:active {
+      background-color: var(--color-enabled-active);
+    }
+
     .pill::before {
       content: " ";
       background: white;
@@ -290,15 +304,6 @@ export class VPNCard extends LitElement {
     .on .pill::before {
       top: 3px;
       left: 24px;
-    }
-
-    span {
-      margin: 0px 10px;
-      color: var(--text-color-primary);
-      padding: 6px 10px;
-      background: var(--main-card--pill-background);
-      opacity: 0.9;
-      border-radius: 6px;
     }
   `;
 }
@@ -377,14 +382,13 @@ export class VPNCardPlaceHolder extends LitElement {
       border-radius: 5px;
     }
     h1 {
-      font-size: 18px;
-      line-height: 20px;
-      font-weight: 700;
+      font-size: 16px;
+      line-height: 24px;
+      font-family: "Inter Semi Bold";
     }
     p {
       font-size: 14px;
       line-height: 21px;
-      font-weight: 400;
       opacity: 0.7;
     }
     .pill {
