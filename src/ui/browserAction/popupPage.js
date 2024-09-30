@@ -71,7 +71,10 @@ export class BrowserActionPopup extends LitElement {
     proxyHandler.siteContexts.subscribe((s) => {
       this._siteContexts = s;
     });
-    extController.state.subscribe((s) => (this.extState = s));
+    extController.state.subscribe((s) => {
+      this.extState = s;
+      this.updatePage();
+    });
     this.updatePage();
   }
   updatePage() {
@@ -88,6 +91,18 @@ export class BrowserActionPopup extends LitElement {
         this._siteContext = proxyHandler.siteContexts.value.get(this.pageURL);
       }
     });
+    this.resizePopup();
+  }
+
+  // Hackfix for FXVPN-178
+  // Extension's height does not respond when elements leave the DOM
+  resizePopup() {
+    const conditionalView = document.getElementById("conditional-view");
+    if (!conditionalView) {
+      return;
+    }
+    document.body.style.height = conditionalView.offsetHeight + "px";
+    document.body.style.height = "auto";
   }
 
   connectedCallback() {
