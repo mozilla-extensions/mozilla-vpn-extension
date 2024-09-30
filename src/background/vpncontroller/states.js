@@ -42,8 +42,6 @@ export class VPNState {
    * @type {string | boolean}
    */
   loophole = false;
-  /** @type {Array <ServerCountry> } */
-  servers = [];
 
   /** @type {ServerCity | undefined } */
   exitServerCity = new ServerCity();
@@ -152,6 +150,12 @@ export class StateVPNEnabled extends StateVPNDisabled {
   }
   state = "Enabled";
   subscribed = true;
+  connected = true;
+}
+
+export class StateVPNOnPartial extends StateVPNEnabled {
+  state = "OnPartial";
+  alive = true;
   connected = true;
 }
 

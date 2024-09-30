@@ -12,7 +12,7 @@ import {
   live,
 } from "../../vendor/lit-all.min.js";
 
-import { vpnController, proxyHandler } from "./backend.js";
+import { vpnController, proxyHandler, extController } from "./backend.js";
 
 import { Utils } from "../../shared/utils.js";
 import { tr } from "../../shared/i18n.js";
@@ -51,6 +51,7 @@ export class BrowserActionPopup extends LitElement {
   static properties = {
     servers: { type: Object },
     vpnState: { type: Object },
+    extState: { type: Object },
     pageURL: { type: String },
     _siteContext: { type: Object },
     hasSiteContext: { type: Boolean },
@@ -70,6 +71,7 @@ export class BrowserActionPopup extends LitElement {
     proxyHandler.siteContexts.subscribe((s) => {
       this._siteContexts = s;
     });
+    extController.state.subscribe((s) => (this.extState = s));
     this.updatePage();
   }
   updatePage() {
@@ -119,6 +121,10 @@ export class BrowserActionPopup extends LitElement {
   stackView = createRef();
 
   render() {
+    const handleVPNToggle = () => {
+      extController.toggleConnectivity();
+    };
+
     const back = () => {
       this.stackView?.value?.pop().then(() => {
         this.requestUpdate();
@@ -148,7 +154,8 @@ export class BrowserActionPopup extends LitElement {
         <section data-title="Mozilla VPN">
           <main>
             <vpn-card
-              .enabled=${this.vpnState?.connected}
+              @toggle=${handleVPNToggle}
+              .enabled=${this.extState?.enabled}
               .cityName=${this.vpnState?.exitServerCity?.name}
               .countryFlag=${this.vpnState?.exitServerCountry?.code}
               .connectedSince=${this.vpnState?.connectedSince}
@@ -163,7 +170,7 @@ export class BrowserActionPopup extends LitElement {
   }
 
   locationSettings() {
-    if (!this.pageURL || !this.vpnState?.connected) {
+    if (!this.pageURL || !this.extState.enabled) {
       return null;
     }
     const resetSitePreferences = async () => {

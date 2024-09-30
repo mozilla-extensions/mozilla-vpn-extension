@@ -19,6 +19,7 @@ import {
   StateVPNEnabled,
   StateVPNDisabled,
   StateVPNSubscriptionNeeded,
+  StateVPNOnPartial,
   REQUEST_TYPES,
   ServerCountry,
   vpnStatusResponse,
@@ -161,7 +162,7 @@ export class VPNController extends Component {
           ...response.featurelist,
         });
       default:
-        throw Error("Unexpeted Message type: " + response.t);
+        console.log("Unexpected Message type: " + response.t);
     }
   }
 
@@ -292,6 +293,7 @@ export function fromVPNStatusResponse(
   if (response.t != "status") {
     return;
   }
+  const servers = serverList;
   const status = response.status;
   const appState = status.app;
   if (["StateInitialize", "StateAuthenticating"].includes(appState)) {
@@ -326,6 +328,14 @@ export function fromVPNStatusResponse(
       status.localProxy?.url,
       connectedSince,
       status.connectionHealth
+    );
+  }
+  if (controllerState === "StateOnPartial") {
+    return new StateVPNOnPartial(
+      exitServerCity,
+      exitServerCountry,
+      status.localProxy?.url,
+      connectedSince
     );
   }
   if (

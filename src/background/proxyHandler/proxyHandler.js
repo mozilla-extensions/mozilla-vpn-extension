@@ -15,7 +15,8 @@ const log = Logger.logger("ProxyHandler");
 
 /**
  * This class manages tasks related to creating and storing
- * proxy information for specific origins (siteContexts).
+ * proxy information to be used by the UI and RequestHandler.
+ *
  */
 export class ProxyHandler extends Component {
   // Things to expose to the UI
@@ -25,6 +26,11 @@ export class ProxyHandler extends Component {
     removeContextForOrigin: PropertyType.Function,
   };
 
+  /**
+   *
+   * @param {*} receiver
+   * @param {VPNController} controller Instance of the VPNController that manages VPN states.
+   */
   constructor(receiver, controller) {
     super(receiver);
     this.controller = controller;
@@ -32,14 +38,46 @@ export class ProxyHandler extends Component {
 
   /** @type {VPNState | undefined} */
   controllerState;
+  /** @type {Array <ServerCountry> } */
+  servers;
 
   #mSiteContexts = property(new Map());
   #lastChangedOrigin = property("");
-  currentPort;
+  #mProxyMap = property(new Map());
+  #mLocalProxyInfo = property([]);
+  #mCurrentExitRelays = property([]);
 
   /** @type {IBindable<Map<String, SiteContext>>} */
   get siteContexts() {
     return this.#mSiteContexts.readOnly;
+  }
+
+  /**
+   * Returns an array containing proxy information
+   * for the user's local socks proxy.
+   *  @type {IBindable<Map<String, Array>>}
+   *  */
+  get localProxyInfo() {
+    return this.#mLocalProxyInfo.readOnly;
+  }
+
+  /**
+   * Returns a map of origins and proxy information
+   * for sites with special proxy settings.
+   * @type {IBindable<Map<String, Map>>}
+   * */
+  get proxyMap() {
+    return this.#mProxyMap.readOnly;
+  }
+
+  /**
+   * Returns the array of proxyInfo objects,
+   * in the VPN client's current server
+   * location.
+   * @type {IBindable<Map<String, Array>>}
+   * */
+  get currentExitRelays() {
+    return this.#mCurrentExitRelays.readOnly;
   }
   /**
    * Returns a bindable containing the last origin
@@ -53,11 +91,70 @@ export class ProxyHandler extends Component {
   async init() {
     log("Initializing ProxyHandler");
 
+    this.controller.servers.subscribe((s) => (this.servers = s));
+
     this.controller.state.subscribe((s) => {
       this.controllerState = s;
+      this.processClientStateChanges(s);
     });
 
     this.#mSiteContexts.value = await this.#getSiteContexts();
+  }
+
+  /**
+   *
+   * @param {VPNState} vpnState
+   * @returns
+   */
+  processClientStateChanges(vpnState) {
+    console.log(`Processing client state change ${vpnState}`);
+    this.#mLocalProxyInfo.value = vpnState.loophole
+      ? [ProxyUtils.parseProxy(vpnState.loophole)]
+      : [];
+
+    if (this.servers.length == 0) {
+      console.log("No servers, unable to get exit location proxy info");
+      return;
+    }
+
+    const { exitServerCity, exitServerCountry } = vpnState;
+    if (exitServerCountry.code == "") {
+      console.log(
+        "No exit location information available, unable to get exit location proxy info"
+      );
+      return;
+    }
+
+    const proxies = ProxyUtils.getProxies(
+      exitServerCountry.code,
+      exitServerCity.code,
+      this.servers
+    );
+
+    this.#mCurrentExitRelays.value = proxies;
+
+    console.log(`Updated #mCurrentExitRelays to ${this.#mCurrentExitRelays}`);
+
+    if (this.#mSiteContexts.value.size > 0) {
+      this.updateProxyMap(this.#mSiteContexts.value, this.servers);
+    }
+  }
+
+  updateProxyMap(newProxyMap, servers) {
+    const result = new Map();
+    newProxyMap.forEach((ctx, origin) => {
+      if (ctx.excluded) {
+        result.set(origin, [...this.#mLocalProxyInfo.value]);
+      } else {
+        result.set(
+          origin,
+          ProxyUtils.getProxies(ctx.countryCode, ctx.cityCode, servers)
+        );
+      }
+    });
+    this.#mProxyMap.value = result;
+    console.log(`Updated #mCurrentExitRelays to ${this.#mCurrentExitRelays}`);
+    return result;
   }
 
   /**
@@ -84,6 +181,7 @@ export class ProxyHandler extends Component {
     this.#lastChangedOrigin.set(siteContext.origin);
     return this.#setSiteContexts(siteContexts);
   }
+
   async #getSiteContexts() {
     let { siteContexts } = await browser.storage.local.get([
       ProxyUtils.getSiteContextsStorageKey(),
@@ -106,37 +204,18 @@ export class ProxyHandler extends Component {
   }
 
   /**
-   * Takes in an Object containing an origin, cityName, and countryCode.
-   * Creates an array of proxyInfo objects for the location and attaches it
-   * to the origin in a new SiteContext.
-   * @param {Object} info - An object containing an origin, countryCode, and cityName.
-   * @param {string} info.origin
-   * @param {string} info.countryCode
-   * @param {string} info.cityName
-   */
-  async #setContextForOrigin(info) {
-    const proxyInfo = await ProxyUtils.getProxies(
-      info.countryCode,
-      info.cityName,
-      this.controllerState.servers
-    );
-    const siteContext = new SiteContext({ ...info, proxyInfo });
-    return this.addSiteContext(siteContext);
-  }
-
-  /**
    * Stores the updated siteContexts map.
    * @param {Map} siteContexts - The site contexts map to store be stored.
    */
   async #setSiteContexts(siteContexts) {
-    console.log(siteContexts);
     try {
       this.#mSiteContexts.value = siteContexts;
+      this.updateProxyMap(this.#mSiteContexts.value, this.servers);
       await browser.storage.local.set({
         [ProxyUtils.getSiteContextsStorageKey()]: siteContexts,
       });
     } catch (error) {
-      log(`Error setting site contexts: ${error.message}`);
+      console.log(`Error setting site contexts: ${error.message}`);
     }
   }
 }

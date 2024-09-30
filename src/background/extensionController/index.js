@@ -2,6 +2,5 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-export { SiteContext } from "./siteContext.js";
-export { ProxyHandler } from "./proxyHandler.js";
-export { ProxyUtils } from "./proxyUtils.js";
+export * from "./states.js";
+export * from "./extensionController.js";
