@@ -18,6 +18,9 @@ export class FirefoxVPNState {
    */
   enabled = false;
 
+
+  connecting = false;
+
   /**
    * True when the Firefox VPN has been deactivated
    * but the client VPN is connected.
@@ -88,6 +91,7 @@ export class StateFirefoxVPNIdle extends FirefoxVPNState {
 export class StateFirefoxVPNConnecting extends FirefoxVPNState {
   state = "Connecting";
   enabled = false;
+  connecting = true;
   bypassTunnel = false;
   useExitRelays = false;
 }

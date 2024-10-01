@@ -26,6 +26,7 @@ export class VPNCard extends LitElement {
     countryFlag: { type: String },
     stability: { type: String },
     hasContext: { type: Boolean },
+    connecting: { type: Boolean },
   };
 
   constructor() {
@@ -35,6 +36,7 @@ export class VPNCard extends LitElement {
     this.countryFlag = "";
     this.connectedSince = 0;
     this.stability = VPNState.Stable;
+    this.connecting = false;
   }
   #intervalHandle = null;
 
@@ -59,6 +61,7 @@ export class VPNCard extends LitElement {
     const boxClasses = {
       box: true,
       on: this.enabled,
+      connecting: this.connecting,
       unstable: this.enabled && this.stability === VPNState.Unstable,
       noSignal: this.enabled && this.stability === VPNState.NoSignal,
       stable:
@@ -84,27 +87,34 @@ export class VPNCard extends LitElement {
         formatSingle(secs)
       );
     }
-    //console.log(`Connected Since ${this.connectedSince}`)
+
     const time = Date.now() - this.connectedSince;
-    //console.log(`Elapsed Time: ${time}`)
 
     const timeString =
       this.enabled && this.stability === VPNState.Stable
         ? html`<p class="timer">${formatTime(time)}</p>`
         : html``;
-    const vpnHeader = this.enabled ? tr("vpnIsOn") : tr("vpnIsOff");
-
+  
+    const vpnHeader = () => {
+      if (this.enabled) {
+        return tr("vpnIsOn");
+      }
+      if (this.connecting) {
+        return "Connecting...";
+      }
+      return tr("vpnIsOff");
+    };
     return html`
       <div class="${classMap(boxClasses)}">
         <main>
-          ${VPNCard.shield(this.enabled)}
+          ${VPNCard.shield(this.enabled, this.connecting)}
           <div class="infobox">
-            <h1>${vpnHeader}</h1>
+            <h1>${vpnHeader()}</h1>
             ${VPNCard.subline(this.enabled, this.stability)} ${timeString}
           </div>
           <button class="pill" @click=${this.#toggle}></button>
         </main>
-        ${this.enabled ? VPNCard.footer(this.cityName, this.countryFlag) : null}
+        ${this.enabled || this.connecting ? VPNCard.footer(this.cityName, this.countryFlag) : null}
       </div>
     `;
   }
@@ -142,8 +152,8 @@ export class VPNCard extends LitElement {
     }
   }
 
-  static shield(enabled) {
-    if (!enabled) {
+  static shield(enabled, connecting) {
+    if (!enabled && !connecting) {
       return html`
         <svg>
           <use xlink:href="../../assets/img/globe-shield-off.svg#globe"></use>
@@ -174,7 +184,8 @@ export class VPNCard extends LitElement {
       flex-direction: column;
       box-shadow: var(--box-shadow-off);
     }
-    .box.on {
+    .box.on,
+    .box.connecting {
       background: var(--main-card-background);
       box-shadow: var(--box-shadow-on);
     }
@@ -207,8 +218,10 @@ export class VPNCard extends LitElement {
 
     .box * {
       color: var(--text-color-primary);
+      transition: all 0.3s ease;
     }
-    .box.on * {
+    .box.on *,
+    .box.connecting * {
       color: var(--main-card-text-color);
     }
     .box.unstable {
@@ -219,7 +232,8 @@ export class VPNCard extends LitElement {
       --shield-color: var(--color-fatal-error);
       --error-fill: var(--color-fatal-error);
     }
-    .box.stable {
+    .box.stable,
+    .box.connecting {
       --shield-color: var(--color-enabled);
     }
 
@@ -277,14 +291,17 @@ export class VPNCard extends LitElement {
     .pill:active {
       background-color: var(--color-disabled-active);
     }
-    .on .pill {
+    .on .pill,
+    .connecting .pill {
       background-color: var(--color-enabled);
     }
 
+    .connecting .pill:hover,
     .on .pill:hover {
       background-color: var(--color-enabled-hover);
     }
 
+    .connecting .pill:active,
     .on .pill:active {
       background-color: var(--color-enabled-active);
     }
@@ -300,10 +317,20 @@ export class VPNCard extends LitElement {
       top: 3px;
       left: 3px;
       transition: all 0.25s;
-    }
+    } 
+
+    .connecting .pill::before,
     .on .pill::before {
       top: 3px;
       left: 24px;
+    }
+
+    .box.connecting svg,
+    .box.connecting .timer,
+    .connecting .pill,
+    .connecting footer {
+      opacity: .5;
+      transition: opacity 0.3s ease;
     }
   `;
 }
