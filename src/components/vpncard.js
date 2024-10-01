@@ -94,7 +94,7 @@ export class VPNCard extends LitElement {
       this.enabled && this.stability === VPNState.Stable
         ? html`<p class="timer">${formatTime(time)}</p>`
         : html``;
-  
+
     const vpnHeader = () => {
       if (this.enabled) {
         return tr("vpnIsOn");
@@ -114,7 +114,9 @@ export class VPNCard extends LitElement {
           </div>
           <button class="pill" @click=${this.#toggle}></button>
         </main>
-        ${this.enabled || this.connecting ? VPNCard.footer(this.cityName, this.countryFlag) : null}
+        ${this.enabled || this.connecting
+          ? VPNCard.footer(this.cityName, this.countryFlag)
+          : null}
       </div>
     `;
   }
@@ -317,7 +319,7 @@ export class VPNCard extends LitElement {
       top: 3px;
       left: 3px;
       transition: all 0.25s;
-    } 
+    }
 
     .connecting .pill::before,
     .on .pill::before {
@@ -329,7 +331,7 @@ export class VPNCard extends LitElement {
     .box.connecting .timer,
     .connecting .pill,
     .connecting footer {
-      opacity: .5;
+      opacity: 0.5;
       transition: opacity 0.3s ease;
     }
   `;

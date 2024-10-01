@@ -18,7 +18,6 @@ export class FirefoxVPNState {
    */
   enabled = false;
 
-
   connecting = false;
 
   /**
