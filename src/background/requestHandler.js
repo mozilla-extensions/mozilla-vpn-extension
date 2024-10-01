@@ -31,7 +31,7 @@ export class RequestHandler extends Component {
     this.localProxyInfo = [];
     this.currentExitRelays = [];
     this.defaultProxyInfo = ProxyUtils.getDirectProxyInfoObject();
-    self=this;
+    self = this;
 
     /** @type {FirefoxVPNState | undefined} */
     this.extState = {};
