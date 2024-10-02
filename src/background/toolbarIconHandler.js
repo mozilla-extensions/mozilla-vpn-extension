@@ -39,14 +39,25 @@ export class ToolbarIconHandler extends Component {
       .addEventListener("change", (e) => {
         this.maybeUpdateBrowserActionIcon();
       });
+
+    browser.windows.onFocusChanged.addListener(
+      this.maybeUpdateBrowserActionIcon.bind(this)
+    );
+
+    browser.windows.onCreated.addListener(this.maybeUpdateBrowserActionIcon.bind(this));
   }
 
-  maybeUpdateBrowserActionIcon() {
-    const scheme =
+  async maybeUpdateBrowserActionIcon() {
+    const windowInfo = await browser.windows.getCurrent();
+    if (!windowInfo) {
+      return;
+    }
+
+    const darkMode =
       window.matchMedia &&
-      !!window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "light"
-        : "dark";
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+    const scheme = darkMode || windowInfo.incognito ? "light" : "dark";
 
     const status = ["Connecting", "Enabled"].includes(this.extState.state)
       ? "enabled"
@@ -57,6 +68,7 @@ export class ToolbarIconHandler extends Component {
         16: `./../assets/logos/browserAction/logo-${scheme}-${status}.svg`,
         32: `./../assets/logos/browserAction/logo-${scheme}-${status}.svg`,
       },
+      windowId: windowInfo.id,
     });
   }
 }

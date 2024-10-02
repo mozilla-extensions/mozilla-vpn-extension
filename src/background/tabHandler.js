@@ -66,6 +66,9 @@ export class TabHandler extends Component {
 
   async maybeShowIcon() {
     const currentTab = await Utils.getCurrentTab();
+    if (!currentTab) {
+      return
+    }
     if (this.extState.state !== "Enabled") {
       return browser.pageAction.hide(currentTab.id);
     }
