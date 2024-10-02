@@ -34,7 +34,7 @@ export class VPNState {
   // True if it is authenticated
   authenticated = false;
   // Can be "Stable", "Unstable", "NoSignal"
-  connectionStability = "Stable";
+  connectionHealth = "Stable";
   /**
    * A socks:// url to connect to
    * to bypass the vpn.

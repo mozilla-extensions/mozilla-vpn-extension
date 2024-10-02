@@ -19,17 +19,25 @@ export class ToolbarIconHandler extends Component {
    * @param {*} receiver
    * @param {ExtensionController} extController
    */
-  constructor(receiver, extController) {
+  constructor(receiver, extController, vpnController) {
     super(receiver);
     this.extController = extController;
+    this.vpnController = vpnController;
   }
 
   /** @type {FirefoxVPNState | undefined} */
   extState;
 
+  vpnState;
+
   async init() {
     this.extController.state.subscribe((s) => {
       this.extState = s;
+      this.maybeUpdateBrowserActionIcon();
+    });
+
+    this.vpnController.state.subscribe((s) => {
+      this.vpnState = s;
       this.maybeUpdateBrowserActionIcon();
     });
 
@@ -40,13 +48,26 @@ export class ToolbarIconHandler extends Component {
         this.maybeUpdateBrowserActionIcon();
       });
 
+    // Catch changes between private and non-private browsing windows
     browser.windows.onFocusChanged.addListener(
       this.maybeUpdateBrowserActionIcon.bind(this)
     );
 
+    // Catch changes between private and non-private browsing modes
+    // when a new window is opened.
     browser.windows.onCreated.addListener(
       this.maybeUpdateBrowserActionIcon.bind(this)
     );
+  }
+
+  setIcon(scheme, status, id) {
+    browser.browserAction.setIcon({
+      path: {
+        16: `./../assets/logos/browserAction/logo-${scheme}-${status}.svg`,
+        32: `./../assets/logos/browserAction/logo-${scheme}-${status}.svg`,
+      },
+      windowId: id,
+    });
   }
 
   async maybeUpdateBrowserActionIcon() {
@@ -61,16 +82,18 @@ export class ToolbarIconHandler extends Component {
 
     const scheme = darkMode || windowInfo.incognito ? "light" : "dark";
 
-    const status = ["Connecting", "Enabled"].includes(this.extState.state)
+    let status = ["Connecting", "Enabled"].includes(this.extState.state)
       ? "enabled"
       : "disabled";
 
-    browser.browserAction.setIcon({
-      path: {
-        16: `./../assets/logos/browserAction/logo-${scheme}-${status}.svg`,
-        32: `./../assets/logos/browserAction/logo-${scheme}-${status}.svg`,
-      },
-      windowId: windowInfo.id,
-    });
+    const stability = this.vpnState?.connectionHealth;
+
+    if (!stability || stability == "Stable") {
+      return this.setIcon(scheme, status, windowInfo.id);
+    }
+
+    status = stability === "Unstable" ? "unstable" : "disabled";
+
+    return this.setIcon(scheme, status, windowInfo.id);
   }
 }

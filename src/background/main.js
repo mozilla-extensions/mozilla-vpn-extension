@@ -30,9 +30,14 @@ class Main {
     this.proxyHandler
   );
   tabHandler = new TabHandler(this, this.extController, this.proxyHandler);
-  toolbarIconHandler = new ToolbarIconHandler(this, this.extController);
+  toolbarIconHandler = new ToolbarIconHandler(
+    this,
+    this.extController,
+    this.vpnController
+  );
+  
   tabReloader = new TabReloader(this, this.extController, this.proxyHandler);
-
+  
   async init() {
     log("Hello from the background script!");
 
