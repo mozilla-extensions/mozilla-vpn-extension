@@ -175,7 +175,7 @@ export class BrowserActionPopup extends LitElement {
               .cityName=${this.vpnState?.exitServerCity?.name}
               .countryFlag=${this.vpnState?.exitServerCountry?.code}
               .connectedSince=${this.vpnState?.connectedSince}
-              .stability=${this.vpnState?.connectionStability}
+              .stability=${this.vpnState?.connectionHealth}
               .hasContext=${this._siteContext}
               .connecting=${this.extState?.connecting}
             ></vpn-card>
