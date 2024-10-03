@@ -13,7 +13,7 @@ import { ProxyHandler, ProxyUtils } from "./proxyHandler/index.js";
 import { propertySum } from "../shared/property.js";
 
 const log = Logger.logger("RequestHandler");
-
+let self;
 /**
  * Handles request interception, inspection, and determines whether a request should be proxied.
  *
@@ -31,6 +31,7 @@ export class RequestHandler extends Component {
     this.localProxyInfo = [];
     this.currentExitRelays = [];
     this.defaultProxyInfo = ProxyUtils.getDirectProxyInfoObject();
+    self = this;
 
     /** @type {FirefoxVPNState | undefined} */
     this.extState = {};
@@ -55,8 +56,6 @@ export class RequestHandler extends Component {
   }
 
   updateProxyInfoFromClient(localProxy, exitRelays) {
-    console.log(`Updating proxy info`);
-
     this.localProxyInfo = localProxy;
     this.currentExitRelay = exitRelays;
 
@@ -99,13 +98,13 @@ export class RequestHandler extends Component {
   }
 
   addRequestListener() {
-    if (this.active) {
+    if (browser.proxy.onRequest.hasListener(this.interceptRequests)) {
       return;
     }
     console.log(
       `Starting listening for requests, active rules ${this.proxyMap.size}`
     );
-    browser.proxy.onRequest.addListener(this.interceptRequests.bind(this), {
+    browser.proxy.onRequest.addListener(this.interceptRequests, {
       urls: ["<all_urls>"],
     });
     this.active = true;
@@ -113,13 +112,9 @@ export class RequestHandler extends Component {
   }
 
   removeRequestListener() {
-    if (!this.active) {
-      return;
-    }
     console.log("Removing request listener");
-    const ok = browser.proxy.onRequest.removeListener(this.interceptRequests);
+    browser.proxy.onRequest.removeListener(this.interceptRequests);
     this.active = false;
-    return ok;
   }
 
   proxyAllReqsByDefault() {
@@ -134,8 +129,8 @@ export class RequestHandler extends Component {
    * @returns {browser.proxy.proxyInfo | undefined} Proxy information for the request, or undefined for default.
    */
   async interceptRequests(requestInfo) {
-    if (this.extState.bypassTunnel) {
-      return this.localProxyInfo;
+    if (self.extState.bypassTunnel) {
+      return self.localProxyInfo;
     }
 
     let { documentUrl, url } = requestInfo;
@@ -151,7 +146,7 @@ export class RequestHandler extends Component {
     for (let urlString of [documentUrl, url]) {
       if (urlString) {
         const parsedHostname = Utils.getFormattedHostname(urlString);
-        const proxyInfo = this.proxyMap.get(parsedHostname);
+        const proxyInfo = self.proxyMap.get(parsedHostname);
         if (proxyInfo) {
           return proxyInfo;
         }
@@ -159,7 +154,7 @@ export class RequestHandler extends Component {
     }
 
     // No custom proxy for the site, return default connection
-    return this.defaultProxyInfo;
+    return self.defaultProxyInfo;
   }
 }
 
