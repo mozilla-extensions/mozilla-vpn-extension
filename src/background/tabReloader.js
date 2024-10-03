@@ -34,17 +34,21 @@ export class TabReloader extends Component {
     this.proxyHandler = proxyHandler;
     this.extController = extController;
   }
-  
+
   async init() {
     this.proxyHandler.lastChangedOrigin.subscribe(TabReloader.onOriginChanged);
-    this.extController.state.subscribe((s) => { TabReloader.onExtensionStateChanged(s)
+    this.extController.state.subscribe((s) => {
+      TabReloader.onExtensionStateChanged(s);
     });
   }
 
   currentExtState;
 
   static async onExtensionStateChanged(extState) {
-    if (this.currentExtState == extState.state || !["Enabled", "Disabled"].includes(extState.state)) {
+    if (
+      this.currentExtState == extState.state ||
+      !["Enabled", "Disabled"].includes(extState.state)
+    ) {
       return;
     }
     this.currentExtState = extState.state;
@@ -56,7 +60,9 @@ export class TabReloader extends Component {
       // If discarded, the next activation will reload it anyway.
       discarded: false,
     });
-    const relevantTabs = origin ? loadedTabs.filter(TabReloader.matches(origin)) : loadedTabs;
+    const relevantTabs = origin
+      ? loadedTabs.filter(TabReloader.matches(origin))
+      : loadedTabs;
     if (relevantTabs.length == 0) {
       return;
     }
@@ -67,7 +73,6 @@ export class TabReloader extends Component {
       browser.tabs.reload(tab.id);
     });
   }
-
 
   /**
    * Checks if a tab matches an hostname
