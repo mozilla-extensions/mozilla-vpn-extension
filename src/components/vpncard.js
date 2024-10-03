@@ -102,7 +102,12 @@ export class VPNCard extends LitElement {
           ${VPNCard.shield(this.enabled)}
           <div class="infobox">
             <h1>${vpnHeader}</h1>
-            ${VPNCard.subline(this.enabled, this.stability, this.clientConnected)} ${timeString}
+            ${VPNCard.subline(
+              this.enabled,
+              this.stability,
+              this.clientConnected
+            )}
+            ${timeString}
           </div>
           <button class="pill" @click=${this.#toggle}></button>
         </main>
@@ -126,7 +131,9 @@ export class VPNCard extends LitElement {
 
   static subline(enabled, stability, clientIsConnected) {
     if (!enabled) {
-      return clientIsConnected ? html`<p class="subline ext-is-off">${tr("extensionVpnIsOff")}</p>` : null;
+      return clientIsConnected
+        ? html`<p class="subline ext-is-off">${tr("extensionVpnIsOff")}</p>`
+        : null;
     }
     const errorSvg = html`
       <svg>
