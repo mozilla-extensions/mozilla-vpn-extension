@@ -44,7 +44,9 @@ export class ToolbarIconHandler extends Component {
       this.maybeUpdateBrowserActionIcon.bind(this)
     );
 
-    browser.windows.onCreated.addListener(this.maybeUpdateBrowserActionIcon.bind(this));
+    browser.windows.onCreated.addListener(
+      this.maybeUpdateBrowserActionIcon.bind(this)
+    );
   }
 
   async maybeUpdateBrowserActionIcon() {
