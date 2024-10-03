@@ -21,6 +21,7 @@ import { VPNState } from "../background/vpncontroller/states.js";
 export class VPNCard extends LitElement {
   static properties = {
     enabled: { type: Boolean },
+    clientConnected: { type: Boolean },
     connectedSince: { type: Date },
     cityName: { type: String },
     countryFlag: { type: String },
@@ -31,6 +32,7 @@ export class VPNCard extends LitElement {
   constructor() {
     super();
     this.enabled = false;
+    this.clientConnected = false;
     this.cityName = "";
     this.countryFlag = "";
     this.connectedSince = 0;
@@ -100,7 +102,12 @@ export class VPNCard extends LitElement {
           ${VPNCard.shield(this.enabled)}
           <div class="infobox">
             <h1>${vpnHeader}</h1>
-            ${VPNCard.subline(this.enabled, this.stability)} ${timeString}
+            ${VPNCard.subline(
+              this.enabled,
+              this.stability,
+              this.clientConnected
+            )}
+            ${timeString}
           </div>
           <button class="pill" @click=${this.#toggle}></button>
         </main>
@@ -122,9 +129,11 @@ export class VPNCard extends LitElement {
     `;
   }
 
-  static subline(enabled, stability) {
+  static subline(enabled, stability, clientIsConnected) {
     if (!enabled) {
-      return null;
+      return clientIsConnected
+        ? html`<p class="subline ext-is-off">${tr("extensionVpnIsOff")}</p>`
+        : null;
     }
     const errorSvg = html`
       <svg>
@@ -231,6 +240,7 @@ export class VPNCard extends LitElement {
       line-height: 24px;
       font-family: "Inter Semi Bold";
     }
+
     p {
       font-size: 14px;
       line-height: 21px;
@@ -241,6 +251,13 @@ export class VPNCard extends LitElement {
     .subline {
       margin-block-start: calc(var(--default-padding) / 2);
     }
+
+    .ext-is-off {
+      margin-inline-end: var(--default-padding);
+      margin-block-start: calc(var(--default-padding) / 4);
+      font-size: 12px;
+    }
+
     .subline svg {
       width: 14px;
       height: 14px;
@@ -260,6 +277,7 @@ export class VPNCard extends LitElement {
       transition: all 3s;
       margin-right: var(--default-padding);
     }
+
     .pill {
       width: 45px;
       height: 24px;

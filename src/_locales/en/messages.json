@@ -61,6 +61,10 @@
     "message": "VPN protection for Firefox is off",
     "description": "Header to signal that VPN connection is disabled"
   },
+  "extensionVpnIsOff": {
+    "message": "Protection for Firefox is off, even if your desktop VPN is on.",
+    "description": "Popup subtitle when the extension VPN is off, but the client VPN is on."
+  },
   "vpnOffStatus": {
     "message": "OFF",
     "description": "Label indicating that the VPN is off."
