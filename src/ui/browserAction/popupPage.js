@@ -177,6 +177,7 @@ export class BrowserActionPopup extends LitElement {
               .connectedSince=${this.vpnState?.connectedSince}
               .stability=${this.vpnState?.connectionStability}
               .hasContext=${this._siteContext}
+              .connecting=${this.extState?.connecting}
             ></vpn-card>
             ${this.locationSettings()}
           </main>
@@ -244,7 +245,7 @@ export class BrowserActionPopup extends LitElement {
       ctx?.cityCode,
       this.servers
     );
-    console.log(serverListSelectedCity);
+
     const serverListElement = BrowserActionPopup.createServerList(
       serverListSelectedCity,
       this.servers,
