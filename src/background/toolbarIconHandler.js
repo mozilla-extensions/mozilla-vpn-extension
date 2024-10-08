@@ -8,7 +8,6 @@ import {
   FirefoxVPNState,
 } from "./extensionController/index.js";
 
-
 /**
  * ToolbarIconHandler updates the browserAction (toolbar) icon
  * to reflect the VPN client's status and updates the icon in
@@ -23,7 +22,7 @@ export class ToolbarIconHandler extends Component {
   constructor(receiver, extController, vpnController) {
     super(receiver);
     this.extController = extController;
-    this.vpnController = vpnController
+    this.vpnController = vpnController;
   }
 
   /** @type {FirefoxVPNState | undefined} */
@@ -39,7 +38,7 @@ export class ToolbarIconHandler extends Component {
 
     this.vpnController.state.subscribe((s) => {
       this.vpnState = s;
-      this.maybeUpdateBrowserActionIcon()
+      this.maybeUpdateBrowserActionIcon();
     });
 
     // Listen for darkmode/lightmode changes and update the browserAction icon
@@ -66,11 +65,10 @@ export class ToolbarIconHandler extends Component {
         ? "light"
         : "dark";
 
-        
-        let status = ["Connecting", "Enabled"].includes(this.extState.state)
-        ? "enabled"
-        : "disabled";
-        
+    let status = ["Connecting", "Enabled"].includes(this.extState.state)
+      ? "enabled"
+      : "disabled";
+
     const stability = this.vpnState?.connectionHealth;
 
     if (!stability || stability == "Stable") {
