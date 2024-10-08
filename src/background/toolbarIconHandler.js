@@ -19,17 +19,25 @@ export class ToolbarIconHandler extends Component {
    * @param {*} receiver
    * @param {ExtensionController} extController
    */
-  constructor(receiver, extController) {
+  constructor(receiver, extController, vpnController) {
     super(receiver);
     this.extController = extController;
+    this.vpnController = vpnController;
   }
 
   /** @type {FirefoxVPNState | undefined} */
   extState;
 
+  vpnState;
+
   async init() {
     this.extController.state.subscribe((s) => {
       this.extState = s;
+      this.maybeUpdateBrowserActionIcon();
+    });
+
+    this.vpnController.state.subscribe((s) => {
+      this.vpnState = s;
       this.maybeUpdateBrowserActionIcon();
     });
 
@@ -41,6 +49,15 @@ export class ToolbarIconHandler extends Component {
       });
   }
 
+  setIcon(scheme, status) {
+    browser.browserAction.setIcon({
+      path: {
+        16: `./../assets/logos/browserAction/logo-${scheme}-${status}.svg`,
+        32: `./../assets/logos/browserAction/logo-${scheme}-${status}.svg`,
+      },
+    });
+  }
+
   maybeUpdateBrowserActionIcon() {
     const scheme =
       window.matchMedia &&
@@ -48,15 +65,18 @@ export class ToolbarIconHandler extends Component {
         ? "light"
         : "dark";
 
-    const status = ["Connecting", "Enabled"].includes(this.extState.state)
+    let status = ["Connecting", "Enabled"].includes(this.extState.state)
       ? "enabled"
       : "disabled";
 
-    browser.browserAction.setIcon({
-      path: {
-        16: `./../assets/logos/browserAction/logo-${scheme}-${status}.svg`,
-        32: `./../assets/logos/browserAction/logo-${scheme}-${status}.svg`,
-      },
-    });
+    const stability = this.vpnState?.connectionHealth;
+
+    if (!stability || stability == "Stable") {
+      return this.setIcon(scheme, status);
+    }
+
+    status = stability === "Unstable" ? "unstable" : "disabled";
+
+    return this.setIcon(scheme, status);
   }
 }
