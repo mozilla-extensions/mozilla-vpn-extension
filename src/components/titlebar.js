@@ -53,6 +53,7 @@ export class TitleBar extends LitElement {
       font-family: "Inter Semi Bold";
       grid-column: 2/3;
       font-weight: normal;
+      color: var(--text-color-headline);
     }
     nav {
       display: grid;
