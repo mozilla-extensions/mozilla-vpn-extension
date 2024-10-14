@@ -73,7 +73,7 @@ export class TabHandler extends Component {
       return browser.pageAction.hide(currentTab.id);
     }
 
-    this.currentHostname = await Utils.getFormattedHostname(currentTab.url);
+    this.currentHostname = await Utils.getDomainName(currentTab.url);
     this.currentContext = this.siteContexts.get(this.currentHostname);
 
     if (this.currentContext && this.currentContext.excluded) {
