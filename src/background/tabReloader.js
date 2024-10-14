@@ -85,7 +85,7 @@ export class TabReloader extends Component {
       if (hostname === "") {
         return false;
       }
-      const tabURL = Utils.getFormattedHostname(tab.url);
+      const tabURL = Utils.getTopLevelDomain(tab.url);
       return tabURL === hostname;
     };
   }
