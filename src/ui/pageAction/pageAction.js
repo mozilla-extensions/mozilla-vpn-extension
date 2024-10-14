@@ -73,28 +73,22 @@ export class PageActionPopup extends LitElement {
       proxyHandler.removeContextForOrigin(this._siteContext.origin);
     };
 
-    const resetButtonClasses = () => {
-      return excluded ? "primary" : "secondary";
-    };
-
     const resetButtonContent = () => {
       return excluded ? "Turn on" : "Remove custom location";
     };
 
     return html`
-      <h1>${tr("productName")}</h1>
-      <p id="context-description">${contextDescriptionText()}</p>
+      <div class="wrapper">
+        <h1>${tr("productName")}</h1>
+        <p id="context-description">${contextDescriptionText()}</p>
 
-      <div class="flex">
-        <img id="context-img" src="${getSrc()}" />
-        <p id="context-location">${getLocationText()}</p>
+        <div class="flex line-height">
+          <img id="context-img" src="${getSrc()}" />
+          <p id="context-location">${getLocationText()}</p>
+        </div>
       </div>
       <div class="flex">
-        <button
-          class="${resetButtonClasses()}"
-          id="removeContext"
-          @click="${removeContext}"
-        >
+        <button id="removeContext" @click="${removeContext}">
           ${resetButtonContent()}
         </button>
       </div>
@@ -106,11 +100,19 @@ export class PageActionPopup extends LitElement {
 
     h1 {
       font-size: 13px;
-      margin-block: 0px 0.5rem;
-      padding-block-end: 1rem;
-      text-align: center;
-      border-bottom: 1px solid rgb(173, 173, 173, 0.8);
-      font-family: "Inter Semi Bold";
+      margin-block: 0px;
+      font-weight: normal;
+      font-family: "Inter Regular";
+      color: var(--grey40);
+      line-height: 21px;
+    }
+
+    .wrapper {
+      padding: 16px;
+    }
+
+    .line-height {
+      block-size: 21px;
     }
 
     .flex {
@@ -122,8 +124,8 @@ export class PageActionPopup extends LitElement {
     }
 
     #context-img {
-      margin-inline-end: 0.5rem;
-      block-size: 1rem;
+      margin-inline-end: 8px;
+      inline-size: 16px;
       margin-block: auto;
     }
 
@@ -132,43 +134,42 @@ export class PageActionPopup extends LitElement {
     } */
 
     p {
-      margin-block: 0.5rem;
+      margin-block: auto;
+      font-size: 13px;
     }
 
     button {
-      margin-block-start: 1rem;
-      margin-inline: auto 0;
-      padding: 4px 16px;
+      margin-block: 8px;
+      margin-inline: 8px;
+      padding: 4px 8px;
       min-block-size: 32px;
       border-radius: 4px;
       border: none;
-      background: none;
+      background: rgba(255, 255, 255, 0);
+      width: 100%;
+      position: relative;
+      font-size: 13px;
+      text-align: left;
+      color: var(--button-secondary-text-color);
       transition: background 0.1s ease;
     }
 
-    .primary {
-      background: var(--button-primary-bg-default);
-      color: var(--button-primary-text-color);
+    button::before {
+      content: "";
+      height: 1px;
+      width: 100%;
+      position: absolute;
+      top: -8px;
+      left: 0;
+      right: 0;
+      background-color: #c4c3c5;
     }
 
-    .primary:hover {
-      background: var(--button-primary-bg-hover);
-    }
-
-    .primary:active {
-      background: var(--button-primary-bg-active);
-    }
-
-    .secondary {
-      background: var(--button-secondary-bg-default);
-      color: var(--button-secondary-text-color);
-    }
-
-    .secondary:hover {
+    button:hover {
       background: var(--button-secondary-bg-hover);
     }
 
-    .secondary:active {
+    button:active {
       background: var(--button-secondary-bg-active);
     }
   `;
