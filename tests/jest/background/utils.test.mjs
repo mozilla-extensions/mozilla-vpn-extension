@@ -29,19 +29,19 @@ describe("Utils", () => {
     mockSet.mockClear();
   });
 
-  describe("getFormattedHostName", () => {
+  describe("getTopLevelDomain", () => {
     test("Returns a formatted hostname when given a url", () => {
-      const result = Utils.getFormattedHostname("www.mozilla.org");
+      const result = Utils.getTopLevelDomain("www.mozilla.org");
       expect(result).toBe("www.mozilla.org");
     });
     test("Removes reader prefixes from the url", () => {
-      const result = Utils.getFormattedHostname(
+      const result = Utils.getTopLevelDomain(
         "about:reader?url=https://firefox.com"
       );
       expect(result).toBe("firefox.com");
     });
     test("Returns the string if the string is not a valid url", () => {
-      const result = Utils.getFormattedHostname("about:debugging");
+      const result = Utils.getTopLevelDomain("about:debugging");
       expect(result).toBe("about:debugging");
     });
   });
