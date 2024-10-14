@@ -217,7 +217,7 @@ export class BrowserActionPopup extends LitElement {
       return html`
         <p class="text-secondary">
           ${parts.at(0)}
-          <span class="bold">${origin}</span>
+          <span class="origin bold">${origin}</span>
           ${parts.at(-1)}
         </p>
       `;
@@ -427,6 +427,11 @@ export class BrowserActionPopup extends LitElement {
     vpn-card {
       display: block;
       margin-bottom: calc(var(--padding-default) * 1);
+    }
+
+    .origin.bold {
+      word-break: break-word;
+      max-width: 260px;
     }
 
     h1,
