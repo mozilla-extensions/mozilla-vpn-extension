@@ -21,6 +21,7 @@ import {
   ghostButtonStyles,
   resetSizing,
   inUseLabel,
+  positioner,
 } from "../../components/styles.js";
 
 // Other components used
@@ -295,11 +296,14 @@ export class BrowserActionPopup extends LitElement {
           .disabled=${live(siteContext.excluded)}
           @click=${openServerList}
         >
-          <img
-            src="../../assets/flags/${siteContext.countryCode.toUpperCase()}.png"
-            height="16"
-            width="16"
-          />
+          <div class="positioner">
+            <img
+              src="../../assets/flags/${siteContext.countryCode.toUpperCase()}.png"
+              height="16"
+              width="16"
+              class="flag"
+            />
+          </div>
           <p class="text-secondary">${getNameForContext(siteContext)}</p>
           ${hasSiteContext && !siteContext.excluded
             ? html`<span class="in-use in-use-light"> In Use </span>`
@@ -317,11 +321,13 @@ export class BrowserActionPopup extends LitElement {
     return html`
       <h1>${tr("titlePageSettings")}</h1>
       <div class="row">
-        <input
-          type="checkbox"
-          .checked=${live(siteContext.excluded)}
-          @click=${toggleExcluded}
-        />
+        <div class="positioner checkbox-positioner">
+          <input
+            type="checkbox"
+            .checked=${live(siteContext.excluded)}
+            @click=${toggleExcluded}
+          />
+        </div>
         ${getExclusionStringElem(siteContext.origin)}
       </div>
       ${pageLocationPicker}
@@ -369,7 +375,7 @@ export class BrowserActionPopup extends LitElement {
   }
 
   static styles = css`
-    ${fontStyling}${resetSizing}${ghostButtonStyles}${inUseLabel}
+    ${fontStyling}${resetSizing}${ghostButtonStyles}${inUseLabel}${positioner}
     section {
       background-color: var(--panel-bg-color);
     }
@@ -377,6 +383,10 @@ export class BrowserActionPopup extends LitElement {
     main {
       padding: var(--padding-default) var(--padding-default) 0
         var(--padding-default);
+    }
+
+    .positioner.checkbox-positioner {
+      margin-block: 0px auto;
     }
 
     * {
@@ -390,16 +400,16 @@ export class BrowserActionPopup extends LitElement {
       align-items: center;
     }
 
-    .row img:first-child {
-      margin: auto 12px auto 0px;
-    }
-
     .in-use {
       margin: auto auto auto 8px;
     }
 
-    .row img:last-of-type {
+    .arrow {
       margin: auto 0 auto auto;
+    }
+
+    .flag {
+      margin: auto;
     }
 
     #selectPageLocation {
@@ -429,15 +439,18 @@ export class BrowserActionPopup extends LitElement {
       margin-bottom: calc(var(--padding-default) * 1);
     }
 
-    h1,
+    h1 {
+      margin-block: 0px important!;
+      padding-block: 8px 16px !important;
+    }
+
     h3 {
-      margin-top: calc(var(--padding-default) / 2);
-      margin-bottom: calc(var(--padding-default) / 2);
+      margin-block: calc(var(--padding-default) / 2) 0px;
     }
 
     h2 {
       margin-block-start: var(--padding-default);
-      margin-block-end: calc(var(--padding-default) / 4);
+      margin-block-end: 0px !important;
     }
 
     input {
@@ -445,8 +458,8 @@ export class BrowserActionPopup extends LitElement {
       height: 20px;
       border: 1px solid var(--border-color);
       background-color: var(--panel-bg-color);
-      margin-block: 0 auto;
     }
+
     input + p {
       margin-left: var(--padding-default);
     }

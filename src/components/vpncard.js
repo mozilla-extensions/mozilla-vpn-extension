@@ -10,7 +10,7 @@ import {
   styleMap,
 } from "../vendor/lit-all.min.js";
 import { tr } from "../shared/i18n.js";
-import { resetSizing, fontStyling } from "./styles.js";
+import { resetSizing, fontStyling, positioner } from "./styles.js";
 
 import { VPNState } from "../background/vpncontroller/states.js";
 
@@ -131,11 +131,13 @@ export class VPNCard extends LitElement {
   static footer(name, countryFlag) {
     return html`
       <footer>
-        <img
-          src="../../assets/flags/${countryFlag.toUpperCase()}.png"
-          width="16"
-          height="16"
-        />
+        <div class="positioner">
+          <img
+            src="../../assets/flags/${countryFlag.toUpperCase()}.png"
+            width="16"
+            height="16"
+          />
+        </div>
         <p>${name}</p>
       </footer>
     `;
@@ -179,7 +181,7 @@ export class VPNCard extends LitElement {
   }
 
   static styles = css`
-    ${resetSizing}${fontStyling}
+    ${resetSizing}${fontStyling}${positioner}
 
     :host {
       font-size: 1rem;
@@ -206,9 +208,6 @@ export class VPNCard extends LitElement {
       align-items: center;
       width: 100%;
       justify-content: baseline;
-    }
-    footer img {
-      margin-right: 12px;
     }
     main {
       justify-content: space-between;
@@ -259,11 +258,13 @@ export class VPNCard extends LitElement {
 
     p {
       font-size: 14px;
-      line-height: 21px;
+      line-height: 18px;
       opacity: 0.7;
     }
 
-    .timer,
+    .timer {
+      margin-block-start: calc(var(--default-padding) / 4);
+    }
     .subline {
       margin-block-start: calc(var(--default-padding) / 2);
     }

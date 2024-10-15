@@ -32,7 +32,7 @@
 
 :root {
   --window-width: 352px;
-  --window-max-height: 468px;
+  --window-max-height: 482px;
   --font-family: "Inter Regular";
   --font-family-semi-bold: "Inter Semi Bold";
   --font-family-bold: "Inter Bold";
@@ -51,8 +51,9 @@
   --grey30: #9e9e9e;
   --grey40: #6d6d6e;
   --grey50: #3d3d3d;
+  --grey60: #0c0c0d;
   --main-card-background: #321c64;
-  --main-card-text-color: white;
+  --main-card-text-color: #ffffff;
   --main-card--pill-background: lch(
     from var(--main-card-background) calc(l + 15) c h
   );
@@ -73,8 +74,9 @@
     --panel-bg-color: #2b2a33;
     --border-color: lch(from var(--panel-bg-color) calc(l + 15) c h);
     --text-secondary-color: rbga(255, 255, 255, 0.6);
-    --text-color-primary: white;
-    --text-color-invert: #3d3d3d;
+    --text-color-primary: #ffffff;
+    --text-color-headline: #ffffff;
+    --text-color-invert: var(--grey50);
     --button-ghost-bg-color: #ffffff;
     --divider-color: lch(from var(--color-divider) l c h / 0.2);
   }
@@ -87,10 +89,11 @@
         firefox "light" theme, otherwise it looks wierd
         **/
     --panel-bg-color: #f9f9fb;
-    --text-color-primary: #3d3d3d;
-    --text-color-invert: white;
+    --text-color-primary: var(--grey50);
+    --text-color-headline: var(--grey60);
+    --text-color-invert: #ffffff;
     --border-color: lch(from var(--panel-bg-color) calc(l - 15) c h / 0.3);
-    --button-ghost-bg-color: #3d3d3d;
+    --button-ghost-bg-color: var(--grey50);
     --input-border: #8f8f9d;
   }
 }

@@ -171,6 +171,17 @@ export const ghostButtonStyles = css`
   }
 `;
 
+export const positioner = css`
+  .positioner {
+    inline-size: 24px;
+    block-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-inline-end: 8px;
+  }
+`;
+
 export const inUseLabel = css`
   .in-use {
     font-size: 11px;
