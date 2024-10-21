@@ -209,7 +209,7 @@ export class BrowserActionPopup extends LitElement {
 
     const getExclusionStringElem = (origin) => {
       const originPlaceholder = "dummyString";
-      const localizedString = tr("exludePageFor", originPlaceholder);
+      const localizedString = tr("excludePageFor", originPlaceholder);
       // Create a new <p> element
       const el = document.createElement("p");
 
