@@ -94,9 +94,7 @@ defineMessageScreen(
   "open-mozilla-vpn-message-screen",
   "message-open.svg",
   tr("headerOpenMozillaVPN"),
-  html`
-    <p>${tr("bodyOpenMsg")}</p>
-  `,
+  html` <p>${tr("bodyOpenMsg")}</p> `,
   null,
   null
 );

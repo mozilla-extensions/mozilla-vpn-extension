@@ -88,7 +88,7 @@ export class MessageScreen extends LitElement {
     ${fontStyling}
     :host {
       --min-block-size: 521px;
-     /* prevent the panel from shrinking vertically when there isn't as much content */
+      /* prevent the panel from shrinking vertically when there isn't as much content */
       min-block-size: var(--min-block-size);
     }
     :host,
@@ -152,7 +152,7 @@ export class MessageScreen extends LitElement {
       font-size: 14px;
       font-style: normal;
       line-height: 22px;
-      color: #6D6D6E;
+      color: #6d6d6e;
     }
 
     ::slotted(.footnote) {
@@ -177,9 +177,8 @@ export class MessageScreen extends LitElement {
       block-size: 40px;
     }
     p {
-      color: #6D6D6E;
+      color: #6d6d6e;
     }
-
   `;
 }
 customElements.define("message-screen", MessageScreen);
