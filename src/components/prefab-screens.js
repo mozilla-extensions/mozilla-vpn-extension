@@ -60,7 +60,7 @@ defineMessageScreen(
   tr("bodySubscribeNow"),
   tr("btnSubscribeNow"),
   () => {
-    open("https://www.mozilla.org/products/vpn");
+    open("https://www.mozilla.org/products/vpn#pricing");
   }
 );
 
