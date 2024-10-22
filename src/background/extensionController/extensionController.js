@@ -36,6 +36,7 @@ export class ExtensionController extends Component {
   constructor(receiver, vpnController) {
     super(receiver);
     this.vpnController = vpnController;
+    this.clientState = vpnController.state.value;
     /** @type {FirefoxVPNState} */
     this.#mState.value = new StateFirefoxVPNIdle();
     this.vpnController.state.subscribe(
@@ -64,7 +65,7 @@ export class ExtensionController extends Component {
     // We are turning the extension on...
     if (this.clientState.state == "Enabled") {
       // Client is already enabled
-      this.#mState.set(new StateFirefoxVPNEnabled(false));
+      this.#mState.set(new StateFirefoxVPNEnabled(false, Date.now()));
       return;
     }
 
@@ -86,25 +87,28 @@ export class ExtensionController extends Component {
     const currentExtState = this.#mState.value;
     this.clientState = newClientState;
 
+    const maybeSet = (s = new FirefoxVPNState()) => {
+      // Check if it is a meaningful change, otherwise don't propagate
+      // a statechange.
+      if (s.constructor == currentExtState.constructor) {
+        return;
+      }
+      this.#mState.set(s);
+    };
+
     switch (newClientState.state) {
       case "Enabled":
-        if (!currentExtState.bypassTunnel) {
-          this.#mState.set(new StateFirefoxVPNEnabled(false));
-        }
-        break;
-
+        maybeSet(new StateFirefoxVPNEnabled(false, Date.now()));
+        return;
       case "Disabled":
-        this.#mState.set(new StateFirefoxVPNDisabled(false));
-        break;
-
+        maybeSet(new StateFirefoxVPNDisabled(false));
+        return;
       case "OnPartial":
-        this.#mState.set(new StateFirefoxVPNEnabled(true));
-        break;
-
+        maybeSet(new StateFirefoxVPNEnabled(true, Date.now()));
+        return;
       default:
-        this.#mState.set(new StateFirefoxVPNIdle());
+        maybeSet(new StateFirefoxVPNIdle());
     }
-    return;
   }
 
   #mState = property(new FirefoxVPNState());

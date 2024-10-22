@@ -306,12 +306,6 @@ export function fromVPNStatusResponse(
 
   //
   const controllerState = status.vpn;
-  const connectedSince = (() => {
-    if (!status.connectedSince) {
-      return 0;
-    }
-    return parseInt(status.connectedSince);
-  })();
   const exit_city_name = status.location["exit_city_name"];
   const exit_country_code = status.location["exit_country_code"];
   const exitServerCountry = serverList.find(
@@ -326,7 +320,6 @@ export function fromVPNStatusResponse(
       exitServerCity,
       exitServerCountry,
       status.localProxy?.url,
-      connectedSince,
       status.connectionHealth
     );
   }
@@ -334,8 +327,7 @@ export function fromVPNStatusResponse(
     return new StateVPNOnPartial(
       exitServerCity,
       exitServerCountry,
-      status.localProxy?.url,
-      connectedSince
+      status.localProxy?.url
     );
   }
   if (

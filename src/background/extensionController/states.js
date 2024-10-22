@@ -38,6 +38,11 @@ export class FirefoxVPNState {
    * @type {boolean}
    */
   useExitRelays = false;
+
+  /**
+   * Timestamp since the VPN connection was established
+   */
+  connectedSince = 0;
 }
 
 /**
@@ -46,10 +51,12 @@ export class FirefoxVPNState {
 export class StateFirefoxVPNEnabled extends FirefoxVPNState {
   /**
    * @param {boolean} useExitRelays
+   * @param {number} connectedSince
    */
-  constructor(useExitRelays) {
+  constructor(useExitRelays, connectedSince) {
     super();
     this.useExitRelays = useExitRelays;
+    this.connectedSince = connectedSince;
   }
   state = "Enabled";
   enabled = true;
@@ -60,7 +67,7 @@ export class StateFirefoxVPNEnabled extends FirefoxVPNState {
  * When Firefox VPN is Off
  */
 export class StateFirefoxVPNDisabled extends FirefoxVPNState {
-  /**s
+  /**
    * @param {boolean} bypassTunnel
    */
   constructor(bypassTunnel) {
