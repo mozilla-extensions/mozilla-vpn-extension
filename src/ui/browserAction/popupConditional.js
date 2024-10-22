@@ -46,7 +46,7 @@ export class PopUpConditionalView extends ConditionalView {
       return "MessageInstallVPN";
     }
     if (!state.alive) {
-      return "MessageStartVPN";
+      return "MessageOpenMozillaVPN";
     }
     if (!features.webExtension) {
       return "MessageOSNotSupported";

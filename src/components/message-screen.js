@@ -28,6 +28,7 @@ export class MessageScreen extends LitElement {
     onPrimaryAction: { type: Function },
     secondaryAction: { type: String },
     onSecondaryAction: { type: Function },
+    identifier: { type: String },
   };
   constructor() {
     super();
@@ -38,6 +39,7 @@ export class MessageScreen extends LitElement {
     this.secondarAction = "";
     this.onPrimaryAction = () => {};
     this.onSecondaryAction = () => {};
+    this.identifier = "";
   }
 
   render() {
@@ -45,7 +47,7 @@ export class MessageScreen extends LitElement {
       <vpn-titlebar title=${this.titleHeader}></vpn-titlebar>
       <div class="inner">
         <div class="upper">
-          <img src="/assets/img/${this.img}" />
+          <img class="${this.identifier}" src="/assets/img/${this.img}" />
           <h1>${this.heading}</h1>
           <slot></slot>
         </div>
@@ -57,6 +59,7 @@ export class MessageScreen extends LitElement {
                 class="primarybtn"
                 @click=${(e) => {
                   this.onPrimaryAction(this, e);
+                  window.close();
                 }}
               >
                 ${this.primaryAction}
@@ -68,7 +71,10 @@ export class MessageScreen extends LitElement {
             () => html`
               <button
                 class="secondarybtn"
-                @click=${(e) => this.onSecondaryAction(this, e)}
+                @click=${(e) => {
+                  this.onSecondaryAction(this, e);
+                  window.close();
+                }}
               >
                 ${this.secondaryAction}
               </button>
@@ -81,9 +87,9 @@ export class MessageScreen extends LitElement {
   static styles = css`
     ${fontStyling}
     :host {
-      width: var(--window-width);
-      height: var(--window-max-height);
-      contain: strict;
+      --min-block-size: 521px;
+     /* prevent the panel from shrinking vertically when there isn't as much content */
+      min-block-size: var(--min-block-size);
     }
     :host,
     .inner,
@@ -96,7 +102,8 @@ export class MessageScreen extends LitElement {
     .inner {
       width: 85%;
       justify-content: space-between;
-      height: 100%;
+      /* ensure the content grows vertically to fill the height of the panel */
+      min-block-size: calc(var(--min-block-size) - var(--nav-height));
     }
     * {
       width: 100%;
@@ -105,14 +112,32 @@ export class MessageScreen extends LitElement {
       font-family: var(--font-family);
     }
     img {
-      margin-top: 16px;
-      margin-bottom: 16px;
-      width: 180px;
-      max-height: 80px;
+      margin-block: 16px;
     }
+
+    img.subscribenow-message-screen,
+    img.unsupported-os-message-screen,
+    img.install-message-screen {
+      max-block-size: 140px;
+      inline-size: 280px;
+    }
+
+    img.signin-message-screen {
+      max-block-size: 140px;
+      inline-size: 140px;
+    }
+
+    img.open-mozilla-vpn-message-screen {
+      block-size: 108px;
+      inline-size: 111px;
+    }
+
     h1 {
       font-family: var(--font-family-bold);
-      margin-bottom: 8px;
+      margin-block: 16px;
+      color: #3d3d3d;
+      line-height: 26px;
+      font-size: 24px;
     }
     .slot {
       padding: 24px 24px;
@@ -121,15 +146,18 @@ export class MessageScreen extends LitElement {
       flex-grow: 1;
     }
     ::slotted(p) {
-      margin: 0;
+      margin-block: 0 24px;
       text-align: center;
       font-family: var(--font-family);
-      font-size: 15px;
+      font-size: 14px;
       font-style: normal;
+      line-height: 22px;
+      color: #6D6D6E;
     }
+
     ::slotted(.footnote) {
-      margin-top: 8px;
-      margin-bottom: 8px;
+      margin-bottom: 16px;
+      inline-size: 90%;
     }
     button {
       border: none;
@@ -139,12 +167,19 @@ export class MessageScreen extends LitElement {
     .secondarybtn {
       background-color: transparent;
       color: var(--action-button-color);
+      block-size: 40px;
+      margin-block-end: 24px;
     }
     .primarybtn {
       background-color: var(--action-button-color);
       color: white;
       border-radius: 4px;
+      block-size: 40px;
     }
+    p {
+      color: #6D6D6E;
+    }
+
   `;
 }
 customElements.define("message-screen", MessageScreen);
