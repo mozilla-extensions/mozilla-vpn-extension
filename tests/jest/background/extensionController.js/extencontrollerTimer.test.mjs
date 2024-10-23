@@ -52,7 +52,7 @@ describe("ExtensionController", () => {
     target.toggleConnectivity();
     expect(controller.lastPostToApp.value).toBe("activate");
   });
-  test("It does *not* reset the timer when switching from partial to full protection", () => {
+  test("It does *not* reset the timer when switching from partial to full protection", async () => {
     // Simulate the device is disconnected
     const controller = new TestController();
     controller.state.set(new StateVPNDisabled());
@@ -65,6 +65,8 @@ describe("ExtensionController", () => {
     // Now we should have a timestamp
     const timestamp = target.state.value.connectedSince;
     expect(timestamp).not.toBe(0);
+    // Wait 10ms to avoid timeing issues
+    await new Promise((resolve) => setTimeout(resolve, 10));
     // let's simulate the user activating the vpn on the device.
     controller.state.set(new StateVPNEnabled());
     expect(timestamp).toBe(target.state.value.connectedSince);
@@ -85,7 +87,7 @@ describe("ExtensionController", () => {
     expect(target.state.value.useExitRelays).toBe(true);
     controller.state.set(new StateVPNEnabled());
 
-    // In full protection mode, we can skip that. 
+    // In full protection mode, we can skip that.
     expect(target.state.value.useExitRelays).toBe(false);
   });
 });

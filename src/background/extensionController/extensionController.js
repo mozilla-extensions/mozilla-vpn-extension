@@ -96,16 +96,23 @@ export class ExtensionController extends Component {
       }
       this.#mState.set(s);
     };
+    const getTime = () => {
+      // If we switch between partial <-> enabled - we need to re-use the timestamp.
+      if (currentExtState.enabled) {
+        return currentExtState.connectedSince;
+      }
+      return Date.now();
+    };
 
     switch (newClientState.state) {
       case "Enabled":
-        maybeSet(new StateFirefoxVPNEnabled(false, Date.now()));
+        maybeSet(new StateFirefoxVPNEnabled(false, getTime()));
         return;
       case "Disabled":
         maybeSet(new StateFirefoxVPNDisabled(false));
         return;
       case "OnPartial":
-        maybeSet(new StateFirefoxVPNEnabled(true, Date.now()));
+        maybeSet(new StateFirefoxVPNEnabled(true, getTime()));
         return;
       default:
         maybeSet(new StateFirefoxVPNIdle());
