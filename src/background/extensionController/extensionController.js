@@ -14,6 +14,7 @@ import {
   StateFirefoxVPNDisabled,
   StateFirefoxVPNEnabled,
   StateFirefoxVPNConnecting,
+  isEquatable,
 } from "./states.js";
 
 /**
@@ -90,7 +91,7 @@ export class ExtensionController extends Component {
     const maybeSet = (s = new FirefoxVPNState()) => {
       // Check if it is a meaningful change, otherwise don't propagate
       // a statechange.
-      if (s.constructor == currentExtState.constructor) {
+      if (isEquatable(s, currentExtState)) {
         return;
       }
       this.#mState.set(s);

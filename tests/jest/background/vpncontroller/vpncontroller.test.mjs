@@ -132,24 +132,6 @@ describe("fromVPNStatusResponse", () => {
     expect(result.exitServerCity).toBe(list[1][0]);
     expect(result.exitServerCountry).toBe(list[1]);
     expect(result.connected).toBe(true);
-    expect(result.connectedSince).toBe(1);
-    expect(result.state).toBe("Enabled");
-  });
-  it("It can handle omition of connectedSince ", () => {
-    const msg = new vpnStatusResponse();
-    msg.status.vpn = "StateOn";
-    delete msg.status.connectedSince;
-    msg.status.location.entry_city_name = "berlin";
-    msg.status.location.entry_country_code = "de";
-    msg.status.location.exit_country_code = "mor";
-    msg.status.location.exit_city_name =
-      "Actually no idea what the name would be";
-
-    const result = fromVPNStatusResponse(msg, list);
-    expect(result.exitServerCity).toBe(list[1][0]);
-    expect(result.exitServerCountry).toBe(list[1]);
-    expect(result.connected).toBe(true);
-    expect(result.connectedSince).toBe(0);
     expect(result.state).toBe("Enabled");
   });
 

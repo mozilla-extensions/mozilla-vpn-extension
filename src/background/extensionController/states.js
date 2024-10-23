@@ -101,3 +101,22 @@ export class StateFirefoxVPNConnecting extends FirefoxVPNState {
   bypassTunnel = false;
   useExitRelays = false;
 }
+
+/**
+ * Checks if 2 states are equal, ignoring the timestamps.
+ * @param {FirefoxVPNState} state
+ * @param {FirefoxVPNState} other
+ * @returns true if they are 2 equal states.
+ */
+export function isEquatable(
+  state = new FirefoxVPNState(),
+  other = new FirefoxVPNState()
+) {
+  if (state === other) {
+    return true;
+  }
+  if (state.constructor !== other.constructor) {
+    return false;
+  }
+  return state.useExitRelays === other.useExitRelays;
+}
