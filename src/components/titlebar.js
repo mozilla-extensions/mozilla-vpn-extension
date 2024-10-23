@@ -64,7 +64,7 @@ export class TitleBar extends LitElement {
 
       justify-items: center;
       align-items: center;
-      height: 48px;
+      block-size: var(--nav-height);
       padding: 0px 16px;
       border-bottom: 1px solid var(--divider-color);
     }

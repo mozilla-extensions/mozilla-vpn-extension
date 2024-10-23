@@ -134,6 +134,10 @@
     "message": "Get Help",
     "description": "Text of a link pointing to a relevant help page"
   },
+  "headerOpenMozillaVPN": {
+    "message": "Open Mozilla VPN",
+    "description": "Headline"
+  },
   "headerSignedOut": {
     "message": "Sign in to your Mozilla account"
   },
@@ -147,8 +151,12 @@
     "message": "Install Mozilla VPN",
     "description": "Header if a VPN installation was not found"
   },
+  "bodyOpenMsg": {
+    "message": "To use this extension, please open the Mozilla VPN application first.",
+    "description": "Popup subtitle text"
+  },
   "bodyInstallMsg": {
-    "message": "In order to use the Mozilla VPN extension, you must first download Mozilla VPN on your desktop."
+    "message": "In order to use the Mozilla VPN extension, you must first download the latest Mozilla VPN on your computer."
   },
   "bodyInstallMsgFooter": {
     "message": "Note that Mozilla VPN is a paid subscription service.",

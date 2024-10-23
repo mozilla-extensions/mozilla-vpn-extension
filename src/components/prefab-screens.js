@@ -37,6 +37,7 @@ const defineMessageScreen = (
       this.onPrimaryAction = onPrimaryAction;
       this.secondaryAction = secondarAction;
       this.onSecondaryAction = onSecondaryAction;
+      this.identifier = tag;
       render(body, this);
     }
   }
@@ -53,12 +54,14 @@ const sendToApp = (customElement, command = "") => {
 };
 
 defineMessageScreen(
-  "subcribenow-message-screen",
+  "subscribenow-message-screen",
   "message-header.svg",
   "Subscribe to Mozilla VPN",
   tr("bodySubscribeNow"),
   tr("btnSubscribeNow"),
-  (elm) => sendToApp(elm, "focus")
+  () => {
+    open("https://www.mozilla.org/products/vpn#pricing");
+  }
 );
 
 defineMessageScreen(
@@ -75,7 +78,7 @@ defineMessageScreen(
 
 defineMessageScreen(
   "install-message-screen",
-  "message-signin.svg",
+  "message-install.svg",
   tr("headerInstallMsg"),
   html`
     <p>${tr("bodyInstallMsg")}</p>
@@ -85,6 +88,15 @@ defineMessageScreen(
   () => {
     open("https://www.mozilla.org/products/vpn/download/");
   }
+);
+
+defineMessageScreen(
+  "open-mozilla-vpn-message-screen",
+  "message-open.svg",
+  tr("headerOpenMozillaVPN"),
+  html` <p>${tr("bodyOpenMsg")}</p> `,
+  null,
+  null
 );
 
 defineMessageScreen(

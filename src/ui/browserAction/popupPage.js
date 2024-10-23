@@ -360,6 +360,7 @@ export class BrowserActionPopup extends LitElement {
    */
   static createServerList(currentCity = null, list = [], onResult = () => {}) {
     const viewElement = document.createElement("section");
+    viewElement.classList = ["limit-panel-height"];
     viewElement.dataset.title = "Select Location";
     render(
       html`
@@ -379,6 +380,7 @@ export class BrowserActionPopup extends LitElement {
     ${fontStyling}${resetSizing}${ghostButtonStyles}${inUseLabel}${positioner}
     section {
       background-color: var(--panel-bg-color);
+      max-block-size: calc(var(--window-max-height) - var(--nav-height));
     }
 
     main {
