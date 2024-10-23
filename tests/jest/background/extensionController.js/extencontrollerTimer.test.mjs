@@ -70,4 +70,22 @@ describe("ExtensionController", () => {
     expect(timestamp).toBe(target.state.value.connectedSince);
     // The Timestamps should be the same.
   });
+
+  test("when switching from partial to full protection useExitRelays is updated", () => {
+    // Simulate the device is disconnected
+    const controller = new TestController();
+    controller.state.set(new StateVPNDisabled());
+    const target = new ExtensionController(new TestRegister(), controller);
+    // To enable we need to send an 'activation' command
+    target.toggleConnectivity();
+    expect(controller.lastPostToApp.value).toBe("activate");
+    controller.state.set(new StateVPNOnPartial());
+
+    // In Partal mode all protected traffic needs to use the exit relays
+    expect(target.state.value.useExitRelays).toBe(true);
+    controller.state.set(new StateVPNEnabled());
+
+    // In full protection mode, we can skip that. 
+    expect(target.state.value.useExitRelays).toBe(false);
+  });
 });
