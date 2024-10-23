@@ -38,6 +38,11 @@ export class FirefoxVPNState {
    * @type {boolean}
    */
   useExitRelays = false;
+
+  /**
+   * Timestamp since the VPN connection was established
+   */
+  connectedSince = 0;
 }
 
 /**
@@ -46,10 +51,12 @@ export class FirefoxVPNState {
 export class StateFirefoxVPNEnabled extends FirefoxVPNState {
   /**
    * @param {boolean} useExitRelays
+   * @param {number} connectedSince
    */
-  constructor(useExitRelays) {
+  constructor(useExitRelays, connectedSince) {
     super();
     this.useExitRelays = useExitRelays;
+    this.connectedSince = connectedSince;
   }
   state = "Enabled";
   enabled = true;
@@ -60,7 +67,7 @@ export class StateFirefoxVPNEnabled extends FirefoxVPNState {
  * When Firefox VPN is Off
  */
 export class StateFirefoxVPNDisabled extends FirefoxVPNState {
-  /**s
+  /**
    * @param {boolean} bypassTunnel
    */
   constructor(bypassTunnel) {
@@ -93,4 +100,23 @@ export class StateFirefoxVPNConnecting extends FirefoxVPNState {
   connecting = true;
   bypassTunnel = false;
   useExitRelays = false;
+}
+
+/**
+ * Checks if 2 states are equal, ignoring the timestamps.
+ * @param {FirefoxVPNState} state
+ * @param {FirefoxVPNState} other
+ * @returns true if they are 2 equal states.
+ */
+export function isEquatable(
+  state = new FirefoxVPNState(),
+  other = new FirefoxVPNState()
+) {
+  if (state === other) {
+    return true;
+  }
+  if (state.constructor !== other.constructor) {
+    return false;
+  }
+  return state.useExitRelays === other.useExitRelays;
 }

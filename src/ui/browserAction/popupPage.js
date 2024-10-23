@@ -73,6 +73,7 @@ export class BrowserActionPopup extends LitElement {
       this._siteContexts = s;
     });
     extController.state.subscribe((s) => {
+      console.log(s);
       this.extState = s;
       this.updatePage();
     });
@@ -175,7 +176,7 @@ export class BrowserActionPopup extends LitElement {
               .clientConnected=${this.vpnState?.connected}
               .cityName=${this.vpnState?.exitServerCity?.name}
               .countryFlag=${this.vpnState?.exitServerCountry?.code}
-              .connectedSince=${this.vpnState?.connectedSince}
+              .connectedSince=${this.extState?.connectedSince}
               .stability=${this.vpnState?.connectionStability}
               .hasContext=${this._siteContext}
               .connecting=${this.extState?.connecting}

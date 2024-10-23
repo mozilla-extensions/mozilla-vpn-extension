@@ -48,10 +48,6 @@ export class VPNState {
 
   /** @type {ServerCountry | undefined } */
   exitServerCountry = new ServerCountry();
-  /**
-   * Timestamp since the VPN connection was established
-   */
-  connectedSince = 0;
 
   static NoSignal = "NoSignal";
   static Unstable = "Unstable";
@@ -129,14 +125,12 @@ export class StateVPNEnabled extends StateVPNDisabled {
     exitServerCity,
     exitServerCountry,
     aloophole,
-    connectedSince,
     connectionHealth = "Stable"
   ) {
     super(exitServerCity, exitServerCountry);
     this.exitServerCity = exitServerCity;
     this.exitServerCountry = exitServerCountry;
     this.loophole = aloophole;
-    this.connectedSince = connectedSince;
     if (
       ![VPNState.NoSignal, VPNState.Stable, VPNState.Unstable].includes(
         connectionHealth
