@@ -152,7 +152,7 @@ export class MessageScreen extends LitElement {
       font-size: 14px;
       font-style: normal;
       line-height: 22px;
-      color: #6d6d6e;
+      color: var(--grey40);
     }
 
     ::slotted(.footnote) {
@@ -178,6 +178,16 @@ export class MessageScreen extends LitElement {
     }
     p {
       color: #6d6d6e;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      h1 {
+        color: #ffffff;
+      }
+
+      ::slotted(p) {
+        color: rgba(255, 255, 255, 0.6);
+      }
     }
   `;
 }
