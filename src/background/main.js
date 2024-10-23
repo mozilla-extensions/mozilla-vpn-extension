@@ -31,7 +31,7 @@ class Main {
   );
   tabHandler = new TabHandler(this, this.extController, this.proxyHandler);
   toolbarIconHandler = new ToolbarIconHandler(this, this.extController);
-  tabReloader = new TabReloader(this, this.proxyHandler);
+  tabReloader = new TabReloader(this, this.extController, this.proxyHandler);
 
   async init() {
     log("Hello from the background script!");
