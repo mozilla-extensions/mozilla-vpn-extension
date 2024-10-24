@@ -84,7 +84,12 @@ export class VPNController extends Component {
       // the isolation key in order to create new proxy connections. Otherwise
       // we could see random timeout when the browser tries to connect to an
       // invalid proxy connection.
-      this.#port.onDisconnect.addListener(() => {
+      this.#port.onDisconnect.addListener((p) => {
+        // @ts-ignore
+        if (p.error.message === "No such native application mozillavpn") {
+          this.#mState.value = new StateVPNUnavailable();
+          return;
+        }
         this.#increaseIsolationKey();
         this.#mState.value = new StateVPNClosed();
       });
