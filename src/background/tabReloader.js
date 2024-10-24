@@ -36,22 +36,22 @@ export class TabReloader extends Component {
   }
 
   async init() {
-    this.proxyHandler.lastChangedOrigin.subscribe(TabReloader.onOriginChanged);
     this.extController.state.subscribe((s) => {
       TabReloader.onExtensionStateChanged(s);
     });
+    this.proxyHandler.lastChangedOrigin.subscribe(TabReloader.onOriginChanged);
   }
 
   currentExtState;
 
   static async onExtensionStateChanged(extState) {
     if (
-      this.currentExtState == extState.state ||
+      this.currentExtState?.state == extState.state ||
       !["Enabled", "Disabled"].includes(extState.state)
     ) {
       return;
     }
-    this.currentExtState = extState.state;
+    this.currentExtState = extState;
     TabReloader.onOriginChanged();
   }
 
@@ -69,9 +69,13 @@ export class TabReloader extends Component {
     relevantTabs.filter(TabReloader.needsDiscard).forEach((tab) => {
       browser.tabs.discard(tab.id);
     });
-    relevantTabs.filter(TabReloader.needsReload).forEach((tab) => {
+
+    const delay = TabReloader.currentExtState.state == "Enabled" && TabReloader.currentExtState.useExitRelays ? 2500 : 0;
+
+    setTimeout(() => {
+      relevantTabs.filter(TabReloader.needsReload).forEach((tab) => {
       browser.tabs.reload(tab.id);
-    });
+    })}, delay);
   }
 
   /**
