@@ -179,6 +179,7 @@ export const positioner = css`
     align-items: center;
     justify-content: center;
     margin-inline-end: 8px;
+    flex: 0 0 auto;
   }
 `;
 
