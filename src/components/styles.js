@@ -198,4 +198,10 @@ export const inUseLabel = css`
   .in-use-light {
     background-color: #e7e7e7;
   }
+
+  @media (prefers-color-scheme: dark) {
+    .in-use {
+      background: rgba(255, 255, 255, 0.15);
+    }
+  }
 `;
