@@ -10,7 +10,7 @@ export const resetSizing = css`
     box-sizing: border-box;
   }
   /* Remove default margin for body */
-  body {n
+  body {
     margin: 0;
   }
   h1,
