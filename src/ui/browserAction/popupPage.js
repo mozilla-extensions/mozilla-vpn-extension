@@ -383,6 +383,10 @@ export class BrowserActionPopup extends LitElement {
       max-block-size: calc(var(--window-max-height) - var(--nav-height));
     }
 
+    section.limit-panel-height {
+      overflow-y: scroll;
+    }
+
     main {
       padding: var(--padding-default) var(--padding-default) 0
         var(--padding-default);
