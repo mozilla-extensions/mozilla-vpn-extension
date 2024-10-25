@@ -35,9 +35,9 @@ class Main {
     this.extController,
     this.vpnController
   );
-  
+
   tabReloader = new TabReloader(this, this.extController, this.proxyHandler);
-  
+
   async init() {
     log("Hello from the background script!");
 
