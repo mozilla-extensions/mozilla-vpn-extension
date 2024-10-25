@@ -34,7 +34,9 @@ export class ProxyHandler extends Component {
   constructor(receiver, controller) {
     super(receiver);
     this.controller = controller;
-    browser.runtime.getPlatformInfo(info => { this.#mPlatformOs = info.os});
+    browser.runtime.getPlatformInfo((info) => {
+      this.#mPlatformOs = info.os;
+    });
   }
 
   /** @type {VPNState | undefined} */
@@ -111,13 +113,15 @@ export class ProxyHandler extends Component {
   processClientStateChanges(vpnState) {
     console.log(`Processing client state change ${vpnState}`);
     if (this.#mPlatformOs === "linux") {
-      this.#mLocalProxyInfo.value = [{
-        type: "socks",
-        host: "file:/var/run/mozillavpn.proxy",
-        port: 1234,
-      }]
+      this.#mLocalProxyInfo.value = [
+        {
+          type: "socks",
+          host: "file:/var/run/mozillavpn.proxy",
+          port: 1234,
+        },
+      ];
     } else if (vpnState.loophole) {
-      this.#mLocalProxyInfo.value = [ProxyUtils.parseProxy(vpnState.loophole)]
+      this.#mLocalProxyInfo.value = [ProxyUtils.parseProxy(vpnState.loophole)];
     } else {
       this.#mLocalProxyInfo.value = [];
     }
