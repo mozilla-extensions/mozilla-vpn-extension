@@ -34,6 +34,7 @@ export class ProxyHandler extends Component {
   constructor(receiver, controller) {
     super(receiver);
     this.controller = controller;
+    browser.runtime.getPlatformInfo(info => { this.#mPlatformOs = info.os});
   }
 
   /** @type {VPNState | undefined} */
@@ -46,6 +47,7 @@ export class ProxyHandler extends Component {
   #mProxyMap = property(new Map());
   #mLocalProxyInfo = property([]);
   #mCurrentExitRelays = property([]);
+  #mPlatformOs = "unknown";
 
   /** @type {IBindable<Map<String, SiteContext>>} */
   get siteContexts() {
@@ -108,9 +110,17 @@ export class ProxyHandler extends Component {
    */
   processClientStateChanges(vpnState) {
     console.log(`Processing client state change ${vpnState}`);
-    this.#mLocalProxyInfo.value = vpnState.loophole
-      ? [ProxyUtils.parseProxy(vpnState.loophole)]
-      : [];
+    if (this.#mPlatformOs === "linux") {
+      this.#mLocalProxyInfo.value = [{
+        type: "socks",
+        host: "file:/var/run/mozillavpn.proxy",
+        port: 1234,
+      }]
+    } else if (vpnState.loophole) {
+      this.#mLocalProxyInfo.value = [ProxyUtils.parseProxy(vpnState.loophole)]
+    } else {
+      this.#mLocalProxyInfo.value = [];
+    }
 
     if (this.servers.length == 0) {
       console.log("No servers, unable to get exit location proxy info");
