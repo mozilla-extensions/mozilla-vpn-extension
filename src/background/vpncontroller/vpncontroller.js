@@ -332,7 +332,8 @@ export function fromVPNStatusResponse(
     return new StateVPNOnPartial(
       exitServerCity,
       exitServerCountry,
-      status.localProxy?.url
+      status.localProxy?.url,
+      status.connectionHealth
     );
   }
   if (
