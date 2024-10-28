@@ -68,7 +68,7 @@ defineMessageScreen(
   "signin-message-screen",
   "message-signin.svg",
   tr("headerSignedOut"),
-  tr("bodySignedOut"),
+  tr("bodySignedOut")
 );
 
 defineMessageScreen(
