@@ -91,9 +91,11 @@ export class ExtensionController extends Component {
     const maybeSet = (s = new FirefoxVPNState()) => {
       // Prevent client status updates from re-enabling the extension VPN when
       // it has been turned off via the popup
-      if (this.clientState.state == "Enabled" && 
-        currentExtState.state == "Disabled" && 
-        currentExtState.bypassTunnel) {
+      if (
+        this.clientState.state == "Enabled" &&
+        currentExtState.state == "Disabled" &&
+        currentExtState.bypassTunnel
+      ) {
         return;
       }
 
