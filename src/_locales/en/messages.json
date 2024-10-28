@@ -147,6 +147,14 @@
   "btnOpenVpn": {
     "message": "Open Mozilla VPN"
   },
+  "headerNeedsUpdate": {
+    "message": "Update Mozilla VPN",
+    "description": "This is the headline of an error panel"
+  },
+  "bodyNeedsUpdate": {
+    "message": "In order to use this extension, you must have the latest Mozilla VPN application installed.",
+    "description": "This is the body copy for an error panel."
+  },
   "headerInstallMsg": {
     "message": "Install Mozilla VPN",
     "description": "Header if a VPN installation was not found"

@@ -35,6 +35,9 @@ export class VPNState {
   authenticated = false;
   // Can be "Stable", "Unstable", "NoSignal"
   connectionStability = "Stable";
+  // True if the client version is post v2.23 but not latest
+  needsUpdate = false;
+  
   /**
    * A socks:// url to connect to
    * to bypass the vpn.
@@ -78,6 +81,12 @@ class StateVPNOpened extends VPNState {
   alive = true;
   installed = true;
 }
+
+export class StateVPNNeedsUpdate extends StateVPNOpened {
+  state = "NeedsUpdate";
+  needsUpdate = true;
+}
+
 export class StateVPNSignedOut extends StateVPNOpened {
   state = "SignedOut";
   authenticated = false;

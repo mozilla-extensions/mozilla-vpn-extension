@@ -5,6 +5,7 @@
 // @ts-check
 import { Component } from "../component.js";
 import { Logger } from "../logger.js";
+import { Utils } from "../../shared/utils.js";
 
 import {
   IBindable,
@@ -25,6 +26,7 @@ import {
   vpnStatusResponse,
   StateVPNClosed,
   StateVPNSignedOut,
+  StateVPNNeedsUpdate,
 } from "./states.js";
 
 const log = Logger.logger("TabHandler");
@@ -301,6 +303,12 @@ export function fromVPNStatusResponse(
   const servers = serverList;
   const status = response.status;
   const appState = status.app;
+
+  const version = status.version;
+  if (!version || !Utils.isViableClientVersion(version)) {
+    return new StateVPNNeedsUpdate();
+  }
+
   if (["StateInitialize", "StateAuthenticating"].includes(appState)) {
     return new StateVPNSignedOut();
   }

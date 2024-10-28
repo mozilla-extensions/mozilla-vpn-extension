@@ -19,6 +19,15 @@ export const Utils = {
     return currentTab[0];
   },
 
+  isViableClientVersion: (clientVersion) => {
+
+    // TODO we should do something better here
+    // We'll likely want to update the minimumViableClient
+    // out of band at some point.
+    const minimumViableClient = "2.25.0";
+    return parseInt(clientVersion) < parseInt(minimumViableClient);
+  },
+
   /**
    * Formats and retrieves the hostname from a given URL.
    * @param {string} url - The URL to format.
