@@ -20,7 +20,6 @@ export const Utils = {
   },
 
   isViableClientVersion: (clientVersion) => {
-
     // TODO we should do something better here
     // We'll likely want to update the minimumViableClient
     // out of band at some point.

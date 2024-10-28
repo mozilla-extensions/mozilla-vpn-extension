@@ -73,7 +73,7 @@ defineMessageScreen(
   () => {
     open("https://www.mozilla.org/products/vpn/download/");
   }
-)
+);
 
 defineMessageScreen(
   "signin-message-screen",

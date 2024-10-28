@@ -37,7 +37,7 @@ export class VPNState {
   connectionStability = "Stable";
   // True if the client version is post v2.23 but not latest
   needsUpdate = false;
-  
+
   /**
    * A socks:// url to connect to
    * to bypass the vpn.
