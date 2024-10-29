@@ -61,7 +61,7 @@ export class VPNController extends Component {
     return this.#mFeaturelist;
   }
 
-  async initNativeMessaging() {
+  initNativeMessaging() {
     log("initNativeMessaging");
     if (this.#port && this.#port.error === null) {
       return;
@@ -77,8 +77,8 @@ export class VPNController extends Component {
         this.handleResponse(response)
       );
 
-      this.postToApp("servers");
-      this.postToApp("status");
+      this.#postToAppInternal("servers");
+      this.#postToAppInternal("status");
 
       // When the mozillavpn dies or the VPN disconnects, we need to increase
       // the isolation key in order to create new proxy connections. Otherwise
@@ -87,6 +87,7 @@ export class VPNController extends Component {
       this.#port.onDisconnect.addListener((p) => {
         // @ts-ignore
         if (p.error.message === "No such native application mozillavpn") {
+          this.#port = null; // The port is invalid, so we should retry later.
           this.#mState.value = new StateVPNUnavailable();
           return;
         }
@@ -122,15 +123,23 @@ export class VPNController extends Component {
    * @param { string } command - Command to Send
    */
   postToApp(command) {
+    if (!REQUEST_TYPES.includes(command)) {
+      log(`Command ${command} not in known command list`);
+    }
+    if(!this.#port){
+      this.initNativeMessaging();
+      setTimeout(()=>this.#postToAppInternal(command),500);
+    }
+    this.#postToAppInternal(command)
+  }
+  #postToAppInternal(command =""){
     try {
-      if (!REQUEST_TYPES.includes(command)) {
-        log(`Command ${command} not in known command list`);
-      }
       this.#port?.postMessage({ t: command });
     } catch (e) {
       log(e);
       // @ts-ignore
-      if (e.toString() === "Attempt to postMessage on disconnected port") {
+      if (e.message === "Attempt to postMessage on disconnected port") {
+        this.#port = null; // The port is invalid, so we should retry later.
         this.#mState.value = new StateVPNClosed();
       }
     }
