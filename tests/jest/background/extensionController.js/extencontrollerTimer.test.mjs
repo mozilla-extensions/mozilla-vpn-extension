@@ -10,7 +10,10 @@ class TestRegister {
   registerObserver() {}
 }
 class TestController {
-  state = property(new VPNState());
+  constructor(s = new VPNState()){
+    this.state = property(s);
+  }
+  state;
 
   postToApp(command) {
     this.lastPostToApp.set(command);
@@ -20,6 +23,7 @@ class TestController {
 
 import { ExtensionController } from "../../../../src/background/extensionController/extensionController.js";
 import {
+  StateVPNClosed,
   StateVPNDisabled,
   StateVPNEnabled,
   StateVPNOnPartial,
@@ -90,4 +94,59 @@ describe("ExtensionController", () => {
     // In full protection mode, we can skip that.
     expect(target.state.value.useExitRelays).toBe(false);
   });
+
+
+  describe("Upon Firefox launch, the VPN Extension status follows the status of the VPN client", ()=>{
+    test("If Firefox is launched while the VPN client is ON, the extension starts with a default ON state", ()=>{
+      const testController = new TestController(new StateVPNClosed())
+      const target = new ExtensionController(
+        new TestRegister(),testController
+      );
+      expect(target.state.value.enabled).toBe(false);
+      testController.state.set(new StateVPNEnabled());
+      expect(target.state.value.enabled).toBe(true);
+    });
+    test("If Firefox is launched while the VPN client is OFF, the extension starts with a default OFF state", ()=>{
+      const testController = new TestController(new StateVPNClosed())
+
+      const target = new ExtensionController(
+        new TestRegister(),testController
+      );
+      expect(target.state.value.enabled).toBe(false);
+      testController.state.set(new StateVPNDisabled());
+      expect(target.state.value.enabled).toBe(false);
+    })
+
+    test("If Firefox was launched when the VPN client was OFF, turning the VPN client ON, should turn the VPN extension ON.", ()=>{
+      const testController = new TestController(new StateVPNClosed())
+
+      const target = new ExtensionController(
+        new TestRegister(),testController
+      );
+      expect(target.state.value.enabled).toBe(false);
+      testController.state.set(new StateVPNDisabled());
+      expect(target.state.value.enabled).toBe(false);
+
+      // If we now have turned it on, it should follow
+      testController.state.set(new StateVPNEnabled());
+      expect(target.state.value.enabled).toBe(true);
+    });
+    test("If Firefox was launched when the VPN client was ON, turning the VPN client OFF, should NOT turn the VPN extension OFF.", ()=>{
+      const testController = new TestController(new StateVPNClosed())
+
+      const target = new ExtensionController(
+        new TestRegister(),testController
+      );
+      expect(target.state.value.enabled).toBe(false);
+      testController.state.set(new StateVPNDisabled());
+      expect(target.state.value.enabled).toBe(false);
+
+      // If we now have turned it on, it should follow
+      testController.state.set(new StateVPNDisabled());
+      expect(target.state.value.enabled).toBe(true);
+    });
+  });
+
+
+
 });
