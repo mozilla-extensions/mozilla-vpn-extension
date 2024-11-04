@@ -126,13 +126,13 @@ export class VPNController extends Component {
     if (!REQUEST_TYPES.includes(command)) {
       log(`Command ${command} not in known command list`);
     }
-    if(!this.#port){
+    if (!this.#port) {
       this.initNativeMessaging();
-      setTimeout(()=>this.#postToAppInternal(command),500);
+      setTimeout(() => this.#postToAppInternal(command), 500);
     }
-    this.#postToAppInternal(command)
+    this.#postToAppInternal(command);
   }
-  #postToAppInternal(command =""){
+  #postToAppInternal(command = "") {
     try {
       this.#port?.postMessage({ t: command });
     } catch (e) {
