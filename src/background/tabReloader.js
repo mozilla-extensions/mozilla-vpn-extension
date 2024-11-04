@@ -58,7 +58,7 @@ export class TabReloader extends Component {
   static async onOriginChanged(origin = null) {
     const loadedTabs = await browser.tabs.query({
       // If discarded, the next activation will reload it anyway.
-      discarded: false,
+      active: true,
     });
     const relevantTabs = origin
       ? loadedTabs.filter(TabReloader.matches(origin))
@@ -66,10 +66,7 @@ export class TabReloader extends Component {
     if (relevantTabs.length == 0) {
       return;
     }
-    relevantTabs.filter(TabReloader.needsDiscard).forEach((tab) => {
-      browser.tabs.discard(tab.id);
-    });
-    relevantTabs.filter(TabReloader.needsReload).forEach((tab) => {
+    relevantTabs.forEach((tab) => {
       browser.tabs.reload(tab.id);
     });
   }
@@ -91,24 +88,5 @@ export class TabReloader extends Component {
       const tabURL = Utils.getFormattedHostname(tab.url);
       return tabURL === hostname;
     };
-  }
-
-  /**
-   * Returns true if the Tab Should be discarded if
-   * the SiteContext Rule for the Tab Changes
-   * @param {browser.tabs.Tab} tab - The Tab to check
-   * @returns {Boolean}
-   */
-  static needsDiscard(tab) {
-    return !tab.discarded && !tab.audible && !tab.active;
-  }
-  /**
-   * Returns true if the Tab Should be Reloaded if
-   * the SiteContext Rule for the Tab Changes
-   * @param {browser.tabs.Tab} tab - The Tab to check
-   * @returns {Boolean}
-   */
-  static needsReload(tab) {
-    return tab.active && !tab.audible && !tab.discarded;
   }
 }
