@@ -32,11 +32,15 @@
     }
   },
   "titleServerList": {
-    "message": "Select site location",
-    "description": "The header of a list of servers, prompting the user to select a location"
+    "message": "Website location",
+    "description": "Title for a dialog where users can set the location for a website. "
+  },
+  "selectWebsiteLocation": {
+    "message": "Select website location",
+    "description": "Button label"
   },
   "titlePageSettings": {
-    "message": "Preferences for this site",
+    "message": "Preferences for this website",
     "description": "The header for website specific settings, i.e. exclude a page from VPN"
   },
   "excludePageFor": {
@@ -50,7 +54,7 @@
     }
   },
   "resetPageSettings": {
-    "message": "Reset site preferences",
+    "message": "Reset website preferences",
     "description": "Button text to reset all site specific settings"
   },
   "vpnIsOn": {
@@ -62,23 +66,19 @@
     "description": "Header to signal that VPN connection is disabled"
   },
   "extensionVpnIsOff": {
-    "message": "Protection for Firefox is off, even if your desktop VPN is on.",
+    "message": "Mozilla VPN is still on, protecting the rest of your computer.",
     "description": "Popup subtitle when the extension VPN is off, but the client VPN is on."
   },
   "vpnOffStatus": {
-    "message": "OFF",
+    "message": "Off",
     "description": "Label indicating that the VPN is off."
   },
   "vpnOnStatus": {
-    "message": "ON",
+    "message": "On",
     "description": "Label indicating that the VPN is on."
   },
-  "headlineWebsitePreferences": {
-    "message": "Website Preferences",
-    "description": "Headline for the Website Preferences page."
-  },
   "placeholderSearchWebsites": {
-    "message": "Search Websites",
+    "message": "Search websites",
     "description": "Placeholder text for the search input field to search websites."
   },
   "tableHeadingWebsite": {
@@ -86,19 +86,15 @@
     "description": "Table heading for the column listing websites."
   },
   "tableHeadingVpnStatus": {
-    "message": "VPN status",
+    "message": "Website protection",
     "description": "Table heading for the column indicating whether the VPN is on or off for a website."
-  },
-  "tableHeadingLocation": {
-    "message": "VPN location",
-    "description": "Table heading for the column showing the location of the website."
   },
   "headlineNoWebsitePreferences": {
     "message": "You haven’t set any website preferences yet",
     "description": "Headline shown when the user hasn’t set any website preferences."
   },
   "noWebsitePreferencesSubText": {
-    "message": "If you turn off VPN protection or set a custom location for any websites, you’ll see them here.",
+    "message": "With the Firefox extension, you can turn off Mozilla VPN protection for a website or set a custom location. To do this, visit a website, open the extension, and update the website preferences.",
     "description": "Subtext shown when there are no website preferences set by the user."
   },
   "altTextRemoveWebsiteButton": {
@@ -116,14 +112,14 @@
     "description": "Alt text for the button that opens the Extensions Settings page"
   },
   "searchServer": {
-    "message": "Search location",
+    "message": "Search locations",
     "description": "Placeholder for the Input field where users can search the list of servers"
   },
   "titleSubscribeNow": {
     "message": "Subscribe to Mozilla VPN"
   },
   "bodySubscribeNow": {
-    "message": "No subscription found. Click the button below to subscribe to Mozilla VPN.",
+    "message": "It looks like you're not subscribed to Mozilla VPN yet. To use this extension, please subscribe.",
     "description": "Body of an error message, shown if the user is trying to use the extension without a subscription."
   },
   "btnSubscribeNow": {
@@ -131,7 +127,7 @@
     "description": "Call to action button for users to subscribe to Mozilla VPN"
   },
   "getHelp": {
-    "message": "Get Help",
+    "message": "Get help",
     "description": "Text of a link pointing to a relevant help page"
   },
   "headerOpenMozillaVPN": {
@@ -139,10 +135,10 @@
     "description": "Headline"
   },
   "headerSignedOut": {
-    "message": "Sign in to your Mozilla account"
+    "message": "Sign in to the Mozilla VPN app"
   },
   "bodySignedOut": {
-    "message": "You’re currently signed out of your Mozilla account. To use the Mozilla VPN extension, please open the desktop app to sign in first."
+    "message": "You’re currently signed out of the Mozilla VPN app. To use the Mozilla VPN Firefox extension, open the app on your computer and sign in to your account."
   },
   "btnOpenVpn": {
     "message": "Open Mozilla VPN"
@@ -152,11 +148,11 @@
     "description": "Header if a VPN installation was not found"
   },
   "bodyOpenMsg": {
-    "message": "To use this extension, please open the Mozilla VPN application first.",
+    "message": "To use the Mozilla VPN Firefox extension, please open the Mozilla VPN app first.",
     "description": "Popup subtitle text"
   },
   "bodyInstallMsg": {
-    "message": "In order to use the Mozilla VPN extension, you must first download the latest Mozilla VPN on your computer."
+    "message": "Note that Mozilla VPN is a paid subscription service."
   },
   "bodyInstallMsgFooter": {
     "message": "Note that Mozilla VPN is a paid subscription service.",
@@ -167,10 +163,10 @@
     "description": "This is a call to action button to download the VPN."
   },
   "defaultLocationHeader": {
-    "message": "Use default Mozilla VPN location"
+    "message": "Use Mozilla VPN location"
   },
   "useDefaultLocationExplainer": {
-    "message": "This is always the same location as selected in your Mozilla VPN desktop app.",
+    "message": "Use the same location as the Mozilla VPN app protecting this computer.",
     "description": "Explanation of what “Use default Mozilla VPN Location” means."
   },
   "headerUnsupportedOSMessage": {
@@ -181,5 +177,97 @@
   },
   "footnoteUnsupportedOSMessage": {
     "message": "We’re working to bring support to macOS and Linux soon!"
+  },
+  "turnOnProtection": {
+    "message": "Turn on protection",
+    "description": "Button label"
+  },
+  "removeCustomLocation": {
+    "message": "Remove custom location",
+    "description": "Button label"
+  },
+  "websiteProtection": {
+    "message": "Website protection",
+    "description": "A subtitle that is followed by an off icon and the word 'Off'"
+  },
+  "giveFeedback": {
+    "message": "Give feedback",
+    "description": "Button label"
+  },
+  "learnMore": {
+    "message": "Learn more",
+    "description": "Label of link that leads to SUMO"
+  },
+  "onboarding1_title": {
+    "message": "Turn off VPN for specific websites",
+    "description": "Title in onboarding panel"
+  },
+  "onboarding1_body": {
+    "message": "With the Firefox extension, you can turn off VPN protection for specific websites, while keeping it on for everything else.",
+    "description": "Body text in onboarding panel"
+  },
+  "onboarding2_title": {
+    "message": "See different websites from different locations",
+    "description": "Title in onboarding panel"
+  },
+  "onboarding2_body": {
+    "message": "",
+    "description": "Body text in onboarding panel"
+  },
+  "onboarding3_title": {
+    "message": "Keep protection for Firefox “on”",
+    "description": "Title in onboarding panel"
+  },
+  "onboarding3_body": {
+    "message": "Use the extension to turn on VPN protection for Firefox — even when protection is off for the rest of your computer. ",
+    "description": "Body text in onboarding panel"
+  },
+  "next": {
+    "message": "Next",
+    "description": "Label of button to progress to next onboarding panel"
+  },
+  "skip": {
+    "message": "Skip",
+    "description": "Label of button to skip onboarding"
+  },
+  "headerReEnableFirefoxProtection": {
+    "message": "Re-enable Firefox protection",
+    "description": "Error panel title for when Firefox is an excluded app"
+  },
+  "bodyReEnableFirefoxProtection": {
+    "message": "Firefox is currently an “excluded app” in the Mozilla VPN application. To use this extension, open the application and go to Settings > Excluded Apps and remove Firefox.",
+    "description": "Body copy of error panel"
+  },
+  "settingsPageSubtitle": {
+    "message": "To add or change website-specific preferences, visit the site and open the Mozilla VPN Firefox extension. Then, set preferences for the site. Your preferences are only in effect when VPN protection for Firefox is on.",
+    "description": "Subtitle in the settings page"
+  },
+  "settingsPageTitle": {
+    "message": "Mozilla VPN Website preferences",
+    "description": "Title for settings page tab"
+  },
+  "noSignal": {
+    "message": "No Signal",
+    "description": "Indicator text describing the status of the VPN"
+  },
+  "unstable": {
+    "message": "Unstable",
+    "description": "Indicator text describing the status of the VPN"
+  },
+  "connecting": {
+    "message": "Connecting...",
+    "description": "Indicator text describing the status of the VPN"
+  },
+  "helpCenter": {
+    "message": "Help center",
+    "description": "Link title"
+  },
+  "websitePreferences": {
+    "message": "Website preferences",
+    "description": "Link title"
+  },
+  "contactSupport": {
+    "message": "Contact support",
+    "description": "Link title"
   }
 }

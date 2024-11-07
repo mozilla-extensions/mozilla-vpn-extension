@@ -207,7 +207,7 @@ export const tableHeading = (
       </th>
       <th>
         <button class=${getClass("city")} @click=${() => onClick("city")}>
-          ${tr("tableHeadingLocation")}
+          ${tr("titleServerList")}
         </button>
       </th>
       <th></th>

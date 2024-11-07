@@ -42,6 +42,7 @@ export class SettingsPage extends LitElement {
   filterInput = createRef();
 
   render() {
+    document.title = tr("settingsPageTitle");
     // Step 1 Filter the List, so only items that include the website are here
     const filteredList = filter(this.contexts, this.filterInput.value?.value);
     // Let's render the view!
@@ -54,12 +55,8 @@ export class SettingsPage extends LitElement {
         />
       </header>
       <main>
-        <h2>${tr("headlineWebsitePreferences")}</h2>
-        <p>
-          <!-- TODO: Check if those strings are the ones we want to publish. -->
-          You can manage VPN preferences for each website in the Mozilla VPN for
-          Firefox extension.
-        </p>
+        <h2>${tr("websitePreferences")}</h2>
+        <p>${tr("settingsPageSubtitle")}</p>
         <div>
           <img />
           <input
