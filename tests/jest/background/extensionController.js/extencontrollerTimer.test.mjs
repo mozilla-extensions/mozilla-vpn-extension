@@ -10,13 +10,19 @@ class TestRegister {
   registerObserver() {}
 }
 class TestController {
-  constructor(s = new VPNState()){
+  constructor(s = new VPNState()) {
     this.state = property(s);
   }
   state;
 
   postToApp(command) {
     this.lastPostToApp.set(command);
+
+    if (command == "activate") {
+      if (!this.state.value.connected) {
+        this.state.set(new StateVPNOnPartial());
+      }
+    }
   }
   lastPostToApp = property("");
 }
@@ -95,33 +101,35 @@ describe("ExtensionController", () => {
     expect(target.state.value.useExitRelays).toBe(false);
   });
 
-
-  describe("Upon Firefox launch, the VPN Extension status follows the status of the VPN client", ()=>{
-    test("If Firefox is launched while the VPN client is ON, the extension starts with a default ON state", ()=>{
-      const testController = new TestController(new StateVPNClosed())
+  describe("Upon Firefox launch, the VPN Extension status follows the status of the VPN client", () => {
+    test("If Firefox is launched while the VPN client is ON, the extension starts with a default ON state", () => {
+      const testController = new TestController(new StateVPNClosed());
       const target = new ExtensionController(
-        new TestRegister(),testController
+        new TestRegister(),
+        testController
       );
       expect(target.state.value.enabled).toBe(false);
       testController.state.set(new StateVPNEnabled());
       expect(target.state.value.enabled).toBe(true);
     });
-    test("If Firefox is launched while the VPN client is OFF, the extension starts with a default OFF state", ()=>{
-      const testController = new TestController(new StateVPNClosed())
+    test("If Firefox is launched while the VPN client is OFF, the extension starts with a default OFF state", () => {
+      const testController = new TestController(new StateVPNClosed());
 
       const target = new ExtensionController(
-        new TestRegister(),testController
+        new TestRegister(),
+        testController
       );
       expect(target.state.value.enabled).toBe(false);
       testController.state.set(new StateVPNDisabled());
       expect(target.state.value.enabled).toBe(false);
-    })
+    });
 
-    test("If Firefox was launched when the VPN client was OFF, turning the VPN client ON, should turn the VPN extension ON.", ()=>{
-      const testController = new TestController(new StateVPNClosed())
+    test("If Firefox was launched when the VPN client was OFF, turning the VPN client ON, should turn the VPN extension ON.", () => {
+      const testController = new TestController(new StateVPNClosed());
 
       const target = new ExtensionController(
-        new TestRegister(),testController
+        new TestRegister(),
+        testController
       );
       expect(target.state.value.enabled).toBe(false);
       testController.state.set(new StateVPNDisabled());
@@ -131,22 +139,24 @@ describe("ExtensionController", () => {
       testController.state.set(new StateVPNEnabled());
       expect(target.state.value.enabled).toBe(true);
     });
-    test("If Firefox was launched when the VPN client was ON, turning the VPN client OFF, should NOT turn the VPN extension OFF.", ()=>{
-      const testController = new TestController(new StateVPNClosed())
+    test("If Firefox was launched when the VPN client was ON, turning the VPN client OFF, should NOT turn the VPN extension OFF.", () => {
+      const testController = new TestController(new StateVPNClosed());
 
       const target = new ExtensionController(
-        new TestRegister(),testController
+        new TestRegister(),
+        testController
       );
       expect(target.state.value.enabled).toBe(false);
+      testController.state.set(new StateVPNEnabled());
+      expect(target.state.value.enabled).toBe(true);
+      // Given that the client did an unexpected disconnect,
+      // the extension should ask to re-enable instatnly
+      // without disconnecting
       testController.state.set(new StateVPNDisabled());
-      expect(target.state.value.enabled).toBe(false);
-
-      // If we now have turned it on, it should follow
-      testController.state.set(new StateVPNDisabled());
+      // We should have sent a reconnect
+      expect(testController.lastPostToApp.value).toBe("activate");
+      // We still should have been enabled.
       expect(target.state.value.enabled).toBe(true);
     });
   });
-
-
-
 });
