@@ -25,12 +25,26 @@ export class ConditionalView extends LitElement {
   constructor() {
     super();
     this.slotName = "default";
+    this.elements = new Map();
+    this.elements.set("default", "");
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this.ingestChildren();
+  }
+  ingestChildren() {
+    const elements = [...this.children];
+    elements.forEach((e) => {
+      e.remove();
+      if (e.slot) {
+        this.elements.set(e.slot, e);
+      }
+    });
   }
 
   hasSlot(slotName) {
-    return Array.from(this.children).some((e) => {
-      return e.slot === slotName;
-    });
+    return this.elements.has(slotName);
   }
   getTargetSlot() {
     const slot = this.slotName;
@@ -43,7 +57,11 @@ export class ConditionalView extends LitElement {
     return slot;
   }
   render() {
-    return html` <slot name=${this.getTargetSlot()}></slot> `;
+    if (this.children.length > 1) {
+      // Horrible perf, but let's make sure we don't render stuff that should not be visible.
+      this.ingestChildren();
+    }
+    return html`${this.elements.get(this.getTargetSlot())}`;
   }
 }
 customElements.define("conditional-view", ConditionalView);
