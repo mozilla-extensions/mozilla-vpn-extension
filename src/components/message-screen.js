@@ -122,7 +122,8 @@ export class MessageScreen extends LitElement {
       inline-size: 280px;
     }
 
-    img.signin-message-screen {
+    img.signin-message-screen,
+    img.needs-update-message-screen {
       max-block-size: 140px;
       inline-size: 140px;
       margin-block-end: 0px;
