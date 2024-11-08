@@ -95,9 +95,11 @@ describe("fromVPNStatusResponse", () => {
     msg.status.location.exit_country_code = "mor";
     msg.status.location.exit_city_name =
       "Actually no idea what the name would be";
+    msg.status.version = "2.25.1";
 
     const result = fromVPNStatusResponse(msg, list);
     expect(result.exitServerCity).toBe(list[1][0]);
+
     expect(result.exitServerCountry).toBe(list[1]);
     expect(result.connected).toBe(false);
     expect(result.state).toBe("Disabled");
@@ -111,6 +113,7 @@ describe("fromVPNStatusResponse", () => {
     msg.status.location.exit_country_code = "mor";
     msg.status.location.exit_city_name =
       "Actually no idea what the name would be";
+    msg.status.version = "2.25.1";
 
     const result = fromVPNStatusResponse(msg, list);
     expect(result.exitServerCity).toBe(list[1][0]);
@@ -118,7 +121,8 @@ describe("fromVPNStatusResponse", () => {
     expect(result.connected).toBe(false);
     expect(result.state).toBe("Disabled");
   });
-  it("It creates a StatOn Status ", () => {
+
+  it("It creates a StateOn Status ", () => {
     const msg = new vpnStatusResponse();
     msg.status.vpn = "StateOn";
     msg.status.connectedSince = "1";
@@ -127,6 +131,7 @@ describe("fromVPNStatusResponse", () => {
     msg.status.location.exit_country_code = "mor";
     msg.status.location.exit_city_name =
       "Actually no idea what the name would be";
+    msg.status.version = "2.25.1";
 
     const result = fromVPNStatusResponse(msg, list);
     expect(result.exitServerCity).toBe(list[1][0]);
@@ -147,6 +152,7 @@ describe("fromVPNStatusResponse", () => {
           exit_country_code: "",
         },
         vpn: "StateInitializing",
+        version: "2.25.2",
       },
       t: "status",
     };
@@ -154,5 +160,21 @@ describe("fromVPNStatusResponse", () => {
     expect(result).not.toBeNull();
     expect(result.state).toBe("SubscriptionNeeded");
     expect(result.subscribed).toBe(false);
+  });
+
+  it("It can handle StateVPNNeedsUpdate", () => {
+    const msg = new vpnStatusResponse();
+    msg.status.vpn = "StateOn";
+    msg.status.connectedSince = "1";
+    msg.status.location.entry_city_name = "berlin";
+    msg.status.location.entry_country_code = "de";
+    msg.status.location.exit_country_code = "mor";
+    msg.status.location.exit_city_name =
+      "Actually no idea what the name would be";
+    msg.status.version = "2.23.0";
+
+    const result = fromVPNStatusResponse(msg);
+    expect(result).not.toBeNull();
+    expect(result.state).toBe("NeedsUpdate");
   });
 });

@@ -305,7 +305,11 @@ export function fromVPNStatusResponse(
   const appState = status.app;
 
   const version = status.version;
-  if (!version || !Utils.isViableClientVersion(version)) {
+  const parseVersion = (versionString) => {
+    return parseInt(versionString.replace(".", ""));
+  };
+
+  if (!version || parseVersion(version) < parseVersion("2.25.0")) {
     return new StateVPNNeedsUpdate();
   }
 
