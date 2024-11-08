@@ -7,7 +7,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { describe, expect, test } from "@jest/globals";
-import { render, html } from "../../../src/vendor/lit-all.min.js";
+import {
+  render,
+  html,
+  ref,
+  createRef,
+} from "../../../src/vendor/lit-all.min.js";
 
 import { ConditionalView } from "../../../src/components/conditional-view.js";
 
@@ -36,8 +41,10 @@ describe("ConditionalView", () => {
     );
     element.slotName = "visible";
     await element.requestUpdate();
-    const slot = element.shadowRoot;
-    expect(slot.textContent).toBe("this is visible");
+    const slot = element.shadowRoot.querySelector("slot");
+    const selectedHeader = slot.assignedNodes()[0];
+
+    expect(selectedHeader.textContent).toBe("this is visible");
   });
   test("It selects the default slot if none match", async () => {
     const element = document.createElement("conditional-view");
@@ -52,7 +59,9 @@ describe("ConditionalView", () => {
     );
     element.slotName = "this-slot-does-not-exist";
     await element.requestUpdate();
-    const slot = element.shadowRoot;
-    expect(slot.textContent).toBe("this is default");
+    const slot = element.shadowRoot.querySelector("slot");
+    const selectedHeader = slot.assignedNodes()[0];
+
+    expect(selectedHeader.textContent).toBe("this is default");
   });
 });
