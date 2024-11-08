@@ -65,15 +65,21 @@ defineMessageScreen(
 );
 
 defineMessageScreen(
+  "needs-update-message-screen",
+  "message-update.svg",
+  tr("headerNeedsUpdate"),
+  tr("bodyNeedsUpdate"),
+  tr("btnDownloadNow"),
+  () => {
+    open("https://www.mozilla.org/products/vpn/download/");
+  }
+);
+
+defineMessageScreen(
   "signin-message-screen",
   "message-signin.svg",
   tr("headerSignedOut"),
-  tr("bodySignedOut"),
-  tr("btnOpenVpn"),
-  (elm) => {
-    sendToApp(elm, "focus");
-    sendToApp(elm, "openAuth");
-  }
+  tr("bodySignedOut")
 );
 
 defineMessageScreen(

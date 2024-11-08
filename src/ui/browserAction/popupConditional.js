@@ -57,6 +57,9 @@ export class PopUpConditionalView extends ConditionalView {
     if (!state.subscribed) {
       return "MessageSubscription";
     }
+    if (state.needsUpdate) {
+      return "MessageUpdateClient";
+    }
     /**
      * TODO:
      * if( did not have onboarding){
