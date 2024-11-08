@@ -189,5 +189,19 @@
   },
   "footnoteUnsupportedOSMessage": {
     "message": "We’re working to bring support to macOS and Linux soon!"
+  },
+  "offForWebsite": {
+    "message": "Mozilla VPN off for website",
+    "description": "Aria label"
+  },
+  "websiteLocationLabel": {
+    "message": "$SERVERLOCATION$: Mozilla VPN website location",
+    "description": "Aria label for a flag icon representing the location of the VPN server",
+    "placeholders": {
+      "serverlocation": {
+        "content": "$1",
+        "example": "Germany"
+      }
+    }
   }
 }

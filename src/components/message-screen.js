@@ -126,6 +126,7 @@ export class MessageScreen extends LitElement {
     img.needs-update-message-screen {
       max-block-size: 140px;
       inline-size: 140px;
+      margin-block-end: 0px;
     }
 
     img.open-mozilla-vpn-message-screen {

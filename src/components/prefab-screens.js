@@ -79,12 +79,7 @@ defineMessageScreen(
   "signin-message-screen",
   "message-signin.svg",
   tr("headerSignedOut"),
-  tr("bodySignedOut"),
-  tr("btnOpenVpn"),
-  (elm) => {
-    sendToApp(elm, "focus");
-    sendToApp(elm, "openAuth");
-  }
+  tr("bodySignedOut")
 );
 
 defineMessageScreen(
