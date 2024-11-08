@@ -104,6 +104,7 @@ export class MessageScreen extends LitElement {
       justify-content: space-between;
       /* ensure the content grows vertically to fill the height of the panel */
       min-block-size: calc(var(--min-block-size) - var(--nav-height));
+      margin-inline: auto;
     }
     * {
       width: 100%;
