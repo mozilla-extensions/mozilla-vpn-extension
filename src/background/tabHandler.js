@@ -57,7 +57,7 @@ export class TabHandler extends Component {
     log("Initializing TabHandler");
     this.vpnController.servers.subscribe((s) => {
       this.servers = s;
-      console.log("servers", s)
+      console.log("servers", s);
     });
 
     this.extController.state.subscribe((s) => {
@@ -97,8 +97,8 @@ export class TabHandler extends Component {
       });
       browser.pageAction.setTitle({
         tabId: currentTab.id,
-        title: tr("offForWebsite")
-      })
+        title: tr("offForWebsite"),
+      });
       return browser.pageAction.show(currentTab.id);
     }
 
@@ -110,8 +110,15 @@ export class TabHandler extends Component {
 
       browser.pageAction.setTitle({
         tabId: currentTab.id,
-        title: tr("websiteLocationLabel", Utils.nameFor(this.currentContext.countryCode, this.currentContext.cityCode, this.servers)),
-      })
+        title: tr(
+          "websiteLocationLabel",
+          Utils.nameFor(
+            this.currentContext.countryCode,
+            this.currentContext.cityCode,
+            this.servers
+          )
+        ),
+      });
       return browser.pageAction.show(currentTab.id);
     }
 

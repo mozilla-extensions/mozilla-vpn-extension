@@ -29,7 +29,12 @@ class Main {
     this.extController,
     this.proxyHandler
   );
-  tabHandler = new TabHandler(this, this.extController, this.proxyHandler, this.vpnController);
+  tabHandler = new TabHandler(
+    this,
+    this.extController,
+    this.proxyHandler,
+    this.vpnController
+  );
   toolbarIconHandler = new ToolbarIconHandler(this, this.extController);
   tabReloader = new TabReloader(this, this.extController, this.proxyHandler);
 
