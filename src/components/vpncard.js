@@ -102,7 +102,7 @@ export class VPNCard extends LitElement {
         return tr("vpnIsOn");
       }
       if (this.connecting) {
-        return "Connecting...";
+        return tr("connecting");
       }
       return tr("vpnIsOff");
     };

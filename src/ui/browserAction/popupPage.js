@@ -290,7 +290,7 @@ export class BrowserActionPopup extends LitElement {
   ) {
     const pageLocationPicker = (() => {
       return html`
-        <h2 class="select-location-title">${tr("titleServerList")}</h2>
+        <h2 class="select-location-title">${tr("selectWebsiteLocation")}</h2>
         <button
           class="row ghost-btn "
           id="selectPageLocation"
@@ -361,7 +361,7 @@ export class BrowserActionPopup extends LitElement {
   static createServerList(currentCity = null, list = [], onResult = () => {}) {
     const viewElement = document.createElement("section");
     viewElement.classList = ["limit-panel-height"];
-    viewElement.dataset.title = "Select Location";
+    viewElement.dataset.title = tr("titleServerList");
     render(
       html`
         <server-list
