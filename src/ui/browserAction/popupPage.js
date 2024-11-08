@@ -22,6 +22,7 @@ import {
   resetSizing,
   inUseLabel,
   positioner,
+  secondaryButton,
 } from "../../components/styles.js";
 
 // Other components used
@@ -339,6 +340,7 @@ export class BrowserActionPopup extends LitElement {
       >
         ${tr("resetPageSettings")}
       </button>
+      <button class="btn-secondary">${tr("giveFeedback")}</button>
     `;
   }
   static backBtn(back) {
@@ -377,7 +379,7 @@ export class BrowserActionPopup extends LitElement {
   }
 
   static styles = css`
-    ${fontStyling}${resetSizing}${ghostButtonStyles}${inUseLabel}${positioner}
+    ${fontStyling}${resetSizing}${ghostButtonStyles}${inUseLabel}${positioner}${secondaryButton}
     section {
       background-color: var(--panel-bg-color);
       max-block-size: calc(var(--window-max-height) - var(--nav-height));
@@ -390,6 +392,8 @@ export class BrowserActionPopup extends LitElement {
     main {
       padding: var(--padding-default) var(--padding-default) 0
         var(--padding-default);
+      display: flex;
+      flex-direction: column;
     }
 
     .positioner.checkbox-positioner {
@@ -470,7 +474,7 @@ export class BrowserActionPopup extends LitElement {
       margin-left: var(--padding-default);
     }
 
-    button {
+    #selectLocation {
       width: 100%;
       border-radius: 4px;
       padding: 8px, 16px, 8px, 16px;

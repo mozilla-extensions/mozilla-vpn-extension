@@ -124,6 +124,34 @@ export const fontStyling = css`
   }
 `;
 
+export const secondaryButton = css`
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0);
+    border: none;
+    line-height: 23px;
+    margin-inline: auto;
+    margin-block: 0 var(--padding-default);
+    padding-inline: 4px;
+    color: var(--action-button-color);
+    font-family: "Inter Semi Bold";
+    font-size: 15px;
+    border-radius: 4px;
+    transition: background 0.2s ease-in-out;
+  }
+
+  .btn-secondary:hover {
+    background-color: lch(from var(--action-button-color) l c h / 0.1);
+  }
+
+  .btn-secondary:active {
+    background-color: lch(from var(--action-button-color) l c h / 0.2);
+  }
+
+  .btn-secondary:focus-visible {
+    box-shadow: 0 0 0 4px var (--action-button-color);
+  }
+`;
+
 export const ghostButtonStyles = css`
   button.ghost-btn {
     background-color: transparent;
