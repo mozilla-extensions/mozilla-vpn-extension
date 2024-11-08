@@ -18,7 +18,10 @@
     <title>Mozilla VPN</title>
   </head>
   <body>
-    <popup-condview id="conditional-view">
+    <popup-condview id="conditional-view" class="needsSlotted">
+      <needs-update-message-screen
+        slot="MessageUpdateClient"
+      ></needs-update-message-screen>
       <unsupported-os-message-screen
         slot="MessageOSNotSupported"
       ></unsupported-os-message-screen>

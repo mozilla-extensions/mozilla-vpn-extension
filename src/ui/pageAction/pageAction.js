@@ -50,7 +50,7 @@ export class PageActionPopup extends LitElement {
         : "dark";
 
     const contextDescriptionText = () => {
-      return excluded ? "Protection for this site:" : "Location for this site:";
+      return excluded ? "websiteProtection" : "titleServerList";
     };
 
     const getLocationText = () => {
@@ -74,13 +74,13 @@ export class PageActionPopup extends LitElement {
     };
 
     const resetButtonContent = () => {
-      return excluded ? "Turn on" : "Remove custom location";
+      return excluded ? "turnOnProtection" : "removeCustomLocation";
     };
 
     return html`
       <div class="wrapper">
         <h1>${tr("productName")}</h1>
-        <p id="context-description">${contextDescriptionText()}</p>
+        <p id="context-description">${tr(contextDescriptionText())}</p>
 
         <div class="flex line-height">
           <img id="context-img" src="${getSrc()}" />
@@ -89,7 +89,7 @@ export class PageActionPopup extends LitElement {
       </div>
       <div class="flex">
         <button id="removeContext" @click="${removeContext}">
-          ${resetButtonContent()}
+          ${tr(resetButtonContent())}
         </button>
       </div>
     `;
