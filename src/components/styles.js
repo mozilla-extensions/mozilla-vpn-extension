@@ -131,6 +131,7 @@ export const ghostButtonStyles = css`
     border-radius: var(--button-border-radius);
     outline: none !important;
     min-block-size: 40px;
+    position: relative;
   }
 
   .ghost-icon-btn {
@@ -151,17 +152,20 @@ export const ghostButtonStyles = css`
     inset: 0px;
   }
 
-  .ghost-btn:hover::before {
+  .ghost-btn:hover::before,
+  #settingsList button:hover {
     background: lch(from var(--button-ghost-bg-color) l c h / 0.1);
   }
 
-  .ghost-btn:focus::before {
+  .ghost-btn:focus-visible::before,
+  #settingsList button:focus-visible {
     border: 2px solid lch(from var(--button-ghost-bg-color) l c h / 0.5);
   }
 
-  .ghost-btn:active::before {
+  .ghost-btn:active::before,
+  #settingsList button:active {
     background: lch(from var(--button-ghost-bg-color) l c h / 0.15);
-    border: none;
+    // border: none;
   }
 
   @media (prefers-color-scheme: dark) {
