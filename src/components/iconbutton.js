@@ -26,14 +26,21 @@ export class IconLinkButton extends LitElement {
     href: { attribute: true },
     alt: { attribute: true },
     icon: { attribute: true },
+    eventLabel: { attribute: true},
   };
   constructor() {
     super();
     this.href = "";
     this.alt = "";
     this.icon = "";
+    this.eventLabel = "";
   }
   onClick() {
+    if (this.eventLabel) {
+      if (this.eventLabel == "openSettings") {
+        return this.dispatchEvent(new CustomEvent("openSettings"));
+      }
+    }
     if (this.href == "") {
       return this.dispatchEvent(new CustomEvent("goBack"));
     }
