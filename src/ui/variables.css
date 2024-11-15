@@ -80,6 +80,7 @@
     --text-color-invert: var(--grey50);
     --button-ghost-bg-color: #ffffff;
     --divider-color: lch(from var(--color-divider) l c h / 0.2);
+    --secondary-btn-color: #ffffff;
   }
 }
 
@@ -96,5 +97,6 @@
     --border-color: lch(from var(--panel-bg-color) calc(l - 15) c h / 0.3);
     --button-ghost-bg-color: var(--grey50);
     --input-border: #8f8f9d;
+    --secondary-btn-color: var(--action-button-color);
   }
 }

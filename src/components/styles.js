@@ -132,7 +132,7 @@ export const secondaryButton = css`
     margin-inline: auto;
     margin-block: 0 var(--padding-default);
     padding-inline: 4px;
-    color: var(--action-button-color);
+    color: var(--secondary-btn-color);
     font-family: "Inter Semi Bold";
     font-size: 15px;
     border-radius: 4px;
@@ -140,15 +140,16 @@ export const secondaryButton = css`
   }
 
   .btn-secondary:hover {
-    background-color: lch(from var(--action-button-color) l c h / 0.1);
+    background-color: lch(from var(--secondary-btn-color) l c h / 0.1);
   }
 
   .btn-secondary:active {
-    background-color: lch(from var(--action-button-color) l c h / 0.2);
+    background-color: lch(from var(--secondary-btn-color) l c h / 0.2);
   }
 
   .btn-secondary:focus-visible {
-    box-shadow: 0 0 0 4px var (--action-button-color);
+    box-shadow: 0 0 0 2px var(--secondary-btn-color);
+    outline: none;
   }
 `;
 
@@ -159,6 +160,7 @@ export const ghostButtonStyles = css`
     border-radius: var(--button-border-radius);
     outline: none !important;
     min-block-size: 40px;
+    position: relative;
   }
 
   .ghost-icon-btn {
@@ -179,17 +181,20 @@ export const ghostButtonStyles = css`
     inset: 0px;
   }
 
-  .ghost-btn:hover::before {
+  .ghost-btn:hover::before,
+  #settingsList button:hover {
     background: lch(from var(--button-ghost-bg-color) l c h / 0.1);
   }
 
-  .ghost-btn:focus::before {
+  .ghost-btn:focus-visible::before,
+  #settingsList button:focus-visible {
     border: 2px solid lch(from var(--button-ghost-bg-color) l c h / 0.5);
   }
 
-  .ghost-btn:active::before {
+  .ghost-btn:active::before,
+  #settingsList button:active {
     background: lch(from var(--button-ghost-bg-color) l c h / 0.15);
-    border: none;
+    // border: none;
   }
 
   @media (prefers-color-scheme: dark) {
