@@ -19,6 +19,7 @@ export const REQUEST_TYPES = [
   "telemetry",
   "session_start",
   "session_stop",
+  "interventions",
 ];
 
 export class VPNState {

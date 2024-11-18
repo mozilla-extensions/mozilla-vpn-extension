@@ -62,6 +62,10 @@ export class VPNController extends Component {
   get featureList() {
     return this.#mFeaturelist;
   }
+  /** @type {IBindable<Array<String>>} */
+  get interventions() {
+      return this.#mInterventions;
+  }
 
   initNativeMessaging() {
     log("initNativeMessaging");
@@ -173,6 +177,12 @@ export class VPNController extends Component {
           this.#increaseIsolationKey();
         }
         break;
+      case "interventions":
+        const data = response.interventions;
+        if(typeof data == typeof []){
+          this.#mInterventions.set(data);
+        }
+        break;
       case "featurelist":
         this.#mFeaturelist.set({
           ...new FeatureFlags(),
@@ -235,6 +245,8 @@ export class VPNController extends Component {
   #mFeaturelist = property(new FeatureFlags());
 
   #isExcluded = property(false);
+
+  #mInterventions = property([]);
 }
 
 export function isSplitTunnled(
