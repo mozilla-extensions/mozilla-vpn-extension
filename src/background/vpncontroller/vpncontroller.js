@@ -64,7 +64,7 @@ export class VPNController extends Component {
   }
   /** @type {IBindable<Array<String>>} */
   get interventions() {
-      return this.#mInterventions;
+    return this.#mInterventions;
   }
 
   initNativeMessaging() {
@@ -179,7 +179,7 @@ export class VPNController extends Component {
         break;
       case "interventions":
         const data = response.interventions;
-        if(typeof data == typeof []){
+        if (typeof data == typeof []) {
           this.#mInterventions.set(data);
         }
         break;
