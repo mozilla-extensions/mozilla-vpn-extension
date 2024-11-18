@@ -16,6 +16,7 @@ export const REQUEST_TYPES = [
   "deactivate",
   "focus",
   "openAuth",
+  "interventions",
 ];
 
 export class VPNState {
