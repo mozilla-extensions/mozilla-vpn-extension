@@ -56,14 +56,14 @@ export class ExtensionController extends Component {
 
       if (this.clientState.state == "OnPartial") {
         // Send deactivation to client and wait for response
-        this.mExpectDisconnect = true;
+        this.mKeepAliveConnection = false;
         this.vpnController.postToApp("deactivate");
         return;
       }
 
       return this.#mState.set(new StateFirefoxVPNDisabled(true));
     }
-    this.mExpectDisconnect = false;
+    this.mKeepAliveConnection = true;
 
     // We are turning the extension on...
     if (this.clientState.state == "Enabled") {
@@ -118,20 +118,16 @@ export class ExtensionController extends Component {
 
     switch (newClientState.state) {
       case "Enabled":
+        this.mKeepAliveConnection = true;
         maybeSet(new StateFirefoxVPNEnabled(false, getTime()));
         return;
       case "Disabled":
-        if (this.mExpectDisconnect) {
-          maybeSet(new StateFirefoxVPNDisabled(false));
-          this.mExpectDisconnect = false;
-          return;
-        }
-        if (this.#mState.value.enabled) {
-          // This activation was not okay. let's re-enable to state-on-partial
-          // and wait for the next connection change
+        if (this.mKeepAliveConnection) {
           this.vpnController.postToApp("activate");
           return;
         }
+        this.#mState.set(new StateFirefoxVPNDisabled(false));
+        return;
       case "OnPartial":
         maybeSet(new StateFirefoxVPNEnabled(true, getTime()));
         return;
@@ -141,5 +137,5 @@ export class ExtensionController extends Component {
   }
 
   #mState = property(new FirefoxVPNState());
-  mExpectDisconnect = false;
+  mKeepAliveConnection = false;
 }
