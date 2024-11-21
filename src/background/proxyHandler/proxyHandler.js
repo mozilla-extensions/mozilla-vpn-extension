@@ -36,6 +36,28 @@ export class ProxyHandler extends Component {
     this.controller = controller;
     browser.runtime.getPlatformInfo((info) => {
       this.#mPlatformOs = info.os;
+      if (info.os === "linux") {
+        // Linux provides bypass via a UNIX domain socket.
+        this.#mLocalProxyInfo.value = [
+          {
+            type: "socks",
+            host: "file:/var/run/mozillavpn.proxy",
+            port: 1234,
+          },
+        ];
+      } else if (info.os === "win") {
+        // Windows uses a service on a well-known TCP port.
+        this.#mLocalProxyInfo.value = [
+          {
+            type: "socks",
+            host: "localhost",
+            port: 8123,
+          },
+        ];
+      } else {
+        // Not supported on this platform
+        this.#mLocalProxyInfo.value = [];
+      }
     });
   }
 
@@ -112,19 +134,6 @@ export class ProxyHandler extends Component {
    */
   processClientStateChanges(vpnState) {
     console.log(`Processing client state change ${vpnState}`);
-    if (this.#mPlatformOs === "linux") {
-      this.#mLocalProxyInfo.value = [
-        {
-          type: "socks",
-          host: "file:/var/run/mozillavpn.proxy",
-          port: 1234,
-        },
-      ];
-    } else if (vpnState.loophole) {
-      this.#mLocalProxyInfo.value = [ProxyUtils.parseProxy(vpnState.loophole)];
-    } else {
-      this.#mLocalProxyInfo.value = [];
-    }
 
     if (this.servers.length == 0) {
       console.log("No servers, unable to get exit location proxy info");
