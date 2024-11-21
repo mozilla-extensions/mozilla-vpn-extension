@@ -69,7 +69,7 @@
   --divider-color: var(--color-divider);
   --text-secondary-color: var(--grey40);
 
-  --settings-secondary-text-color: #5B5B66;
+  --settings-secondary-text-color: #5b5b66;
   --settings-border-color: #e7e7e7;
   --settings-link-color: var(--action-button-color);
 }
@@ -85,7 +85,7 @@
     --button-ghost-bg-color: #ffffff;
     --divider-color: lch(from var(--color-divider) l c h / 0.2);
     --secondary-btn-color: #ffffff;
-    --settings-secondary-text-color: rgba(255, 255, 255, .8);
+    --settings-secondary-text-color: rgba(255, 255, 255, 0.8);
     --settings-border-color: #e7e7e74d;
     --settings-link-color: rgba(255, 255, 255, 1);
   }

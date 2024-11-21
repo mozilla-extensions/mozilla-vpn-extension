@@ -158,7 +158,7 @@ export class SettingsPage extends LitElement {
     .secondary {
       color: var(--settings-secondary-text-color);
     }
-    
+
     @media (prefers-color-scheme: dark) {
       .invert_darkmode {
         filter: invert();

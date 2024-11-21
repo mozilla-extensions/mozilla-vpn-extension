@@ -106,7 +106,9 @@ export class ContextTable extends LitElement {
       border-bottom: none;
     }
 
-    td, tr, .tableHeader {
+    td,
+    tr,
+    .tableHeader {
       height: 56px;
       vertical-align: center;
     }
@@ -119,11 +121,11 @@ export class ContextTable extends LitElement {
     }
 
     a:hover {
-      color: lch(from var(--settings-link-color) l c h / 0.8)
+      color: lch(from var(--settings-link-color) l c h / 0.8);
     }
 
     a:active {
-      color: lch(from var(--settings-link-color) l c h / 0.5)
+      color: lch(from var(--settings-link-color) l c h / 0.5);
     }
 
     .tableHolder th {
@@ -185,7 +187,6 @@ export class ContextTable extends LitElement {
 
     td.row {
       text-align: center;
-
     }
 
     .align-left button {
@@ -268,12 +269,13 @@ export const tableRow = (ctx, serverList, removeOrigin) => {
   const name = ctx.excluded
     ? ""
     : Utils.nameFor(ctx.countryCode, ctx.cityCode, serverList);
-    
-  let flagIcon =  null;
+
+  let flagIcon = null;
   if (!ctx.excluded) {
     flagIcon = html`<img
-    class="flag-icon"
-    src="../../assets/flags/${ctx.countryCode.toUpperCase()}.png">`;
+      class="flag-icon"
+      src="../../assets/flags/${ctx.countryCode.toUpperCase()}.png"
+    />`;
   }
   return html`
 
