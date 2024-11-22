@@ -125,7 +125,7 @@ export class VPNController extends Component {
    * @param { string } command - Command to Send
    * @param { object } args - Argument blob
    */
-  postToApp(command, args) {
+  postToApp(command, args = {}) {
     if (!REQUEST_TYPES.includes(command)) {
       log(`Command ${command} not in known command list`);
     }
