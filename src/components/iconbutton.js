@@ -26,7 +26,7 @@ export class IconLinkButton extends LitElement {
     href: { attribute: true },
     alt: { attribute: true },
     icon: { attribute: true },
-    eventLabel: { attribute: true},
+    eventLabel: { attribute: true },
   };
   constructor() {
     super();

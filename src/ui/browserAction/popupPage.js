@@ -232,10 +232,10 @@ export class BrowserActionPopup extends LitElement {
 
     const openGiveFeedback = () => {
       browser.tabs.create({
-        url: "https://qsurvey.mozilla.com/s3/VPN-Extension-Feedback"
+        url: "https://qsurvey.mozilla.com/s3/VPN-Extension-Feedback",
       });
       window.close();
-    }
+    };
 
     return BrowserActionPopup.sitePreferencesTemplate(
       this.currentSiteContext,
@@ -247,7 +247,7 @@ export class BrowserActionPopup extends LitElement {
       resetSitePreferences,
       this._siteContext !== null,
       getExclusionStringElem,
-      openGiveFeedback,
+      openGiveFeedback
     );
   }
 
@@ -378,40 +378,39 @@ export class BrowserActionPopup extends LitElement {
     const linkList = document.createElement("ul");
     linkList.id = "settingsList";
 
-   [
+    [
       {
         linkTitle: "Website preferences",
         url: "/ui/settingsPage/index.html",
-        iconId: "websitePreferences"
+        iconId: "websitePreferences",
       },
       {
-        linkTitle: "Help center", 
+        linkTitle: "Help center",
         url: "https://www.sumo.mozilla.com",
-        iconId: "helpCenter"
+        iconId: "helpCenter",
       },
       {
         linkTitle: "Contact support",
         url: "https://support.mozilla.org/questions/new/firefox-private-network-vpn/form",
-        iconId: "contactSupport"
-      }
-  ].forEach(link => {
-    const listItem = document.createElement("li");
-    const buttonEl = document.createElement("button");
-    buttonEl.classList = [`${link.iconId}`];
-    buttonEl.textContent = link.linkTitle;
+        iconId: "contactSupport",
+      },
+    ].forEach((link) => {
+      const listItem = document.createElement("li");
+      const buttonEl = document.createElement("button");
+      buttonEl.classList = [`${link.iconId}`];
+      buttonEl.textContent = link.linkTitle;
 
-    const openInNewTab = () => {
-      browser.tabs.create({ url: link.url});
-      window.close();
-    };
+      const openInNewTab = () => {
+        browser.tabs.create({ url: link.url });
+        window.close();
+      };
 
-    buttonEl.addEventListener("click", openInNewTab);
-    listItem.appendChild(buttonEl);
-    linkList.appendChild(listItem);
-  })
+      buttonEl.addEventListener("click", openInNewTab);
+      listItem.appendChild(buttonEl);
+      linkList.appendChild(listItem);
+    });
 
-  viewElement.appendChild(linkList)
-
+    viewElement.appendChild(linkList);
 
     return viewElement;
   }
@@ -572,7 +571,7 @@ export class BrowserActionPopup extends LitElement {
       text-align: left;
       block-size: 40px;
       font-family: "Inter Semi Bold";
-      background: lch(from var(--action-button-color) l c h / 0 );
+      background: lch(from var(--action-button-color) l c h / 0);
       transition: background 0.2s ease-in-out;
       border: none;
       padding-left: 48px;
@@ -622,7 +621,6 @@ export class BrowserActionPopup extends LitElement {
     }
 
     @media (prefers-color-scheme: dark) {
-
       #settingsList button {
         color: var(--text-color-headline);
       }
