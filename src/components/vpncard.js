@@ -30,6 +30,7 @@ export class VPNCard extends LitElement {
     stability: { type: String },
     hasContext: { type: Boolean },
     connecting: { type: Boolean },
+    allowDisconnect: { type: Boolean }
   };
 
   constructor() {
@@ -41,6 +42,7 @@ export class VPNCard extends LitElement {
     this.connectedSince = 0;
     this.stability = VPNState.Stable;
     this.connecting = false;
+    this.allowDisconnect = false;
   }
   #intervalHandle = null;
   #shieldElement = createRef();
@@ -79,6 +81,7 @@ export class VPNCard extends LitElement {
       box: true,
       on: this.enabled,
       connecting: this.connecting,
+      allowDisconnect: this.allowDisconnect,
       unstable: this.enabled && this.stability === VPNState.Unstable,
       noSignal: this.enabled && this.stability === VPNState.NoSignal,
       stable:
@@ -222,6 +225,15 @@ export class VPNCard extends LitElement {
     .box.connecting {
       background: var(--main-card-background);
       box-shadow: var(--box-shadow-on);
+    }
+
+    .box.connecting .pill {
+      pointer-events: none;
+    }
+
+    .box.connecting.allowDisconnect .pill {
+      pointer-events: all;
+      opacity: 1;
     }
     main,
     footer {
