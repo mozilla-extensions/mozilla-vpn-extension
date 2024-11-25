@@ -35,7 +35,11 @@ class Main {
     this.proxyHandler,
     this.vpnController
   );
-  toolbarIconHandler = new ToolbarIconHandler(this, this.extController);
+  toolbarIconHandler = new ToolbarIconHandler(
+    this,
+    this.extController,
+    this.vpnController
+  );
   tabReloader = new TabReloader(this, this.extController, this.proxyHandler);
 
   async init() {
