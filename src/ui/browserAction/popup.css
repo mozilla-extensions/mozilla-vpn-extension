@@ -22,3 +22,7 @@ body {
   max-height: calc(var(--window-max-height) - var(--nav-height));
   max-block-size: calc(var(--window-max-height)- var(--nav-height));
 }
+
+.needsSlotted > * {
+  display: none;
+}
