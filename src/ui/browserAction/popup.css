@@ -23,6 +23,6 @@ body {
   max-block-size: calc(var(--window-max-height)- var(--nav-height));
 }
 
-.needsSlotted * {
+.needsSlotted > * {
   display: none;
 }
