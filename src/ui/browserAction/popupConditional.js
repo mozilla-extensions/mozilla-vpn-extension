@@ -45,6 +45,9 @@ export class PopUpConditionalView extends ConditionalView {
     if (!state.installed) {
       return "MessageInstallVPN";
     }
+    if (state.needsUpdate) {
+      return "MessageUpdateClient";
+    }
     if (!state.alive) {
       return "MessageOpenMozillaVPN";
     }
@@ -56,9 +59,6 @@ export class PopUpConditionalView extends ConditionalView {
     }
     if (!state.subscribed) {
       return "MessageSubscription";
-    }
-    if (state.needsUpdate) {
-      return "MessageUpdateClient";
     }
     /**
      * TODO:
