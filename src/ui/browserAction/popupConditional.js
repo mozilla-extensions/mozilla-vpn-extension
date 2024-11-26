@@ -4,6 +4,7 @@
 
 import { ConditionalView } from "../../components/conditional-view.js";
 import { propertySum } from "../../shared/property.js";
+import { Utils } from "../../shared/utils.js";
 import { vpnController } from "./backend.js";
 
 export class PopUpConditionalView extends ConditionalView {
@@ -11,13 +12,16 @@ export class PopUpConditionalView extends ConditionalView {
     super();
   }
 
-  connectedCallback() {
+  async connectedCallback() {
     super.connectedCallback();
+    const deviceOs = await browser.runtime.getPlatformInfo();
+    const supportedPlatform = Utils.isSupportedOs(deviceOs.os);
+
     propertySum(
       vpnController.state,
       vpnController.featureList,
       (state, features) => {
-        this.slotName = PopUpConditionalView.toSlotname(state, features);
+        this.slotName = PopUpConditionalView.toSlotname(state, features, supportedPlatform);
       }
     );
 
@@ -39,11 +43,18 @@ export class PopUpConditionalView extends ConditionalView {
    * @typedef {import("../../background/vpncontroller/states.js").VPNState} State
    * @param {State} state
    * @param {FeatureFlags} features
+   * @param {Boolean} supportedPlatform 
    * @returns {String}
    */
-  static toSlotname(state, features) {
+  static toSlotname(state, features, supportedPlatform) {
+    if (!supportedPlatform && !features.webExtension) {
+      return "MessageOSNotSupported"
+    }
     if (!state.installed) {
       return "MessageInstallVPN";
+    }
+    if (state.needsUpdate) {
+      return "MessageUpdateClient";
     }
     if (!state.alive) {
       return "MessageOpenMozillaVPN";
@@ -56,9 +67,6 @@ export class PopUpConditionalView extends ConditionalView {
     }
     if (!state.subscribed) {
       return "MessageSubscription";
-    }
-    if (state.needsUpdate) {
-      return "MessageUpdateClient";
     }
     /**
      * TODO:
