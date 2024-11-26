@@ -56,9 +56,8 @@ export class SettingsPage extends LitElement {
       </header>
       <main>
         <h2>${tr("websitePreferences")}</h2>
-        <p>${tr("settingsPageSubtitle")}</p>
+        <p class="secondary subtitle">${tr("settingsPageSubtitle")}</p>
         <div>
-          <img />
           <input
             type="text"
             placeholder=${tr("placeholderSearchWebsites")}
@@ -106,14 +105,22 @@ export class SettingsPage extends LitElement {
       flex-direction: column;
       align-items: center;
     }
-    * {
-      color: var(--text-color-primary);
+
+    h2 {
+      color: var(--text-color-headline);
     }
+
+    .subtitle {
+      font-size: 16px;
+      line-height: 24px;
+      margin-block-end: 16px;
+    }
+
     header {
       display: flex;
       flex-direction: row;
       padding: 20px 30px;
-      border-bottom: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--settings-border-color);
       width: 100%;
       margin-bottom: 32px;
     }
@@ -129,14 +136,13 @@ export class SettingsPage extends LitElement {
 
     input {
       margin-bottom: 32px;
-      padding: 10px 20px;
-      padding-left: 30px;
+      padding: 10px 20px 10px 48px;
       color: black;
       width: calc(max(50%, 300px));
       background-image: url("../../assets/img/search-icon.svg");
-      background-position: 2.5px 6px;
+      background-position: 12px 6px;
       background-repeat: no-repeat;
-      border: 2px solid var(--border-color);
+      border: 1px solid var(--border-color);
       border-radius: 5px;
     }
 
@@ -148,6 +154,11 @@ export class SettingsPage extends LitElement {
       align-items: center;
       max-width: 640px;
     }
+
+    .secondary {
+      color: var(--settings-secondary-text-color);
+    }
+
     @media (prefers-color-scheme: dark) {
       .invert_darkmode {
         filter: invert();
@@ -156,9 +167,12 @@ export class SettingsPage extends LitElement {
 
     h3 {
       margin-top: 32px;
+      font-family: "Inter Semi Bold";
+      color: var(--text-color-headline);
     }
     .emptyState p {
       opacity: 0.8;
+      text-align: center;
     }
   `;
 }
@@ -183,7 +197,7 @@ export const noElementPlaceHolder = () => {
     <div class="emptyState">
       <img aria-hidden="true" src="../../assets/img/country-tabs.svg" />
       <h3>${tr("headlineNoWebsitePreferences")}</h3>
-      <p>${tr("noWebsitePreferencesSubText")}</p>
+      <p class="secondary">${tr("noWebsitePreferencesSubText")}</p>
     </div>
   `;
 };
