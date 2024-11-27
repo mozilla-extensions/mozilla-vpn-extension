@@ -379,7 +379,7 @@ export class BrowserActionPopup extends LitElement {
   static styles = css`
     ${fontStyling}${resetSizing}${ghostButtonStyles}${inUseLabel}${positioner}
     section {
-      background-color: var(--panel-bg-color);
+      background-color: red;
       max-block-size: calc(var(--window-max-height) - var(--nav-height));
     }
 
