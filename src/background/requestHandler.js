@@ -145,7 +145,7 @@ export class RequestHandler extends Component {
 
     for (let urlString of [documentUrl, url]) {
       if (urlString) {
-        const parsedHostname = Utils.getFormattedHostname(urlString);
+        const parsedHostname = Utils.getTopLevelDomain(urlString);
         const proxyInfo = self.proxyMap.get(parsedHostname);
         if (proxyInfo) {
           return proxyInfo;
