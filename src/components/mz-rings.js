@@ -156,7 +156,7 @@ export class Rings extends LitElement {
      this.height = 100
      // TODO: Lucky numbers, calulate this from a 
      // property bounding box of the to be centered element
-     this.x = 165 
+     this.x = 200 
      this.y = 115
    }
    connectedCallback(){
@@ -247,14 +247,14 @@ export class Rings extends LitElement {
 
 
     const render = (time) => {
-      const timeInSeconds = time * 0.0001;
-      gl.uniform1f(uTimeLocation, timeInSeconds);
       gl.clear(gl.COLOR_BUFFER_BIT);
-      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       if(!this.enabled) {
        this.#running = false;
        return; 
       }
+      const timeInSeconds = time * 0.0001;
+      gl.uniform1f(uTimeLocation, timeInSeconds);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       requestAnimationFrame(render);
     }
     this.#running = true;

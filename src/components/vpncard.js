@@ -107,26 +107,26 @@ export class VPNCard extends LitElement {
       return tr("vpnIsOff");
     };
     return html`
-      <div class="stack">
-      <mz-rings></mz-rings>
-      <div class="${classMap(boxClasses)}">
-        <main>
-            ${VPNCard.shield(this.enabled, this.connecting)}
-          <div class="infobox">
-            <h1>${vpnHeader()}</h1>
-            ${VPNCard.subline(
-              this.enabled,
-              this.stability,
-              this.clientConnected
-            )}
-            ${timeString}
-          </div>
-          <button class="pill" @click=${this.#toggle}></button>
-        </main>
-        ${this.enabled || this.connecting
-          ? VPNCard.footer(this.cityName, this.countryFlag)
-          : null}
-      </div>
+      <div class="stack ${classMap(boxClasses)}">
+        <mz-rings .enabled=${this.enabled}></mz-rings>
+        <div>
+          <main>
+              ${VPNCard.shield(this.enabled, this.connecting)}
+            <div class="infobox">
+              <h1>${vpnHeader()}</h1>
+              ${VPNCard.subline(
+                this.enabled,
+                this.stability,
+                this.clientConnected
+              )}
+              ${timeString}
+            </div>
+            <button class="pill" @click=${this.#toggle}></button>
+          </main>
+          ${this.enabled || this.connecting
+            ? VPNCard.footer(this.cityName, this.countryFlag)
+            : null}
+        </div>
       </div>
       
     `;
@@ -194,16 +194,12 @@ export class VPNCard extends LitElement {
     }
     .box {
       border-radius: 8px;
-      background: transparent; //lch(from var(--panel-bg-color) calc(l + 5) c h);
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      flex-direction: column;
+      background: lch(from var(--panel-bg-color) calc(l + 5) c h);
       box-shadow: var(--box-shadow-off);
     }
     .box.on,
     .box.connecting {
-      background: transparent; //var(--main-card-background);
+      background: var(--main-card-background);
       box-shadow: var(--box-shadow-on);
     }
     main,
