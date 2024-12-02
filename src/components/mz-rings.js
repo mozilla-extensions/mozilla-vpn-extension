@@ -48,6 +48,9 @@ uniform float u_time;     // Time for animation
 uniform vec2 u_frag_resolution; // Canvas resolution
 
 // Constants
+const float ringCount = 5.0;
+const float baseStrokeWidth = 0.020;
+const float radiusMinimumFadeIn = 0.1;     // Start fading in
 const float radiusStartFadeOut = 0.2;     // Start fading out
 const float maxRadius = 0.4;             // Fully faded out
 const float radiusStartThinning = 0.15;   // Start thinning stroke width
@@ -68,14 +71,17 @@ float calcRingRadius(float minRadius, float maxRadius, float currentRadius, floa
 }
 
 float calculateFade(float distance) {
-    if (distance < radiusStartFadeOut) {
-        return 0.9; // Fully visible
+    if (distance < radiusMinimumFadeIn) {
+        return  0.0;
+    }
+    if (distance >= radiusMinimumFadeIn && distance < radiusStartFadeOut) {
+        return  0.2*((distance - radiusMinimumFadeIn) / (maxRadius - radiusStartFadeOut-0.1));
     }
     if (distance > maxRadius) {
         return 0.0; // Fully transparent
     }
     // Linear fade between radiusStartFadeOut and maxRadius
-    return 0.9 - (distance - radiusStartFadeOut) / (maxRadius - radiusStartFadeOut);
+    return 0.3 - (distance - radiusStartFadeOut) / (maxRadius - radiusStartFadeOut);
 }
 
 float calculateThinning(float distance, float originalStrokeWidth) {
@@ -97,27 +103,19 @@ void main() {
     float centerDistance = length(fragCoord - u_center);
 
     // Ring properties
-    float baseStrokeWidth = 0.015;
     float strokeWidth = calculateThinning(centerDistance, baseStrokeWidth);
     float minRadius = 0.0;
-    float maxRadiusInner = 0.5; // Inner logic for rings
+    float maxRadiusInner = maxRadius; // Inner logic for rings
 
     // Animated progress
     float animationProgress = mod(u_time * 0.5, maxRadiusInner);
 
-    // Compute ring radii
-    float ringRadius1 = calcRingRadius(minRadius, maxRadiusInner, animationProgress, 0.0);
-    float ring1 = composeRing(centerDistance, strokeWidth, ringRadius1);
-
-    float ringRadius2 = calcRingRadius(minRadius, maxRadiusInner, animationProgress, 0.33);
-    float ring2 = composeRing(centerDistance, strokeWidth, ringRadius2);
-
-    float ringRadius3 = calcRingRadius(minRadius, maxRadiusInner, animationProgress, 0.66);
-    float ring3 = composeRing(centerDistance, strokeWidth, ringRadius3);
-
-    // Combine rings
-    float rings = ring1 + ring2 + ring3;
-
+    float rings = 0.0; 
+    for(float rc =0.0; rc < ringCount; rc+=1.0 ){
+      float radius = calcRingRadius(minRadius, maxRadiusInner, animationProgress, rc/ringCount);
+      float ring = composeRing(centerDistance, strokeWidth, radius);
+      rings += ring;
+    }
     // Apply fade based on distance
     float fade = calculateFade(centerDistance);
 
@@ -156,8 +154,10 @@ export class Rings extends LitElement {
      this.scene = [];
      this.width = 100
      this.height = 100
-     this.x = 50
-     this.y = 50
+     // TODO: Lucky numbers, calulate this from a 
+     // property bounding box of the to be centered element
+     this.x = 165 
+     this.y = 115
    }
    connectedCallback(){
     const rect = this.getBoundingClientRect();
@@ -229,22 +229,20 @@ export class Rings extends LitElement {
     const aRectangleLocation = gl.getAttribLocation(program, "a_rectangle");
     gl.vertexAttrib4fv(aRectangleLocation, rectangle);
     const uResolutionLocation = gl.getUniformLocation(program, "u_resolution");
-    gl.uniform2f(uResolutionLocation, canvas.width, canvas.height);
+    gl.uniform2f(uResolutionLocation, canvas.height, canvas.height);
 
 
 
     const uTimeLocation = gl.getUniformLocation(program, "u_time");
     const uCenterLocation = gl.getUniformLocation(program, "u_center");
     const uFragResolutionLocation = gl.getUniformLocation(program, "u_frag_resolution");
-    gl.uniform2f(uFragResolutionLocation, canvas.width, canvas.height);
+    gl.uniform2f(uFragResolutionLocation, canvas.height, canvas.height);
 
     // Calculate the center of the rectangle
-    const centerX = rectangle[0] + rectangle[2] / 2;
-    const centerY = rectangle[1] + rectangle[3] / 2;
-
+    const centerX = this.x / 2;
+    const centerY = this.y / 2;
     const normalizedCenterX = centerX / canvas.width;
     const normalizedCenterY = (canvas.height - centerY) / canvas.height; // Invert Y-axis
-
     gl.uniform2f(uCenterLocation, normalizedCenterX, normalizedCenterY);
 
 
