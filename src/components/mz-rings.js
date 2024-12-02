@@ -49,10 +49,10 @@ uniform vec2 u_frag_resolution; // Canvas resolution
 
 // Constants
 const float ringCount = 5.0;
-const float baseStrokeWidth = 0.020;
-const float radiusMinimumFadeIn = 0.1;     // Start fading in
+const float baseStrokeWidth = 0.010;
+const float radiusMinimumFadeIn = 0.01;     // Start fading in
 const float radiusStartFadeOut = 0.2;     // Start fading out
-const float maxRadius = 0.4;             // Fully faded out
+const float maxRadius = 0.5;             // Fully faded out
 const float radiusStartThinning = 0.15;   // Start thinning stroke width
 
 float drawCircle(float distance, float radius) {
@@ -71,6 +71,9 @@ float calcRingRadius(float minRadius, float maxRadius, float currentRadius, floa
 }
 
 float calculateFade(float distance) {
+    if (distance == 0.0) {
+      return 1.0;
+    }
     if (distance < radiusMinimumFadeIn) {
         return  0.0;
     }
@@ -140,10 +143,7 @@ void main() {
 export class Rings extends LitElement {
    static properties = {
      enabled: { attribute: false },
-     width: { attribute: true },
-     height: { attribute: true },
-     x: { attribute: true },
-     y: { attribute: true },
+     targetElementRef: {attribute: false},
    };
    canvasElement = createRef();
    #running = false;
@@ -151,16 +151,11 @@ export class Rings extends LitElement {
    constructor() {
      super();
      this.enabled = true;
-     this.scene = [];
-     this.width = 100
-     this.height = 100
-     // TODO: Lucky numbers, calulate this from a 
-     // property bounding box of the to be centered element
-     this.x = 200 
-     this.y = 115
+     this.targetElementRef = createRef();
    }
    connectedCallback(){
     const rect = this.getBoundingClientRect();
+    console.log(rect);
     this.width = rect.width; 
     this.height = rect.height;
     super.connectedCallback();
@@ -176,18 +171,31 @@ export class Rings extends LitElement {
 
    updated(changedProperties){
     super.updated(changedProperties);
-    this.maybeStartRender();
+    // Put this into an idle callback.
+    // It's fine to delay the animation, as we ned to make sure the css layout is up
+    // to date before we can properly start this. 
+    requestIdleCallback(()=>{
+      this.maybeStartRender();
+    });
    }
 
    maybeStartRender(){
     if(this.#running){
       return;
     }
+    const this_rect = this.getBoundingClientRect();
+    
+    /** @type {HTMLElement} */
+    const shield = this.targetElementRef.value; 
+    const shieldBox= shield.getBoundingClientRect();
+
     /** @type {HTMLCanvasElement?} */
     const canvas = this.canvasElement.value;
     if(!canvas){
       return; 
     }
+    canvas.height = this_rect.height;
+    canvas.width = this_rect.width;
 
     const gl = canvas.getContext("webgl2");
     gl.viewport(0, 0, canvas.width, canvas.height);
@@ -236,13 +244,16 @@ export class Rings extends LitElement {
     const uTimeLocation = gl.getUniformLocation(program, "u_time");
     const uCenterLocation = gl.getUniformLocation(program, "u_center");
     const uFragResolutionLocation = gl.getUniformLocation(program, "u_frag_resolution");
-    gl.uniform2f(uFragResolutionLocation, canvas.height, canvas.height);
+    gl.uniform2f(uFragResolutionLocation, canvas.width, canvas.width);
 
     // Calculate the center of the rectangle
-    const centerX = this.x / 2;
-    const centerY = this.y / 2;
+    const centerX = (shieldBox.x-this_rect.x) + shieldBox.width/2;
+    const centerY = (shieldBox.y-this_rect.y) - shieldBox.height;
+
     const normalizedCenterX = centerX / canvas.width;
-    const normalizedCenterY = (canvas.height - centerY) / canvas.height; // Invert Y-axis
+    const normalizedCenterY = 0.3//(centerY) / canvas.height; // Invert Y-axis
+
+    console.log(normalizedCenterY);
     gl.uniform2f(uCenterLocation, normalizedCenterX, normalizedCenterY);
 
 
@@ -250,6 +261,8 @@ export class Rings extends LitElement {
       gl.clear(gl.COLOR_BUFFER_BIT);
       if(!this.enabled) {
        this.#running = false;
+       canvas.height= 0;
+       this.requestUpdate();
        return; 
       }
       const timeInSeconds = time * 0.0001;

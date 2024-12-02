@@ -8,6 +8,8 @@ import {
   LitElement,
   classMap,
   styleMap,
+  createRef,
+  ref,
 } from "../vendor/lit-all.min.js";
 import { tr } from "../shared/i18n.js";
 import { resetSizing, fontStyling, positioner } from "./styles.js";
@@ -41,6 +43,7 @@ export class VPNCard extends LitElement {
     this.connecting = false;
   }
   #intervalHandle = null;
+  #shieldElement = createRef();
 
   updated(changedProperties) {
     super.updated(changedProperties);
@@ -120,10 +123,10 @@ export class VPNCard extends LitElement {
     };
     return html`
       <div class="stack ${classMap(boxClasses)}">
-        <mz-rings .enabled=${this.enabled}></mz-rings>
+        <mz-rings .enabled=${this.enabled} .targetElementRef=${this.#shieldElement}></mz-rings>
         <div>
           <main>
-              ${VPNCard.shield(this.enabled, this.connecting)}
+              ${VPNCard.shield(this.enabled, this.connecting, this.#shieldElement)}
             <div class="infobox">
               <h1>${vpnHeader()}</h1>
               ${VPNCard.subline(
@@ -181,16 +184,16 @@ export class VPNCard extends LitElement {
     }
   }
 
-  static shield(enabled, connecting) {
+  static shield(enabled, connecting, shieldRef ) {
     if (!enabled && !connecting) {
       return html`
-        <svg>
+        <svg ${ref(shieldRef)}>
           <use xlink:href="../../assets/img/globe-shield-off.svg#globe"></use>
         </svg>
       `;
     }
     return html`
-      <svg>
+      <svg ${ref(shieldRef)}>
         <use xlink:href="../../assets/img/globe-shield-on.svg#globe"></use>
       </svg>
     `;
