@@ -21,7 +21,11 @@ export class PopUpConditionalView extends ConditionalView {
       vpnController.state,
       vpnController.featureList,
       (state, features) => {
-        this.slotName = PopUpConditionalView.toSlotname(state, features, supportedPlatform);
+        this.slotName = PopUpConditionalView.toSlotname(
+          state,
+          features,
+          supportedPlatform
+        );
       }
     );
 
@@ -43,12 +47,12 @@ export class PopUpConditionalView extends ConditionalView {
    * @typedef {import("../../background/vpncontroller/states.js").VPNState} State
    * @param {State} state
    * @param {FeatureFlags} features
-   * @param {Boolean} supportedPlatform 
+   * @param {Boolean} supportedPlatform
    * @returns {String}
    */
   static toSlotname(state, features, supportedPlatform) {
     if (!supportedPlatform && !features.webExtension) {
-      return "MessageOSNotSupported"
+      return "MessageOSNotSupported";
     }
     if (!state.installed) {
       return "MessageInstallVPN";

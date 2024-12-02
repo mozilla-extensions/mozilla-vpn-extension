@@ -368,5 +368,5 @@ export function fromVPNStatusResponse(
 
 export class FeatureFlags {
   localProxy = true;
-  webExtension = true;
+  webExtension = false;
 }
