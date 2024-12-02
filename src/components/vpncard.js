@@ -15,7 +15,7 @@ import { tr } from "../shared/i18n.js";
 import { resetSizing, fontStyling, positioner } from "./styles.js";
 
 import { VPNState } from "../background/vpncontroller/states.js";
-import "./mz-rings.js"
+import "./mz-rings.js";
 /**
  * @typedef {import("../background/vpncontroller/states.js").VPNState} VPNState
  */
@@ -123,10 +123,17 @@ export class VPNCard extends LitElement {
     };
     return html`
       <div class="stack ${classMap(boxClasses)}">
-        <mz-rings .enabled=${this.enabled} .targetElementRef=${this.#shieldElement}></mz-rings>
+        <mz-rings
+          .enabled=${this.enabled}
+          .targetElementRef=${this.#shieldElement}
+        ></mz-rings>
         <div>
           <main>
-              ${VPNCard.shield(this.enabled, this.connecting, this.#shieldElement)}
+            ${VPNCard.shield(
+              this.enabled,
+              this.connecting,
+              this.#shieldElement
+            )}
             <div class="infobox">
               <h1>${vpnHeader()}</h1>
               ${VPNCard.subline(
@@ -143,7 +150,6 @@ export class VPNCard extends LitElement {
             : null}
         </div>
       </div>
-      
     `;
   }
 
@@ -184,7 +190,7 @@ export class VPNCard extends LitElement {
     }
   }
 
-  static shield(enabled, connecting, shieldRef ) {
+  static shield(enabled, connecting, shieldRef) {
     if (!enabled && !connecting) {
       return html`
         <svg ${ref(shieldRef)}>
@@ -307,7 +313,7 @@ export class VPNCard extends LitElement {
       grid-template-rows: 1fr;
       grid-template-columns: 1fr;
     }
-    .stack > *  {
+    .stack > * {
       grid-row: 1 / 2;
       grid-column: 1 / 2;
     }
