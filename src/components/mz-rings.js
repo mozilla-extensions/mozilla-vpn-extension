@@ -2,17 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
- import { html, LitElement, 
-  createRef,
-  ref,
- } from "../vendor/lit-all.min.js";
+import { html, LitElement, createRef, ref } from "../vendor/lit-all.min.js";
 //#region shaders
 // Vec Shader
 // INPUTS:
 // a rectangle = vec4 in pixelspace
 // uniform resolution of the pixelspace
 // Draws:
-// A retangle in clipspace. 
+// A retangle in clipspace.
 const vsSource = `#version 300 es
 in vec4 a_rectangle;
 uniform vec2 u_resolution;
@@ -127,72 +124,70 @@ void main() {
 }
 `;
 
-
-
 //#endregion
 
-
- /**
-  * `Rings`
-  *
-  * Creates a canvas and will spawn multiple rings, when the animation is turned on
-  * Usage:
-  * <mz-iconlink href="https://example.com" alt="Visit Example" icon="example-icon"></mz-iconlink>
-  *
+/**
+ * `Rings`
+ *
+ * Creates a canvas and will spawn multiple rings, when the animation is turned on
+ * Usage:
+ * <mz-iconlink href="https://example.com" alt="Visit Example" icon="example-icon"></mz-iconlink>
+ *
  */
 export class Rings extends LitElement {
-   static properties = {
-     enabled: { attribute: false },
-     targetElementRef: {attribute: false},
-   };
-   canvasElement = createRef();
-   #running = false;
+  static properties = {
+    enabled: { attribute: false },
+    targetElementRef: { attribute: false },
+  };
+  canvasElement = createRef();
+  #running = false;
 
-   constructor() {
-     super();
-     this.enabled = true;
-     this.targetElementRef = createRef();
-   }
-   connectedCallback(){
+  constructor() {
+    super();
+    this.enabled = true;
+    this.targetElementRef = createRef();
+  }
+  connectedCallback() {
     const rect = this.getBoundingClientRect();
     console.log(rect);
-    this.width = rect.width; 
+    this.width = rect.width;
     this.height = rect.height;
     super.connectedCallback();
-   }
-   render() {
-     return html`
-        <canvas 
-          width=${this.width} 
-          height=${this.height}
-          ${ref(this.canvasElement)}></canvas>
-     `;
-   }
+  }
+  render() {
+    return html`
+      <canvas
+        width=${this.width}
+        height=${this.height}
+        ${ref(this.canvasElement)}
+      ></canvas>
+    `;
+  }
 
-   updated(changedProperties){
+  updated(changedProperties) {
     super.updated(changedProperties);
     // Put this into an idle callback.
     // It's fine to delay the animation, as we ned to make sure the css layout is up
-    // to date before we can properly start this. 
-    requestIdleCallback(()=>{
+    // to date before we can properly start this.
+    requestIdleCallback(() => {
       this.maybeStartRender();
     });
-   }
+  }
 
-   maybeStartRender(){
-    if(this.#running){
+  maybeStartRender() {
+    if (this.#running) {
       return;
     }
     const this_rect = this.getBoundingClientRect();
-    
+
     /** @type {HTMLElement} */
-    const shield = this.targetElementRef.value; 
-    const shieldBox= shield.getBoundingClientRect();
+    const shield = this.targetElementRef.value;
+    const shieldBox = shield.getBoundingClientRect();
 
     /** @type {HTMLCanvasElement?} */
     const canvas = this.canvasElement.value;
-    if(!canvas){
-      return; 
+    if (!canvas) {
+      return;
     }
     canvas.height = this_rect.height;
     canvas.width = this_rect.width;
@@ -215,12 +210,12 @@ export class Rings extends LitElement {
       gl.shaderSource(shader, source);
       gl.compileShader(shader);
       if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-          console.error("Shader compile error:", gl.getShaderInfoLog(shader));
-          return null;
+        console.error("Shader compile error:", gl.getShaderInfoLog(shader));
+        return null;
       }
-        return shader;
+      return shader;
     }
-  
+
     const vertexShader = compileShader(gl, vsSource, gl.VERTEX_SHADER);
     const fragmentShader = compileShader(gl, fsSource, gl.FRAGMENT_SHADER);
     const program = gl.createProgram();
@@ -228,7 +223,7 @@ export class Rings extends LitElement {
     gl.attachShader(program, fragmentShader);
     gl.linkProgram(program);
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-        console.error("Program link error:", gl.getProgramInfoLog(program));
+      console.error("Program link error:", gl.getProgramInfoLog(program));
     }
     // Now lets draw with the programm!
 
@@ -239,40 +234,39 @@ export class Rings extends LitElement {
     const uResolutionLocation = gl.getUniformLocation(program, "u_resolution");
     gl.uniform2f(uResolutionLocation, canvas.height, canvas.height);
 
-
-
     const uTimeLocation = gl.getUniformLocation(program, "u_time");
     const uCenterLocation = gl.getUniformLocation(program, "u_center");
-    const uFragResolutionLocation = gl.getUniformLocation(program, "u_frag_resolution");
+    const uFragResolutionLocation = gl.getUniformLocation(
+      program,
+      "u_frag_resolution"
+    );
     gl.uniform2f(uFragResolutionLocation, canvas.width, canvas.width);
 
     // Calculate the center of the rectangle
-    const centerX = (shieldBox.x-this_rect.x) + shieldBox.width/2;
-    const centerY = (shieldBox.y-this_rect.y) - shieldBox.height;
+    const centerX = shieldBox.x - this_rect.x + shieldBox.width / 2;
+    const centerY = shieldBox.y - this_rect.y - shieldBox.height;
 
     const normalizedCenterX = centerX / canvas.width;
-    const normalizedCenterY = 0.3//(centerY) / canvas.height; // Invert Y-axis
+    const normalizedCenterY = 0.3; //(centerY) / canvas.height; // Invert Y-axis
 
     console.log(normalizedCenterY);
     gl.uniform2f(uCenterLocation, normalizedCenterX, normalizedCenterY);
 
-
     const render = (time) => {
       gl.clear(gl.COLOR_BUFFER_BIT);
-      if(!this.enabled) {
-       this.#running = false;
-       canvas.height= 0;
-       this.requestUpdate();
-       return; 
+      if (!this.enabled) {
+        this.#running = false;
+        canvas.height = 0;
+        this.requestUpdate();
+        return;
       }
       const timeInSeconds = time * 0.0001;
       gl.uniform1f(uTimeLocation, timeInSeconds);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       requestAnimationFrame(render);
-    }
+    };
     this.#running = true;
     requestAnimationFrame(render);
-   }
- }
+  }
+}
 customElements.define("mz-rings", Rings);
- 
