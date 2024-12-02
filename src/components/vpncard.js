@@ -13,7 +13,7 @@ import { tr } from "../shared/i18n.js";
 import { resetSizing, fontStyling, positioner } from "./styles.js";
 
 import { VPNState } from "../background/vpncontroller/states.js";
-
+import "./mz-rings.js"
 /**
  * @typedef {import("../background/vpncontroller/states.js").VPNState} VPNState
  */
@@ -119,9 +119,11 @@ export class VPNCard extends LitElement {
       return tr("vpnIsOff");
     };
     return html`
+      <div class="stack">
+      <mz-rings></mz-rings>
       <div class="${classMap(boxClasses)}">
         <main>
-          ${VPNCard.shield(this.enabled, this.connecting)}
+            ${VPNCard.shield(this.enabled, this.connecting)}
           <div class="infobox">
             <h1>${vpnHeader()}</h1>
             ${VPNCard.subline(
@@ -137,6 +139,8 @@ export class VPNCard extends LitElement {
           ? VPNCard.footer(this.cityName, this.countryFlag)
           : null}
       </div>
+      </div>
+      
     `;
   }
 
@@ -202,7 +206,7 @@ export class VPNCard extends LitElement {
     }
     .box {
       border-radius: 8px;
-      background: lch(from var(--panel-bg-color) calc(l + 5) c h);
+      background: transparent; //lch(from var(--panel-bg-color) calc(l + 5) c h);
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
@@ -211,7 +215,7 @@ export class VPNCard extends LitElement {
     }
     .box.on,
     .box.connecting {
-      background: var(--main-card-background);
+      background: transparent; //var(--main-card-background);
       box-shadow: var(--box-shadow-on);
     }
     main,
@@ -298,6 +302,15 @@ export class VPNCard extends LitElement {
     }
     .noSignal .subline {
       color: var(--color-fatal-error);
+    }
+    .stack {
+      display: grid;
+      grid-template-rows: 1fr;
+      grid-template-columns: 1fr;
+    }
+    .stack > *  {
+      grid-row: 1 / 2;
+      grid-column: 1 / 2;
     }
 
     svg {

@@ -30,6 +30,7 @@ import "./../../components/serverlist.js";
 import "./../../components/vpncard.js";
 import "./../../components/titlebar.js";
 import "./../../components/iconbutton.js";
+import "./../../components/mz-rings.js"
 import { SiteContext } from "../../background/proxyHandler/siteContext.js";
 import {
   ServerCity,
