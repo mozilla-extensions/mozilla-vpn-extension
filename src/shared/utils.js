@@ -72,4 +72,21 @@ export const Utils = {
       .find((sc) => sc.code === countryCode)
       ?.cities.find((c) => c.code === cityCode);
   },
+
+
+  /**
+ * Generates a URL relative to the current module's location.
+ * @param {string} relativePath - The relative path to resolve.
+ * @returns {string} - The resolved absolute URL as a string.
+ */
+  resolveLocalURL: (relativePath) => {
+  // Get the directory of the current module
+  const moduleUrl = new URL(import.meta.url);
+  const moduleDir = new URL('.', moduleUrl);
+
+  // Resolve the relative path against the module's directory
+  const resolvedUrl = new URL(relativePath, moduleDir);
+
+  return resolvedUrl.toString();
+}
 };
