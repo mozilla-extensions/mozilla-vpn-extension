@@ -123,20 +123,21 @@ export class VPNController extends Component {
   /**
    * Sends a message to the client
    * @param { string } command - Command to Send
+   * @param { object } args - Argument blob
    */
-  postToApp(command) {
+  postToApp(command, args = {}) {
     if (!REQUEST_TYPES.includes(command)) {
       log(`Command ${command} not in known command list`);
     }
     if (!this.#port) {
       this.initNativeMessaging();
-      setTimeout(() => this.#postToAppInternal(command), 500);
+      setTimeout(() => this.#postToAppInternal(command, args), 500);
     }
-    this.#postToAppInternal(command);
+    this.#postToAppInternal(command, args);
   }
-  #postToAppInternal(command = "") {
+  #postToAppInternal(command = "", args = {}) {
     try {
-      this.#port?.postMessage({ t: command });
+      this.#port?.postMessage({ ...args, t: command });
     } catch (e) {
       log(e);
       // @ts-ignore
@@ -195,10 +196,10 @@ export class VPNController extends Component {
     // The VPN Just started && connected to Native Messaging
     if (response.status && response.status === "vpn-client-up") {
       queueMicrotask(() => {
+        this.postToApp("featurelist");
         this.postToApp("status");
         this.postToApp("servers");
         this.postToApp("disabled_apps");
-        this.postToApp("featurelist");
       });
       return;
     }
