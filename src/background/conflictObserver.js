@@ -2,8 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { PropertyType } from "../shared/ipc";
-import { IBindable, property } from "../shared/property";
+import { PropertyType } from "../shared/ipc.js";
+import { IBindable, property } from "../shared/property.js";
 
 //@ts-check
 
@@ -19,18 +19,20 @@ export class ConflictObserver {
   conflictingAddons = property([]);
 
   constructor() {
-    this.updateList();
+    //this.updateList();
   }
 
   async updateList() {
     /**  @type { Promise<Array<browser.management.ExtensionInfo>>}*/
     const addonRequest = browser.management.getAll();
-    const installedAddons = await addonRequest;
+    try {
+      const installedAddons = await addonRequest;
 
-    const newConflictAddons = installedAddons.filter(
-      ConflictObserver.isConflicting
-    );
-    this.conflictingAddons.value = newConflictAddons;
+      const newConflictAddons = installedAddons.filter(
+        ConflictObserver.isConflicting
+      );
+      this.conflictingAddons.value = newConflictAddons;
+    } catch (error) {}
   }
 
   /**
