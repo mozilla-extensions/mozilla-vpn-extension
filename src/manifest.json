@@ -45,5 +45,12 @@
     "default_title": "Page action button (TODO: Localize)"
   },
 
-  "permissions": ["<all_urls>", "nativeMessaging", "storage", "proxy", "tabs"]
+  "permissions": [
+    "<all_urls>",
+    "nativeMessaging",
+    "storage",
+    "proxy",
+    "tabs",
+    "management"
+  ]
 }
