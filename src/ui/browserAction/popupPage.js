@@ -115,6 +115,9 @@ export class BrowserActionPopup extends LitElement {
     requestIdleCallback(() => {
       vpnController.postToApp("servers");
     });
+    requestIdleCallback(() => {
+      vpnController.postToApp("featurelist");
+    });
   }
 
   get currentSiteContext() {

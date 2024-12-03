@@ -19,6 +19,10 @@ export const Utils = {
     return currentTab[0];
   },
 
+  isSupportedOs(os) {
+    return ["win"].includes(os);
+  },
+
   isViableClientVersion: (clientVersion) => {
     // TODO we should do something better here
     // We'll likely want to update the minimumViableClient
