@@ -19,7 +19,7 @@ export class ConflictObserver {
   conflictingAddons = property([]);
 
   constructor() {
-    //this.updateList();
+    this.updateList();
   }
 
   async updateList() {
