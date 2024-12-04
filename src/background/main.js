@@ -13,6 +13,7 @@ import { ExtensionController } from "./extensionController/index.js";
 
 import { expose } from "../shared/ipc.js";
 import { TabReloader } from "./tabReloader.js";
+import { ConflictObserver } from "./conflictObserver.js";
 const log = Logger.logger("Main");
 
 class Main {
@@ -20,6 +21,7 @@ class Main {
   #pendingEvents = [];
 
   observers = new Set();
+  conflictObserver = new ConflictObserver();
   vpnController = new VPNController(this);
   extController = new ExtensionController(this, this.vpnController);
   logger = new Logger(this);
@@ -51,6 +53,7 @@ class Main {
     expose(this.vpnController);
     expose(this.extController);
     expose(this.proxyHandler);
+    expose(this.conflictObserver);
 
     this.#handlingEvent = false;
     this.#processPendingEvents();
