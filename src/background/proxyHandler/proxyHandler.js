@@ -124,6 +124,13 @@ export class ProxyHandler extends Component {
       this.processClientStateChanges(s);
     });
 
+    browser.storage.sync.onChanged.addListener(() => {
+      const changedItems = Object.keys(changes);
+      if (changedItems.includes(ProxyUtils.getSiteContextsStorageKey())) {
+        this.#getSiteContexts();
+      }
+    });
+
     this.#mSiteContexts.value = await this.#getSiteContexts();
   }
 
@@ -206,7 +213,7 @@ export class ProxyHandler extends Component {
   }
 
   async #getSiteContexts() {
-    let { siteContexts } = await browser.storage.local.get([
+    let { siteContexts } = await browser.storage.sync.get([
       ProxyUtils.getSiteContextsStorageKey(),
     ]);
     if (!siteContexts) {
@@ -234,7 +241,7 @@ export class ProxyHandler extends Component {
     try {
       this.#mSiteContexts.value = siteContexts;
       this.updateProxyMap(this.#mSiteContexts.value, this.servers);
-      await browser.storage.local.set({
+      await browser.storage.sync.set({
         [ProxyUtils.getSiteContextsStorageKey()]: siteContexts,
       });
     } catch (error) {
