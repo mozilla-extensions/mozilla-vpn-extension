@@ -124,6 +124,37 @@ void main() {
 }
 `;
 
+/**
+ *
+ * @param {HTMLCanvasElement} canvas
+ * @param {HTMLElement} other
+ */
+const getCenterCoords = (aCanvas, aOther) => {
+  const canvas = aCanvas.getBoundingClientRect();
+  const other = aOther.getBoundingClientRect();
+
+  // Calculate the center of the rectangle
+  // 1: We need to normalize the coordinates, so lets
+  // calulate the shield bounding box in relation to the canvas.
+  const normOther = {
+    width: other.width,
+    height: other.height,
+    x: other.x - canvas.x,
+    y: other.y - canvas.y,
+  };
+  // Now we can calc the center of the box in pixelspace
+  const center = {
+    x: normOther.x + normOther.width / 2.0,
+    y: normOther.y + normOther.height + 17,
+  };
+  // Now let's make those relative to the dimentions of the canvas (clipspace)
+  const clipSpaceCenter = {
+    x: center.x / canvas.width,
+    y: center.y / canvas.width,
+  };
+  return clipSpaceCenter;
+};
+
 //#endregion
 
 /**
@@ -169,6 +200,9 @@ export class Rings extends LitElement {
     // Put this into an idle callback.
     // It's fine to delay the animation, as we ned to make sure the css layout is up
     // to date before we can properly start this.
+    if (!this.enabled) {
+      return;
+    }
     requestIdleCallback(() => {
       this.maybeStartRender();
     });
@@ -242,15 +276,17 @@ export class Rings extends LitElement {
     );
     gl.uniform2f(uFragResolutionLocation, canvas.width, canvas.width);
 
-    // Calculate the center of the rectangle
-    const centerX = shieldBox.x - this_rect.x + shieldBox.width / 2;
-    const centerY = shieldBox.y - this_rect.y - shieldBox.height;
+    let clipSpaceCenter = getCenterCoords(canvas, shield);
+    console.log(clipSpaceCenter);
+    gl.uniform2f(uCenterLocation, clipSpaceCenter.x, clipSpaceCenter.y);
 
-    const normalizedCenterX = centerX / canvas.width;
-    const normalizedCenterY = 0.3; //(centerY) / canvas.height; // Invert Y-axis
-
-    console.log(normalizedCenterY);
-    gl.uniform2f(uCenterLocation, normalizedCenterX, normalizedCenterY);
+    // The layout may be slower then we setup the renderer
+    // So let's check after 500ms that the ref-points are still up
+    // to date in case the layout changed
+    setTimeout(() => {
+      const clipSpaceCenter = getCenterCoords(canvas, shield);
+      gl.uniform2f(uCenterLocation, clipSpaceCenter.x, clipSpaceCenter.y);
+    }, 500);
 
     const render = (time) => {
       gl.clear(gl.COLOR_BUFFER_BIT);
