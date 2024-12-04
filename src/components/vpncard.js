@@ -43,10 +43,22 @@ export class VPNCard extends LitElement {
   #intervalHandle = null;
 
   updated(changedProperties) {
+    super.updated(changedProperties);
     if (!changedProperties.has("enabled")) {
       return;
     }
-    if (this.enabled) {
+    this.#setTimer(this.enabled);
+  }
+  firstUpdated() {
+    super.firstUpdated();
+    this.#setTimer(this.enabled);
+  }
+
+  #setTimer(enable) {
+    if (enable) {
+      if (this.#intervalHandle != null) {
+        return;
+      }
       this.#intervalHandle = setInterval(() => {
         this.requestUpdate();
       }, 1000);
