@@ -8,12 +8,14 @@ import {
   LitElement,
   classMap,
   styleMap,
+  createRef,
+  ref,
 } from "../vendor/lit-all.min.js";
 import { tr } from "../shared/i18n.js";
 import { resetSizing, fontStyling, positioner } from "./styles.js";
 
 import { VPNState } from "../background/vpncontroller/states.js";
-
+import "./mz-rings.js";
 /**
  * @typedef {import("../background/vpncontroller/states.js").VPNState} VPNState
  */
@@ -41,6 +43,7 @@ export class VPNCard extends LitElement {
     this.connecting = false;
   }
   #intervalHandle = null;
+  #shieldElement = createRef();
 
   updated(changedProperties) {
     super.updated(changedProperties);
@@ -119,23 +122,33 @@ export class VPNCard extends LitElement {
       return tr("vpnIsOff");
     };
     return html`
-      <div class="${classMap(boxClasses)}">
-        <main>
-          ${VPNCard.shield(this.enabled, this.connecting)}
-          <div class="infobox">
-            <h1>${vpnHeader()}</h1>
-            ${VPNCard.subline(
+      <div class="stack ${classMap(boxClasses)}">
+        <mz-rings
+          .enabled=${this.enabled}
+          .targetElementRef=${this.#shieldElement}
+        ></mz-rings>
+        <div>
+          <main>
+            ${VPNCard.shield(
               this.enabled,
-              this.stability,
-              this.clientConnected
+              this.connecting,
+              this.#shieldElement
             )}
-            ${timeString}
-          </div>
-          <button class="pill" @click=${this.#toggle}></button>
-        </main>
-        ${this.enabled || this.connecting
-          ? VPNCard.footer(this.cityName, this.countryFlag)
-          : null}
+            <div class="infobox">
+              <h1>${vpnHeader()}</h1>
+              ${VPNCard.subline(
+                this.enabled,
+                this.stability,
+                this.clientConnected
+              )}
+              ${timeString}
+            </div>
+            <button class="pill" @click=${this.#toggle}></button>
+          </main>
+          ${this.enabled || this.connecting
+            ? VPNCard.footer(this.cityName, this.countryFlag)
+            : null}
+        </div>
       </div>
     `;
   }
@@ -177,16 +190,16 @@ export class VPNCard extends LitElement {
     }
   }
 
-  static shield(enabled, connecting) {
+  static shield(enabled, connecting, shieldRef) {
     if (!enabled && !connecting) {
       return html`
-        <svg>
+        <svg ${ref(shieldRef)}>
           <use xlink:href="../../assets/img/globe-shield-off.svg#globe"></use>
         </svg>
       `;
     }
     return html`
-      <svg>
+      <svg ${ref(shieldRef)}>
         <use xlink:href="../../assets/img/globe-shield-on.svg#globe"></use>
       </svg>
     `;
@@ -203,10 +216,6 @@ export class VPNCard extends LitElement {
     .box {
       border-radius: 8px;
       background: lch(from var(--panel-bg-color) calc(l + 5) c h);
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      flex-direction: column;
       box-shadow: var(--box-shadow-off);
     }
     .box.on,
@@ -298,6 +307,15 @@ export class VPNCard extends LitElement {
     }
     .noSignal .subline {
       color: var(--color-fatal-error);
+    }
+    .stack {
+      display: grid;
+      grid-template-rows: 1fr;
+      grid-template-columns: 1fr;
+    }
+    .stack > * {
+      grid-row: 1 / 2;
+      grid-column: 1 / 2;
     }
 
     svg {
