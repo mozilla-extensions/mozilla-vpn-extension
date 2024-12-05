@@ -164,7 +164,9 @@ export class BrowserActionPopup extends LitElement {
     return html`
       <vpn-titlebar title="${title}" ${ref(this.titleBar)}>
         ${canGoBack ? BrowserActionPopup.backBtn(back) : null}
-        ${ !canGoBack ? BrowserActionPopup.settingsIcon(this.openSettingsPanel) :null}
+        ${!canGoBack
+          ? BrowserActionPopup.settingsIcon(this.openSettingsPanel)
+          : null}
       </vpn-titlebar>
       <stack-view ${ref(this.stackView)}>
         <section data-title="Mozilla VPN">
@@ -375,50 +377,64 @@ export class BrowserActionPopup extends LitElement {
     icon="settings-cog"
     slot="right"
   ></mz-iconlink>
-  `
+  `;
   }
 
-  static createSettingsPanel(onResult = () => {}) {
+  static createSettingsPanel() {
     const viewElement = document.createElement("section");
     viewElement.classList = ["settings-panel"];
     viewElement.dataset.title = "Settings";
-    const linkList = document.createElement("ul");
-    linkList.id = "settingsList";
 
-    [
+    const openInNewTab = (url) => {
+      console.log("do we get here?");
+      browser.tabs.create({ url });
+      window.close();
+    };
+
+    const settingsLinks = [
       {
-        linkTitle: "Website preferences",
-        url: "/ui/settingsPage/index.html",
+        title: tr("websitePreferences"),
+        onClick: () => {
+          openInNewTab("/ui/settingsPage/index.html");
+        },
         iconId: "websitePreferences",
       },
       {
-        linkTitle: "Help center",
-        url: "https://support.mozilla.org/products/firefox-private-network-vpn/settings/add-ons-extensions-and-themes",
+        title: tr("helpCenter"),
+        onClick: () => {
+          openInNewTab(
+            "https://support.mozilla.org/products/firefox-private-network-vpn/settings/add-ons-extensions-and-themes"
+          );
+        },
         iconId: "helpCenter",
       },
       {
-        linkTitle: "Contact support",
-        url: "https://support.mozilla.org/questions/new/firefox-private-network-vpn/form",
+        title: tr("contactSupport"),
+        onClick: () => {
+          openInNewTab(
+            "https://support.mozilla.org/questions/new/firefox-private-network-vpn/form"
+          );
+        },
         iconId: "contactSupport",
       },
-    ].forEach((link) => {
-      const listItem = document.createElement("li");
-      const buttonEl = document.createElement("button");
-      buttonEl.classList = [`${link.iconId}`];
-      buttonEl.textContent = link.linkTitle;
+    ];
 
-      const openInNewTab = () => {
-        browser.tabs.create({ url: link.url });
-        window.close();
-      };
-
-      buttonEl.addEventListener("click", openInNewTab);
-      listItem.appendChild(buttonEl);
-      linkList.appendChild(listItem);
-    });
-
-    viewElement.appendChild(linkList);
-
+    render(
+      html`
+        <ul id="settingsList">
+          ${settingsLinks.map(
+            (link) => html`
+              <li>
+                <button class="${link.iconId}" @click=${link.onClick}>
+                  ${link.title}
+                </button>
+              </li>
+            `
+          )}
+        </ul>
+      `,
+      viewElement
+    );
     return viewElement;
   }
   /**
