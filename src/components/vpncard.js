@@ -126,6 +126,7 @@ export class VPNCard extends LitElement {
             <h1>${vpnHeader()}</h1>
             ${VPNCard.subline(
               this.enabled,
+              this.connecting,
               this.stability,
               this.clientConnected
             )}
@@ -155,8 +156,8 @@ export class VPNCard extends LitElement {
     `;
   }
 
-  static subline(enabled, stability, clientIsConnected) {
-    if (!enabled) {
+  static subline(enabled, connecting, stability, clientIsConnected) {
+    if (!enabled && !connecting) {
       return clientIsConnected
         ? html`<p class="subline ext-is-off">${tr("extensionVpnIsOff")}</p>`
         : null;

@@ -88,7 +88,7 @@ export class VPNController extends Component {
       // invalid proxy connection.
       this.#port.onDisconnect.addListener((p) => {
         // @ts-ignore
-        if (p.error.message === "No such native application mozillavpn") {
+        if (p.error?.message === "No such native application mozillavpn") {
           this.#port = null; // The port is invalid, so we should retry later.
           this.#mState.value = new StateVPNUnavailable();
           return;
