@@ -73,9 +73,15 @@ export class BrowserActionPopup extends LitElement {
       this._siteContexts = s;
     });
     extController.state.subscribe((s) => {
-      console.log(s);
-      this.extState = s;
-      this.updatePage();
+      const currentState = this.extState;
+      
+      // Hack to mitigate FXVPN-217 and FXVPN-222
+      // See Utils.delayToStateEnabledNeeded() for details
+      const timer =  Utils.delayToStateEnabledNeeded(currentState?.state, s.state) ? Utils.connectingDelay() : 0;
+      setTimeout(() => {
+        this.extState = s;
+        this.updatePage();
+      }, timer);
     });
     this.updatePage();
   }
@@ -192,7 +198,7 @@ export class BrowserActionPopup extends LitElement {
   }
 
   locationSettings() {
-    if (!this.pageURL || !this.extState.enabled) {
+    if (!this.pageURL || !this.extState?.enabled) {
       return null;
     }
     const resetSitePreferences = async () => {
