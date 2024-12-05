@@ -157,20 +157,14 @@ export class BrowserActionPopup extends LitElement {
       }
       return this.stackView?.value?.count > 1;
     })();
+
     let title = this.stackView?.value?.currentElement?.dataset?.title;
     title ??= tr("productName");
 
     return html`
       <vpn-titlebar title="${title}" ${ref(this.titleBar)}>
         ${canGoBack ? BrowserActionPopup.backBtn(back) : null}
-        <mz-iconlink
-          @openSettings=${this.openSettingsPanel}
-          alt=${tr("altTextOpenSettingsPage")}
-          eventLabel="openSettings""
-          // href="/ui/settingsPage/index.html"
-          icon="settings-cog"
-          slot="right"
-        ></mz-iconlink>
+        ${ !canGoBack ? BrowserActionPopup.settingsIcon(this.openSettingsPanel) :null}
       </vpn-titlebar>
       <stack-view ${ref(this.stackView)}>
         <section data-title="Mozilla VPN">
@@ -371,6 +365,19 @@ export class BrowserActionPopup extends LitElement {
     ></mz-iconlink>`;
   }
 
+  static settingsIcon(openSettings) {
+    return html`
+    <mz-iconlink
+    @openSettings=${openSettings}
+    alt=${tr("altTextOpenSettingsPage")}
+    eventLabel="openSettings""
+    // href="/ui/settingsPage/index.html"
+    icon="settings-cog"
+    slot="right"
+  ></mz-iconlink>
+  `
+  }
+
   static createSettingsPanel(onResult = () => {}) {
     const viewElement = document.createElement("section");
     viewElement.classList = ["settings-panel"];
@@ -386,7 +393,7 @@ export class BrowserActionPopup extends LitElement {
       },
       {
         linkTitle: "Help center",
-        url: "https://www.sumo.mozilla.com",
+        url: "https://support.mozilla.org/products/firefox-private-network-vpn/settings/add-ons-extensions-and-themes",
         iconId: "helpCenter",
       },
       {
@@ -567,20 +574,18 @@ export class BrowserActionPopup extends LitElement {
     }
 
     #settingsList button {
-      width: 100%;
+      inline-size: 100%;
       text-align: left;
       block-size: 40px;
-      font-family: "Inter Semi Bold";
       background: lch(from var(--action-button-color) l c h / 0);
-      transition: background 0.2s ease-in-out;
-      border: none;
       padding-left: 48px;
       position: relative;
-      border-radius: 4px;
       color: var(--grey50);
       outline: none;
       border: 2px solid transparent;
-      transition: background-color 0.2s ease-in-out;
+      margin: 0;
+      font-size: 15px;
+      transition: background 0.2s ease-in-out;
     }
 
     #settingsList button::before,
