@@ -359,9 +359,8 @@ export class BrowserActionPopup extends LitElement {
   }
   static backBtn(back) {
     return html` <mz-iconlink
-      @goBack=${back}
+      @click=${back}
       alt="${tr("back")}"
-      href=""
       icon="arrow-icon-left"
       slot="left"
     ></mz-iconlink>`;
@@ -369,15 +368,13 @@ export class BrowserActionPopup extends LitElement {
 
   static settingsIcon(openSettings) {
     return html`
-    <mz-iconlink
-    @openSettings=${openSettings}
-    alt=${tr("altTextOpenSettingsPage")}
-    eventLabel="openSettings""
-    // href="/ui/settingsPage/index.html"
-    icon="settings-cog"
-    slot="right"
-  ></mz-iconlink>
-  `;
+      <mz-iconlink
+        @click=${openSettings}
+        alt=${tr("altTextOpenSettingsPage")}
+        icon="settings-cog"
+        slot="right"
+      ></mz-iconlink>
+    `;
   }
 
   static createSettingsPanel() {
@@ -386,7 +383,6 @@ export class BrowserActionPopup extends LitElement {
     viewElement.dataset.title = "Settings";
 
     const openInNewTab = (url) => {
-      console.log("do we get here?");
       browser.tabs.create({ url });
       window.close();
     };
