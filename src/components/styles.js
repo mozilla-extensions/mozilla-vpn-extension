@@ -165,7 +165,6 @@ export const ghostButtonStyles = css`
   .ghost-btn:active::before,
   #settingsList button:active {
     background: lch(from var(--button-ghost-bg-color) l c h / 0.15);
-    // border: none;
   }
 
   @media (prefers-color-scheme: dark) {
