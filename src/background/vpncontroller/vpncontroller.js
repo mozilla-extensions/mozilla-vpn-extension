@@ -27,6 +27,7 @@ import {
   StateVPNClosed,
   StateVPNSignedOut,
   StateVPNNeedsUpdate,
+  VPNSettings,
 } from "./states.js";
 
 const log = Logger.logger("TabHandler");
@@ -47,6 +48,7 @@ export class VPNController extends Component {
     postToApp: PropertyType.Function,
     isolationKey: PropertyType.Bindable,
     featureList: PropertyType.Bindable,
+    settings: PropertyType.Bindable,
   };
 
   get state() {
@@ -61,6 +63,9 @@ export class VPNController extends Component {
   /** @type {IBindable<FeatureFlags>} */
   get featureList() {
     return this.#mFeaturelist;
+  }
+  get settings() {
+    return this.#settings.readOnly;
   }
 
   initNativeMessaging() {
@@ -178,6 +183,17 @@ export class VPNController extends Component {
           ...new FeatureFlags(),
           ...response.featurelist,
         });
+        break;
+      case "settings":
+        const settings = new VPNSettings();
+        // Copy over all values that we expect to be in VPNSettings
+        Object.keys(settings).forEach((k) => {
+          if (response.settings[k]) {
+            settings[k] = response.settings[k];
+          }
+        });
+        this.#settings.set(settings);
+        break;
       default:
         console.log("Unexpected Message type: " + response.t);
     }
@@ -200,6 +216,7 @@ export class VPNController extends Component {
         this.postToApp("status");
         this.postToApp("servers");
         this.postToApp("disabled_apps");
+        this.postToApp("settings");
       });
       return;
     }
@@ -235,6 +252,7 @@ export class VPNController extends Component {
   #mFeaturelist = property(new FeatureFlags());
 
   #isExcluded = property(false);
+  #settings = property(new VPNSettings());
 }
 
 export function isSplitTunnled(
