@@ -35,9 +35,17 @@ ___
 ```bash
 # For more verbose output when extension is starting up
 web-ext run -s src/ --verbose
-
-
 # For identifying errors in the extension or other source code files.
 cd src
 web-ext lint
 ```
+
+## Restoring src/_locales
+You might see the _locales submodule touched after running `npm run start`. 
+```bash
+$ git status
+  (...)
+  modified:   src/_locales
+
+```
+This is a side effect of web-ext, just restore the status with `npm run restore-locales-github`
