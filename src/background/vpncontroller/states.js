@@ -20,6 +20,7 @@ export const REQUEST_TYPES = [
   "session_start",
   "session_stop",
   "interventions",
+  "settings",
 ];
 
 export class VPNState {
@@ -213,4 +214,8 @@ export class vpnStatusResponse {
     },
     version: "2.25.0",
   };
+}
+
+export class VPNSettings {
+  extensionTelemetryEnabled = false;
 }
