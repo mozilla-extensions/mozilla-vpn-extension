@@ -20,7 +20,7 @@ const mocksendMessage = jest.fn();
 
 const controller = {
   settings: property(new VPNSettings()),
-  sendMessage: mocksendMessage,
+  postToApp: mocksendMessage,
 };
 
 const extensionController = {
@@ -68,7 +68,9 @@ describe("Telemetry", () => {
       const newvalue = !target.telemetryEnabled.value;
       target.setTelemetryEnabled(newvalue);
       expect(mocksendMessage).toBeCalledWith("settings", {
-        extensionTelemetryEnabled: newvalue,
+        settings: {
+          extensionTelemetryEnabled: newvalue,
+        },
       });
     });
   });

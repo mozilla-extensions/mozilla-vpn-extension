@@ -47,8 +47,10 @@ export class Telemetry {
     });
   }
   setTelemetryEnabled(enabled) {
-    this.#controller.sendMessage("settings", {
-      extensionTelemetryEnabled: enabled,
+    this.#controller.postToApp("settings", {
+      settings: {
+        extensionTelemetryEnabled: enabled,
+      },
     });
   }
   record(eventName = "", data) {
@@ -59,16 +61,16 @@ export class Telemetry {
     if (eventName == "") {
       return;
     }
-    this.#controller.sendMessage("telemetry", {
+    this.#controller.postToApp("telemetry", {
       name: eventName,
       args: data,
     });
   }
   startSession() {
-    this.#controller.sendMessage("start_session");
+    this.#controller.postToApp("start_session");
   }
   stopSession() {
-    this.#controller.sendMessage("stop_session");
+    this.#controller.postToApp("stop_session");
   }
 
   #controller;
@@ -80,7 +82,13 @@ export class Telemetry {
    * @param {Map<string,SiteContext>} contextMap
    */
   static evaluateSiteContexts(contextMap) {
-    const v = contextMap.values();
+    let v;
+    try {
+      v = contextMap.values();
+    } catch (error) {
+      v = Object.values(contextMap);
+    }
+
     return v.reduce(
       (acc, curr) => {
         curr.excluded ? acc.excluded++ : acc.geoPrefed++;
