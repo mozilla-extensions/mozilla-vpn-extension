@@ -355,6 +355,13 @@ export class BrowserActionPopup extends LitElement {
       >
         ${tr("resetPageSettings")}
       </button>
+      <button
+        id="give-feedback"
+        @click=${openGiveFeedback}
+        class="ghost-btn"
+      >
+        ${tr("giveFeedback")}
+      </button>
     `;
   }
   static backBtn(back) {
@@ -575,6 +582,17 @@ export class BrowserActionPopup extends LitElement {
     #selectLocation.disabled {
       opacity: 0.5;
       pointer-events: none;
+    }
+
+    #selectLocation {
+      margin-block-end: 0px;
+    }
+
+    #give-feedback {
+      margin-block: 8px 16px;
+      border: none;
+      font-family: ;
+      font-size: 15px;
     }
 
     #settingsList {
