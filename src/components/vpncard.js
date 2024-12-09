@@ -16,6 +16,9 @@ import { resetSizing, fontStyling, positioner } from "./styles.js";
 
 import { VPNState } from "../background/vpncontroller/states.js";
 import "./mz-rings.js";
+
+import "./mz-pill.js";
+
 /**
  * @typedef {import("../background/vpncontroller/states.js").VPNState} VPNState
  */
@@ -143,7 +146,10 @@ export class VPNCard extends LitElement {
               )}
               ${timeString}
             </div>
-            <button class="pill" @click=${this.#toggle}></button>
+            <mz-pill
+              .enabled=${this.enabled || this.connecting}
+              @click=${this.#toggle}
+            ></mz-pill>
           </main>
           ${this.enabled || this.connecting
             ? VPNCard.footer(this.cityName, this.countryFlag)
@@ -325,61 +331,9 @@ export class VPNCard extends LitElement {
       margin-right: var(--default-padding);
     }
 
-    .pill {
-      width: 45px;
-      height: 24px;
-      border-radius: 30px;
-      border: none;
-      background-color: var(--color-disabled);
-      position: relative;
-      transition: background-color 0.2s ease;
-    }
-
-    .pill:hover {
-      background-color: var(--color-disabled-hover);
-    }
-
-    .pill:active {
-      background-color: var(--color-disabled-active);
-    }
-    .on .pill,
-    .connecting .pill {
-      background-color: var(--color-enabled);
-    }
-
-    .connecting .pill:hover,
-    .on .pill:hover {
-      background-color: var(--color-enabled-hover);
-    }
-
-    .connecting .pill:active,
-    .on .pill:active {
-      background-color: var(--color-enabled-active);
-    }
-
-    .pill::before {
-      content: " ";
-      background: white;
-      display: box;
-      width: 18px;
-      height: 18px;
-      border-radius: 20px;
-      position: absolute;
-      top: 3px;
-      left: 3px;
-      transition: all 0.25s;
-    }
-
-    .connecting .pill::before,
-    .on .pill::before {
-      top: 3px;
-      left: 24px;
-    }
-
     .box.connecting svg,
     .box.connecting .timer,
-    .connecting .pill,
-    .connecting footer {
+    .connecting mz-pill .connecting footer {
       opacity: 0.5;
       transition: opacity 0.3s ease;
     }
