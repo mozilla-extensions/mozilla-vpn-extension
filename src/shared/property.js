@@ -141,7 +141,7 @@ export class ReadOnlyProperty extends IBindable {
 class LazyComputedProperty {
   /**
    * Constructs a Bindable<T> from a Property
-   * @param {WritableProperty<P>} parent - The proptery to read from
+   * @param {IBindable<P>} parent - The proptery to read from
    * @param {(arg0: (P|null) )=>T} transform - The function to apply
    */
   constructor(parent, transform) {
@@ -189,7 +189,7 @@ class LazyComputedProperty {
   }
 
   /**
-   * @type {WritableProperty<P>}
+   * @type {IBindable<P>}
    * The Parent Property
    */
   #parent;
@@ -221,8 +221,8 @@ export const property = (value) => {
 /**
  * @template T
  * @template P
- * @param {WritableProperty<P>} property - Callback when the value changes
- * @param {(arg0: P?)=>T} transform - Called with the Property Value, must return the transformed value
+ * @param {IBindable<P>} property - Callback when the value changes
+ * @param {(arg0: P)=>T} transform - Called with the Property Value, must return the transformed value
  * @returns {LazyComputedProperty<T,P>} - A Function to stop the subscription
  */
 export const computed = (property, transform) => {
