@@ -355,11 +355,7 @@ export class BrowserActionPopup extends LitElement {
       >
         ${tr("resetPageSettings")}
       </button>
-      <button
-        id="give-feedback"
-        @click=${openGiveFeedback}
-        class="ghost-btn"
-      >
+      <button id="give-feedback" @click=${openGiveFeedback} class="ghost-btn">
         ${tr("giveFeedback")}
       </button>
     `;
@@ -591,7 +587,7 @@ export class BrowserActionPopup extends LitElement {
     #give-feedback {
       margin-block: 8px 16px;
       border: none;
-      font-family: ;
+      font-family:;
       font-size: 15px;
     }
 
