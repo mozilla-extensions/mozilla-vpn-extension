@@ -74,10 +74,15 @@ export class BrowserActionPopup extends LitElement {
     });
     extController.state.subscribe((s) => {
       const currentState = this.extState;
-      
+
       // Hack to mitigate FXVPN-217 and FXVPN-222
       // See Utils.delayToStateEnabledNeeded() for details
-      const timer =  Utils.delayToStateEnabledNeeded(currentState?.state, s.state) ? Utils.connectingDelay() : 0;
+      const timer = Utils.delayToStateEnabledNeeded(
+        currentState?.state,
+        s.state
+      )
+        ? Utils.connectingDelay()
+        : 0;
       setTimeout(() => {
         this.extState = s;
         this.updatePage();
