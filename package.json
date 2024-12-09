@@ -14,7 +14,7 @@
     "start-dev": "npm run remove-locales-github  && npm run web-ext-run --pref=ui.popup.disable_autohide=true",
     "start": "npm run remove-locales-github && npm run web-ext-run",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --collect-coverage --detectOpenHandles --",
-    "restore-locales-github": "cd src/_locales/ && git reset --hard",
+    "restore-locales-github": "cd src/_locales/ && git reset --hard && git submodule update",
     "remove-locales-github": "del-cli src/_locales/.github",
     "web-ext-run": "web-ext run --verbose --source-dir src --"
   },
