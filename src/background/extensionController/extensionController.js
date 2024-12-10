@@ -6,6 +6,7 @@
 
 import { Component } from "../component.js";
 import { VPNController, VPNState } from "../vpncontroller/index.js";
+import { fromStorage, putIntoStorage } from "../vpncontroller/vpncontroller.js";
 import { property } from "../../shared/property.js";
 import { PropertyType } from "../../shared/ipc.js";
 import {
@@ -17,6 +18,8 @@ import {
   isEquatable,
 } from "./states.js";
 
+const ONBOARDING_KEY = "mozillaVpnOnboarding";
+
 /**
  *
  * ExtensionController manages extension state and
@@ -27,6 +30,9 @@ export class ExtensionController extends Component {
   static properties = {
     state: PropertyType.Bindable,
     toggleConnectivity: PropertyType.Function,
+    nextOnboardingPage: PropertyType.Function,
+    finishOnboarding: PropertyType.Function,
+    currentOnboardingPage: PropertyType.Bindable
   };
 
   /**
@@ -48,7 +54,13 @@ export class ExtensionController extends Component {
   /** @type {VPNState} */
   clientState;
 
-  async init() {}
+  async init() {
+    this.#mCurrentOnboardingPage.value = await fromStorage(
+      browser.storage.local,
+      ONBOARDING_KEY,
+      1
+    );
+  }
 
   toggleConnectivity() {
     if (this.#mState.value.enabled) {
@@ -79,6 +91,23 @@ export class ExtensionController extends Component {
 
   get state() {
     return this.#mState.readOnly;
+  }
+
+  get currentOnboardingPage() {
+    return this.#mCurrentOnboardingPage.readOnly; // true w/ or w/o readonly
+  }
+
+  nextOnboardingPage() {
+    this.#mCurrentOnboardingPage.set(this.#mCurrentOnboardingPage.value + 1);
+  }
+
+  finishOnboarding() {
+    this.#mCurrentOnboardingPage.set(4);
+    putIntoStorage(
+      4,
+      browser.storage.local,
+      ONBOARDING_KEY
+    );
   }
 
   /**
@@ -137,5 +166,6 @@ export class ExtensionController extends Component {
   }
 
   #mState = property(new FirefoxVPNState());
+  #mCurrentOnboardingPage = property(1);
   mKeepAliveConnection = false;
 }

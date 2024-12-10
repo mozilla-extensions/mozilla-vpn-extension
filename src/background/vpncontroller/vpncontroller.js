@@ -269,17 +269,19 @@ const MOZILLA_VPN_SERVERS_KEY = "mozillaVpnServers";
    * @param {T} defaultValue - The Default value, in case it does not exist. 
    * @returns {Promise<T>} - Returns a copy of the state, or the same in case of missing data.
    */
-async function fromStorage(
+export async function fromStorage(
   storage = browser.storage.local,
-  key = MOZILLA_VPN_SERVERS_KEY,
+  key,
   defaultValue
 ) {
-  const { mozillaVpnServers } = await storage.get(key);
-  if (typeof mozillaVpnServers === "undefined") {
+  const storageRetrieval = await storage.get(key);
+  const returnValue = storageRetrieval[key];
+
+  if (typeof returnValue === "undefined") {
     return defaultValue;
   }
   // @ts-ignore
-  return mozillaVpnServers;
+  return returnValue;
 }
 
 /**  data into storage, to make sure we can recreate it next time using
@@ -287,10 +289,10 @@ async function fromStorage(
  * @param {browser.storage.StorageArea} storage - The storage area to look for
  * @param {String} key - The key to put the state in
  */
-function putIntoStorage(
+export function putIntoStorage(
   data = {},
   storage = browser.storage.local,
-  key = MOZILLA_VPN_SERVERS_KEY
+  key
 ) {
   // @ts-ignore
   storage.set({ [key]: data });

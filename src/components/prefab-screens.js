@@ -5,6 +5,7 @@
 import { html, render } from "../vendor/lit-all.min.js";
 import { MessageScreen } from "./message-screen.js";
 import { tr } from "../shared/i18n.js";
+import { extController } from "../ui/browserAction/backend.js";
 
 const open = (url) => {
   browser.tabs.create({
@@ -21,8 +22,9 @@ const defineMessageScreen = (
   bodyText,
   primaryAction,
   onPrimaryAction,
-  secondarAction = tr("getHelp"),
-  onSecondaryAction = () => open(sumoLink)
+  secondaryAction = tr("getHelp"),
+  onSecondaryAction = () => open(sumoLink),
+  closeOnClick = true
 ) => {
   const body =
     typeof bodyText === "string" ? html`<p>${bodyText}</p>` : bodyText;
@@ -34,9 +36,20 @@ const defineMessageScreen = (
       this.img = img;
       this.heading = heading;
       this.primaryAction = primaryAction;
-      this.onPrimaryAction = onPrimaryAction;
-      this.secondaryAction = secondarAction;
-      this.onSecondaryAction = onSecondaryAction;
+      this.secondaryAction = secondaryAction;
+      if (closeOnClick) {
+        this.onPrimaryAction = function() {
+          onPrimaryAction();
+          window.close();
+        }
+        this.onSecondaryAction = function() {
+          onSecondaryAction();
+          window.close();
+        }
+      } else {
+        this.onPrimaryAction = onPrimaryAction;
+        this.onSecondaryAction = onSecondaryAction;
+      }
       this.identifier = tag;
       render(body, this);
     }
@@ -103,6 +116,52 @@ defineMessageScreen(
   html` <p>${tr("bodyOpenMsg")}</p> `,
   null,
   null
+);
+
+defineMessageScreen(
+  "onboarding-screen-1",
+  "onboarding-1.svg",
+  tr("onboarding1_title"),
+  html` <p>${tr("onboarding1_body")}</p> `,
+  tr("next"),
+  () => {
+    extController.nextOnboardingPage();
+  },
+  tr("skip"),
+  () => {
+    extController.finishOnboarding();
+  },
+  false
+);
+
+defineMessageScreen(
+  "onboarding-screen-2",
+  "onboarding-2.svg",
+  tr("onboarding2_title"),
+  html` <p>${tr("onboarding2_body")}</p> `,
+  tr("next"),
+  () => {
+    extController.nextOnboardingPage();
+  },
+  tr("skip"),
+  () => {
+    extController.finishOnboarding();
+  },
+  false
+);
+
+defineMessageScreen(
+  "onboarding-screen-3",
+  "onboarding-3.svg",
+  tr("onboarding3_title"),
+  html` <p>${tr("onboarding3_body")}</p> `,
+  tr("done"),
+  () => {
+    extController.finishOnboarding();
+  },
+  tr(" "), // When using something like `null` there is a large vertical gap
+  null,
+  false
 );
 
 defineMessageScreen(
