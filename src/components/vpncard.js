@@ -16,9 +16,6 @@ import { resetSizing, fontStyling, positioner, inCopyLink } from "./styles.js";
 
 import { VPNState } from "../background/vpncontroller/states.js";
 import "./mz-rings.js";
-
-import "./mz-pill.js";
-
 import "./mz-pill.js";
 
 /**
