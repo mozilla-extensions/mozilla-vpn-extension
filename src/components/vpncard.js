@@ -18,8 +18,6 @@ import { VPNState } from "../background/vpncontroller/states.js";
 import "./mz-rings.js";
 import "./mz-pill.js";
 
-import "./mz-pill.js";
-
 /**
  * @typedef {import("../background/vpncontroller/states.js").VPNState} VPNState
  */
