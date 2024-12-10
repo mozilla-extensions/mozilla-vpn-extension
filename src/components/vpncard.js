@@ -333,7 +333,8 @@ export class VPNCard extends LitElement {
 
     .box.connecting svg,
     .box.connecting .timer,
-    .connecting mz-pill .connecting footer {
+    .connecting mz-pill,
+    .connecting footer {
       opacity: 0.5;
       transition: opacity 0.3s ease;
     }
