@@ -37,6 +37,9 @@ export class Telemetry {
       if (state.enabled == this.#enabled) {
         return;
       }
+      this.record("fx_protection_mode_changed", {
+        message_state: state.name,
+      });
       this.#enabled = state.enabled;
       this.#enabled ? this.startSession() : this.stopSession();
     });
