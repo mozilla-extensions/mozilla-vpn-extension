@@ -145,7 +145,7 @@ const getCenterCoords = (aCanvas, aOther) => {
   // Now we can calc the center of the box in pixelspace
   const center = {
     x: normOther.x + normOther.width / 2.0,
-    y: normOther.y + normOther.height + 17,
+    y: normOther.y + normOther.height + 20,
   };
   // Now let's make those relative to the dimentions of the canvas (clipspace)
   const clipSpaceCenter = {
