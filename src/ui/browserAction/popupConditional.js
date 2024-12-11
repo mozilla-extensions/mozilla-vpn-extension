@@ -18,15 +18,15 @@ export class PopUpConditionalView extends ConditionalView {
     const supportedPlatform = Utils.isSupportedOs(deviceOs.os);
 
     propertySum(
-      vpnController.state,
-      vpnController.featureList,
       (state, features) => {
         this.slotName = PopUpConditionalView.toSlotname(
           state,
           features,
           supportedPlatform
         );
-      }
+      },
+      vpnController.state,
+      vpnController.featureList
     );
 
     // Messages may dispatch an event requesting to send a Command to the VPN

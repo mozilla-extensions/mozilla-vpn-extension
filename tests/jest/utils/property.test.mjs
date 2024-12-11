@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { describe, expect, test, jest } from "@jest/globals";
-import { property, computed } from "../../../src/shared/property";
+import { property, computed, propertySum } from "../../../src/shared/property";
 
 describe("property()", () => {
   test("Can create a property from a value", () => {
@@ -78,5 +78,52 @@ describe("computed()", () => {
     prop.set(2);
     expect(maybeValue).not.toBeNull();
     expect(maybeValue).toBe(4);
+  });
+});
+
+describe("propertySum", () => {
+  test("Can create a property from a value", () => {
+    const obj = property({ x: "hello" });
+    const prop = propertySum((obj) => {
+      return obj.x;
+    }, obj);
+    expect(prop.value.x).toBe(obj.x);
+  });
+  test("Calls the Transform Function in order of the props ", async () => {
+    const prop1 = property("hello");
+    const prop2 = property(4);
+    const prop3 = property(true);
+    propertySum(
+      (value1, value2, value3) => {
+        expect(value1).toBe(prop1.value);
+        expect(value2).toBe(prop2.value);
+        expect(value3).toBe(prop3.value);
+      },
+      prop1,
+      prop2,
+      prop3
+    );
+  });
+
+  test("If any of the props are updated, the transform is called", async () => {
+    const prop1 = property("hello");
+    const prop2 = property(4);
+    const prop3 = property(true);
+
+    let count = 0;
+    propertySum(
+      () => {
+        return count++;
+      },
+      prop1,
+      prop2,
+      prop3
+    );
+    // We auto scheudle the transform to compute the inital value
+    expect(count).toBe(1);
+    prop1.set("h");
+    prop2.set("h");
+    prop3.set("h");
+    expect(count).toBe(4);
   });
 });
