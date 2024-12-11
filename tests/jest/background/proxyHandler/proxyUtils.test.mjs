@@ -7,7 +7,7 @@ import { ProxyUtils } from "../../../../src/background/proxyHandler/proxyUtils";
 
 describe("ProxyUtils", () => {
   describe("getSiteContextsStorageKey", () => {
-    const result = ProxyUtils.getSiteContextsStorageKey();
+    const result = ProxyUtils.SiteContextsStorageKey;
     expect(result).toBe("siteContexts");
     /* 
       If you've failed this test it is because you've changed the value of
