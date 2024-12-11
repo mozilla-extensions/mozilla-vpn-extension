@@ -5,7 +5,7 @@
 import { ConditionalView } from "../../components/conditional-view.js";
 import { propertySum } from "../../shared/property.js";
 import { Utils } from "../../shared/utils.js";
-import { vpnController } from "./backend.js";
+import { vpnController, telemetry } from "./backend.js";
 
 export class PopUpConditionalView extends ConditionalView {
   constructor() {
@@ -24,6 +24,11 @@ export class PopUpConditionalView extends ConditionalView {
           features,
           supportedPlatform
         );
+        if (this.slotName == !"default") {
+          requestIdleCallback(() => {
+            telemetry.record("error_screen", { error: this.slotName });
+          });
+        }
       },
       vpnController.state,
       vpnController.featureList

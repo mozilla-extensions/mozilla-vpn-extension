@@ -17,6 +17,7 @@ import { VPNController } from "./vpncontroller/vpncontroller.js";
 export class Telemetry {
   // Things to expose to the UI
   static properties = {
+    telemetryEnabled: PropertyType.Bindable,
     setTelemetryEnabled: PropertyType.Function,
     record: PropertyType.Function,
   };
@@ -70,10 +71,10 @@ export class Telemetry {
     });
   }
   startSession() {
-    this.#controller.postToApp("start_session");
+    this.#controller.postToApp("session_start");
   }
   stopSession() {
-    this.#controller.postToApp("stop_session");
+    this.#controller.postToApp("session_stop");
   }
 
   #controller;
