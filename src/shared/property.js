@@ -181,7 +181,6 @@ export const propertySum = (transform, ...parent) => {
   };
   const inner = new WritableProperty(transform(...getValues()));
   const onUpdated = () => {
-    const values = getValues();
     inner.set(transform(...getValues()));
   };
   parent.forEach((p) => {
