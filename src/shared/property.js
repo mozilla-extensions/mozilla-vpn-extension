@@ -31,34 +31,6 @@ export class IBindable {
   }
 }
 
-class BaseBindable extends IBindable {
-  /** @returns {T}  */
-  get value() {
-    return this.#innerValue;
-  }
-  /**
-   *
-   * @param {(T)=>void} callback - This callback will be called when the value changes
-   * @returns {()=>void} unsubscribe function, this will stop all callbacks
-   */
-  subscribe(callback) {
-    const unsubscribe = () => {
-      this.#subscriptions = this.#subscriptions.filter((t) => t !== callback);
-    };
-    this.#subscriptions.push(callback);
-    queueMicrotask(() => callback(this.#innerValue));
-    return unsubscribe;
-  }
-  /**
-   * @type {Array<(arg0: T)=>void> }
-   */
-  #subscriptions = [];
-  /**
-   * @type {T}
-   */
-  #innerValue;
-}
-
 /**
  * A property similar to Q_Property
  * Holds an internal value that can be modified using `.set(NewValue)`
@@ -68,7 +40,7 @@ class BaseBindable extends IBindable {
  *
  * @template T
  */
-export class WritableProperty extends BaseBindable {
+export class WritableProperty extends IBindable {
   /**
    * Constructs a Property<T> with an initial Value
    * @param {T} initialvalue
