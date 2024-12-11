@@ -152,7 +152,7 @@ describe("Telemetry", () => {
         proxyHandler
       );
       extensionController.state.set(new StateFirefoxVPNEnabled(true, 0));
-      expect(mocksendMessage).toBeCalledWith("start_session");
+      expect(mocksendMessage).toBeCalledWith("session_start");
     });
     it("Will *NOT* start a session when switching from partial to full", () => {
       const target = new Telemetry(
@@ -161,7 +161,7 @@ describe("Telemetry", () => {
         proxyHandler
       );
       extensionController.state.set(new StateFirefoxVPNEnabled(true, 0));
-      expect(mocksendMessage).toBeCalledWith("start_session");
+      expect(mocksendMessage).toBeCalledWith("session_start");
       mocksendMessage.mockReset();
       extensionController.state.set(new StateFirefoxVPNEnabled(false, 0));
       expect(mocksendMessage).not.toBeCalled();
@@ -173,10 +173,10 @@ describe("Telemetry", () => {
         proxyHandler
       );
       extensionController.state.set(new StateFirefoxVPNEnabled(true, 0));
-      expect(mocksendMessage).toBeCalledWith("start_session");
+      expect(mocksendMessage).toBeCalledWith("session_start");
       mocksendMessage.mockReset();
       extensionController.state.set(new StateFirefoxVPNDisabled(false));
-      expect(mocksendMessage).toBeCalledWith("stop_session");
+      expect(mocksendMessage).toBeCalledWith("session_stop");
     });
     it("Will ignore idle/connecting", () => {
       const target = new Telemetry(

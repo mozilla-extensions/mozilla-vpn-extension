@@ -12,7 +12,12 @@ import {
   live,
 } from "../../vendor/lit-all.min.js";
 
-import { vpnController, proxyHandler, extController } from "./backend.js";
+import {
+  vpnController,
+  proxyHandler,
+  extController,
+  telemetry,
+} from "./backend.js";
 
 import { Utils } from "../../shared/utils.js";
 import { tr } from "../../shared/i18n.js";
@@ -119,6 +124,9 @@ export class BrowserActionPopup extends LitElement {
     requestIdleCallback(() => {
       vpnController.postToApp("featurelist");
     });
+    requestIdleCallback(() => {
+      telemetry.record("main_screen");
+    });
   }
 
   get currentSiteContext() {
@@ -143,6 +151,12 @@ export class BrowserActionPopup extends LitElement {
 
   render() {
     const handleVPNToggle = () => {
+      if (!this.enabled) {
+        telemetry.record("used_feature_disable_firefox_protection");
+        telemetry.record("fx_protection_disabled");
+      } else {
+        telemetry.record("fx_protection_enabled");
+      }
       extController.toggleConnectivity();
     };
 
