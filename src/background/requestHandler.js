@@ -42,11 +42,11 @@ export class RequestHandler extends Component {
     });
 
     propertySum(
-      proxyHandler.localProxyInfo,
-      proxyHandler.currentExitRelays,
       (loophole, exitRelays) => {
         this.updateProxyInfoFromClient(loophole, exitRelays);
-      }
+      },
+      proxyHandler.localProxyInfo,
+      proxyHandler.currentExitRelays
     );
 
     proxyHandler.proxyMap.subscribe((proxyMap) => {

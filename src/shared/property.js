@@ -31,6 +31,34 @@ export class IBindable {
   }
 }
 
+class BaseBindable extends IBindable {
+  /** @returns {T}  */
+  get value() {
+    return this.#innerValue;
+  }
+  /**
+   *
+   * @param {(T)=>void} callback - This callback will be called when the value changes
+   * @returns {()=>void} unsubscribe function, this will stop all callbacks
+   */
+  subscribe(callback) {
+    const unsubscribe = () => {
+      this.#subscriptions = this.#subscriptions.filter((t) => t !== callback);
+    };
+    this.#subscriptions.push(callback);
+    queueMicrotask(() => callback(this.#innerValue));
+    return unsubscribe;
+  }
+  /**
+   * @type {Array<(arg0: T)=>void> }
+   */
+  #subscriptions = [];
+  /**
+   * @type {T}
+   */
+  #innerValue;
+}
+
 /**
  * A property similar to Q_Property
  * Holds an internal value that can be modified using `.set(NewValue)`
@@ -40,7 +68,7 @@ export class IBindable {
  *
  * @template T
  */
-export class WritableProperty extends IBindable {
+export class WritableProperty extends BaseBindable {
   /**
    * Constructs a Property<T> with an initial Value
    * @param {T} initialvalue
@@ -130,86 +158,6 @@ export class ReadOnlyProperty extends IBindable {
 }
 
 /**
- * @template T - Internal Type
- * @template P - Parent Property Type
- *
- * A property consuming another property
- * and applying a transform function
- * before emitting the new value
- *
- */
-class LazyComputedProperty {
-  /**
-   * Constructs a Bindable<T> from a Property
-   * @param {WritableProperty<P>} parent - The proptery to read from
-   * @param {(arg0: (P|null) )=>T} transform - The function to apply
-   */
-  constructor(parent, transform) {
-    this.#parent = parent;
-    this.#transform = transform;
-    this.#innerValue = this.#transform(this.#parent.value);
-  }
-
-  get value() {
-    // If we're currently not subscribed, to the parent
-    // create the value on demand
-    if (!this.#parentUnsubscribe) {
-      return this.#transform(this.#parent.value);
-    }
-    // Otherwise innerValue is cached correctly
-    return this.#innerValue;
-  }
-  /**
-   * Subscribe to changes of the Value
-   * @param {(arg0: T)=>void} callback - A callback
-   */
-  subscribe(callback) {
-    if (!this.#parentUnsubscribe) {
-      this.#parentUnsubscribe = this.#parent.subscribe((parentValue) => {
-        this.#notify(this.#transform(parentValue));
-      });
-    }
-    const unsubscribe = () => {
-      this.unsubscribe(callback);
-    };
-    this.#subscriptions.push(callback);
-    return unsubscribe;
-  }
-  #notify(value) {
-    this.#innerValue = value;
-    this.#subscriptions.forEach((s) => s(value));
-  }
-  unsubscribe(callback) {
-    this.#subscriptions = this.#subscriptions.filter((t) => t !== callback);
-    // Noone listens to us, no need to hook into the parent
-    if (this.#subscriptions.length == 0 && this.#parentUnsubscribe) {
-      this.#parentUnsubscribe();
-      this.#parentUnsubscribe = null;
-    }
-  }
-
-  /**
-   * @type {WritableProperty<P>}
-   * The Parent Property
-   */
-  #parent;
-  /** @type { ?Function} */
-  #parentUnsubscribe = null;
-  /**
-   * @type {(arg0: P?)=>T}
-   */
-  #transform;
-  /**
-   * @type {Array<(arg0: T)=>void>}
-   */
-  #subscriptions = [];
-  /**
-   * @type {T?}
-   */
-  #innerValue = null;
-}
-
-/**
  * @template T
  * @param {T} value - Initial value of the Property
  * @returns {WritableProperty<T>} - A Property
@@ -221,12 +169,16 @@ export const property = (value) => {
 /**
  * @template T
  * @template P
- * @param {WritableProperty<P>} property - Callback when the value changes
+ * @param {IBindable<P>} parent - Callback when the value changes
  * @param {(arg0: P?)=>T} transform - Called with the Property Value, must return the transformed value
- * @returns {LazyComputedProperty<T,P>} - A Function to stop the subscription
+ * @returns {ReadOnlyProperty<T>} - A Function to stop the subscription
  */
-export const computed = (property, transform) => {
-  return new LazyComputedProperty(property, transform);
+export const computed = (parent, transform) => {
+  const inner = new WritableProperty(transform(parent.value));
+  parent.subscribe((value) => {
+    inner.set(transform(value));
+  });
+  return inner.readOnly;
 };
 
 /**
@@ -235,18 +187,33 @@ export const computed = (property, transform) => {
  * When either L or R changes calls the function
  * and updates the returned property.
  *
+ * Example:
+ *     const prop1 = property("hello");
+ *     const prop2 = property(4);
+ *     const prop3 = property(true);
+ *     propertySum( (value1,value2,value3) => {
+ *       expect(value1).toBe(prop1.value)
+ *       expect(value2).toBe(prop2.value)
+ *       expect(value3).toBe(prop3.value)
+ *       return value1+value2+value3;
+ *     }, prop1, prop2, prop3);
  *
  * @template T
- * @template L
- * @template R
- * @param {IBindable<L>} left - Left Hand Property
- * @param {IBindable<R>} right - Right Hand Property
- * @param {(arg0: L, arg1: R)=>T} transform - Called with the Property Value, must return the transformed value
- * @returns {ReadOnlyProperty<T>} -
+ * @param {Array<IBindable<any>>} parent - Callback when the value changes
+ * @param {(...any)=>T} transform - Called with the Property Value, must return the transformed value
+ * @returns {ReadOnlyProperty<T>} - A Function to stop the subscription
  */
-export const propertySum = (left, right, transform) => {
-  const inner = property(transform(left.value, right.value));
-  left.subscribe((l) => inner.set(transform(l, right.value)));
-  right.subscribe((r) => inner.set(transform(left.value, r)));
+export const propertySum = (transform, ...parent) => {
+  const getValues = () => {
+    return parent.map((p) => p.value);
+  };
+  const inner = new WritableProperty(transform(...getValues()));
+  const onUpdated = () => {
+    const values = getValues();
+    inner.set(transform(...getValues()));
+  };
+  parent.forEach((p) => {
+    p.subscribe(onUpdated);
+  });
   return inner.readOnly;
 };
