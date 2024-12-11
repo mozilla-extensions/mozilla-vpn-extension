@@ -27,6 +27,17 @@ import { getExposedObject } from "../../shared/ipc.js";
 export const vpnController = await getExposedObject("VPNController");
 export const extController = await getExposedObject("ExtensionController");
 export const proxyHandler = await getExposedObject("ProxyHandler");
+
+/**
+ * Manually define the types for convinence, please update if making changes :)
+ *
+ * @typedef {Object} ipcTelemetry
+ * @property {IBindable<bool>} telemetryEnabled - Is telemetry enabled?
+ * @property {(bool)=>Promise<>} setTelemetryEnabled - request to set telemetry
+ * @property {(string,any)=>Promise<>} record - record telemetry
+ *
+ */
+/** @type {ipcTelemetry} */
 export const telemetry = await getExposedObject("Telemetry");
 
 export const ready = Promise.all([vpnController, proxyHandler]);
