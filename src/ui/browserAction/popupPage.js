@@ -58,6 +58,7 @@ export class BrowserActionPopup extends LitElement {
     _siteContext: { type: Object },
     hasSiteContext: { type: Boolean },
     _siteContexts: { type: Array },
+    allowDisconnect: { type: Boolean }
   };
 
   constructor() {
@@ -79,6 +80,9 @@ export class BrowserActionPopup extends LitElement {
       this.updatePage();
     });
     this.updatePage();
+    extController.allowDisconnect.subscribe((s) => {
+      this.allowDisconnect = s;
+    });
   }
   updatePage() {
     Utils.getCurrentTab().then(async (tab) => {
@@ -182,6 +186,7 @@ export class BrowserActionPopup extends LitElement {
               .stability=${this.vpnState?.connectionHealth}
               .hasContext=${this._siteContext}
               .connecting=${this.extState?.connecting}
+              .allowDisconnect=${this.allowDisconnect}
             ></vpn-card>
             ${this.locationSettings()}
           </main>
