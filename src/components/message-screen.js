@@ -59,7 +59,6 @@ export class MessageScreen extends LitElement {
                 class="primarybtn"
                 @click=${(e) => {
                   this.onPrimaryAction(this, e);
-                  window.close();
                 }}
               >
                 ${this.primaryAction}
@@ -73,7 +72,6 @@ export class MessageScreen extends LitElement {
                 class="secondarybtn"
                 @click=${(e) => {
                   this.onSecondaryAction(this, e);
-                  window.close();
                 }}
               >
                 ${this.secondaryAction}

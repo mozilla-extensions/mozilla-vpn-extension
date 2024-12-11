@@ -3,9 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { ConditionalView } from "../../components/conditional-view.js";
-import { propertySum } from "../../shared/property.js";
+import { propertySumTrio } from "../../shared/property.js";
 import { Utils } from "../../shared/utils.js";
-import { vpnController } from "./backend.js";
+import { vpnController, extController } from "./backend.js";
 
 export class PopUpConditionalView extends ConditionalView {
   constructor() {
@@ -17,14 +17,16 @@ export class PopUpConditionalView extends ConditionalView {
     const deviceOs = await browser.runtime.getPlatformInfo();
     const supportedPlatform = Utils.isSupportedOs(deviceOs.os);
 
-    propertySum(
+    propertySumTrio(
       vpnController.state,
       vpnController.featureList,
-      (state, features) => {
+      extController.currentOnboardingPage,
+      (state, features, currentPage) => {
         this.slotName = PopUpConditionalView.toSlotname(
           state,
           features,
-          supportedPlatform
+          supportedPlatform,
+          currentPage
         );
       }
     );
@@ -48,9 +50,10 @@ export class PopUpConditionalView extends ConditionalView {
    * @param {State} state
    * @param {FeatureFlags} features
    * @param {Boolean} supportedPlatform
+   * @param {Number} currentOnboardingPage
    * @returns {String}
    */
-  static toSlotname(state, features, supportedPlatform) {
+  static toSlotname(state, features, supportedPlatform, currentOnboardingPage) {
     if (!supportedPlatform && !features.webExtension) {
       return "MessageOSNotSupported";
     }
@@ -72,12 +75,16 @@ export class PopUpConditionalView extends ConditionalView {
     if (!state.subscribed) {
       return "MessageSubscription";
     }
-    /**
-     * TODO:
-     * if( did not have onboarding){
-     *  return "onBoarding"
-     * }
-     */
+    if (currentOnboardingPage == 1) {
+      return "onboarding-1"
+    }
+    if (currentOnboardingPage == 2) {
+      return "onboarding-2"
+    }
+    if (currentOnboardingPage == 3) {
+      return "onboarding-3"
+    }
+
     return "default";
   }
 }

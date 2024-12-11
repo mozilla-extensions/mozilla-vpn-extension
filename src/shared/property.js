@@ -250,3 +250,28 @@ export const propertySum = (left, right, transform) => {
   right.subscribe((r) => inner.set(transform(left.value, r)));
   return inner.readOnly;
 };
+
+/**
+ * Creates a "sum-type" property.
+ * Takes 3 Properties {L,M,R} and a function (l,m,r)=>T
+ * When L, M, or R changes calls the function
+ * and updates the returned property.
+ *
+ *
+ * @template T
+ * @template L
+ * @template M
+ * @template R
+ * @param {IBindable<L>} left - Left Hand Property
+ * @param {IBindable<R>} right - Middle Hand Property
+ * @param {IBindable<R>} right - Right Hand Property
+ * @param {(arg0: L, arg1: M, arg2: R)=>T} transform - Called with the Property Value, must return the transformed value
+ * @returns {ReadOnlyProperty<T>} -
+ */
+export const propertySumTrio = (left, middle, right, transform) => {
+  const inner = property(transform(left.value, middle.value, right.value));
+  left.subscribe((l) => inner.set(transform(l, middle.value, right.value)));
+  middle.subscribe((m) => inner.set(transform(left.value, m, right.value)));
+  right.subscribe((r) => inner.set(transform(left.value, middle.value, r)));
+  return inner.readOnly;
+};
