@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+// @ts-check
+
 import { Component } from "../component.js";
 import { Logger } from "../logger.js";
 
@@ -34,6 +36,7 @@ export class ProxyHandler extends Component {
   constructor(receiver, controller) {
     super(receiver);
     this.controller = controller;
+    //@ts-ignore - Bug in the Typeinfo
     browser.runtime.getPlatformInfo((info) => {
       this.#mPlatformOs = info.os;
       if (info.os === "linux") {
@@ -123,14 +126,6 @@ export class ProxyHandler extends Component {
       this.controllerState = s;
       this.processClientStateChanges(s);
     });
-
-    browser.storage.sync.onChanged.addListener(() => {
-      const changedItems = Object.keys(changes);
-      if (changedItems.includes(ProxyUtils.getSiteContextsStorageKey())) {
-        this.#getSiteContexts();
-      }
-    });
-
     this.#mSiteContexts.value = await this.#getSiteContexts();
   }
 
@@ -193,7 +188,7 @@ export class ProxyHandler extends Component {
    * @returns
    */
   async addSiteContext(siteContext) {
-    if (!siteContext.origin && typeof siteContext.origin != String) {
+    if (!siteContext.origin && typeof siteContext.origin != "string") {
       throw new Error("Invalid Origin for Site context");
     }
     if (!siteContext.excluded) {
@@ -212,14 +207,30 @@ export class ProxyHandler extends Component {
     return this.#setSiteContexts(siteContexts);
   }
 
+  /**
+   * Reads the local Storage, returns a SiteContext Map
+   * @returns {Promise<Map<string,SiteContext>}
+   */
   async #getSiteContexts() {
-    let { siteContexts } = await browser.storage.sync.get([
-      ProxyUtils.getSiteContextsStorageKey(),
+    let { siteContexts } = await browser.storage.local.get([
+      ProxyUtils.SiteContextsStorageKey,
     ]);
     if (!siteContexts) {
       siteContexts = new Map();
       await this.#setSiteContexts(siteContexts);
     }
+    if (typeof siteContexts != typeof {}) {
+      throw new Error("Site context was plluted!");
+    }
+    //@ts-ignore We assert it is an object
+    if (siteContexts.__proto__ !== Map.prototype) {
+      const out = new Map();
+      Object.entries(siteContexts).forEach(([k, v]) => {
+        out.set(k, v);
+      });
+      return out;
+    }
+    //@ts-ignore it is a map.
     return siteContexts;
   }
   /**
@@ -241,8 +252,8 @@ export class ProxyHandler extends Component {
     try {
       this.#mSiteContexts.value = siteContexts;
       this.updateProxyMap(this.#mSiteContexts.value, this.servers);
-      await browser.storage.sync.set({
-        [ProxyUtils.getSiteContextsStorageKey()]: siteContexts,
+      await browser.storage.local.set({
+        [ProxyUtils.SiteContextsStorageKey]: siteContexts,
       });
     } catch (error) {
       console.log(`Error setting site contexts: ${error.message}`);
