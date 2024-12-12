@@ -25,11 +25,11 @@ export class ButterBarService extends Component {
 
   /** @type {IBindable<Array<ButterBarAlert>>} */
   // List of alerts passed to the UI
-  #mButterBarList = property([]);
+  butterBarList = property([]);
 
   /** @type {Array<String>} */
   // List of alert IDs that have been dismissed
-  #mDismissedAlerts = [];
+  dismissedAlerts = [];
 
   /**
    *
@@ -78,38 +78,38 @@ export class ButterBarService extends Component {
     }
     const { alertId } = alert;
 
-    if (this.alertWasDismissed(alertId) || this.alertInButterBarList(alertId)) {
+    if (
+      this.alertWasDismissed(alertId, this.dismissedAlerts) ||
+      this.alertInButterBarList(alertId, this.butterBarList.value)
+    ) {
       return;
     }
-    return this.#mButterBarList.value.push(alert);
+
+    return this.butterBarList.value.push(alert);
   }
 
   /**
    * @param {string} id
+   * @param {Array} dismissedAlerts
    */
-  alertWasDismissed(id) {
-    return this.#mDismissedAlerts.find((alertId) => alertId == id);
+  alertWasDismissed(id, dismissedAlerts) {
+    return dismissedAlerts.some((alertId) => alertId == id);
   }
 
   /**
    * @param {string} id
+   * @param {Array} butterBarList
    */
-  alertInButterBarList(id) {
-    return this.#mButterBarList.value.find((alert) => {
-      alert.alertId == id;
-    });
+  alertInButterBarList(id, butterBarList) {
+    return butterBarList.some((alert) => alert.alertId == id);
   }
 
   removeAlert(id) {
-    const newAlertList = this.#mButterBarList.value.filter(
+    const newAlertList = this.butterBarList.value.filter(
       ({ alertId }) => alertId !== id
     );
-    this.#mDismissedAlerts.push(id);
-    return this.#mButterBarList.set(newAlertList);
-  }
-
-  get butterBarList() {
-    return this.#mButterBarList;
+    this.dismissedAlerts.push(id);
+    return this.butterBarList.set(newAlertList);
   }
 }
 
