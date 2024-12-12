@@ -14,7 +14,7 @@ export class ButterBarService extends Component {
     removeAlert: PropertyType.Function,
   };
 
-  // List of alerts passed to the UI 
+  // List of alerts passed to the UI
   #mButterBarList = property([]);
 
   // List of alert IDs that have been dismissed
@@ -30,14 +30,12 @@ export class ButterBarService extends Component {
     console.log("Initializing ButterBarService");
     await this.conflictObserver.updateList();
 
-
     this.vpnController.interventions.subscribe((interventions) => {
       const alert = new ButterBarAlert(
-          "conflictingProgram",
-          "alert_conflictingProgram",
-          "howToFix",
-          "https://sumo.mozilla.org"
-        
+        "conflictingProgram",
+        "alert_conflictingProgram",
+        "howToFix",
+        "https://sumo.mozilla.org"
       );
       this.maybeCreateAlert(interventions, alert);
     });
@@ -71,7 +69,9 @@ export class ButterBarService extends Component {
   }
 
   alertInButterBarList(id) {
-    return this.#mButterBarList.value.find((alert) => {alert.alertId == id});
+    return this.#mButterBarList.value.find((alert) => {
+      alert.alertId == id;
+    });
   }
 
   removeAlert(id) {

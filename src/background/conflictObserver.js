@@ -41,6 +41,10 @@ export class ConflictObserver {
    * @returns {boolean}
    */
   static isConflicting(addon) {
-    return addon.enabled && addon.permissions.includes("proxy") && addon.id !== "vpn@mozilla.com";
+    return (
+      addon.enabled &&
+      addon.permissions.includes("proxy") &&
+      addon.id !== "vpn@mozilla.com"
+    );
   }
 }
