@@ -14,12 +14,11 @@ export class ButterBarService extends Component {
     removeAlert: PropertyType.Function,
   };
 
-  // List of unresolved 'butter bar' alerts to be shown in the UI
-  get butterBarList() {
-    return this.#mButterBarList;
-  }
-
+  // List of alerts passed to the UI 
   #mButterBarList = property([]);
+
+  // List of alert IDs that have been dismissed
+  #mDismissedAlerts = [];
 
   constructor(receiver, vpnController, conflictObserver) {
     super(receiver);
@@ -27,59 +26,65 @@ export class ButterBarService extends Component {
     this.conflictObserver = conflictObserver;
   }
 
-  // List of alert IDs that have been dismissed
-  dismissedAlerts = [];
-
   async init() {
     console.log("Initializing ButterBarService");
+    await this.conflictObserver.updateList();
 
-    this.vpnController.state.subscribe((s) => {
-      this.controllerState = s;
-      // Check for interventions
-      // if interventions...
-      this.#mButterBarList.value.push(
-        new ButterBarAlert(
+
+    this.vpnController.interventions.subscribe((interventions) => {
+      const alert = new ButterBarAlert(
           "conflictingProgram",
           "alert_conflictingProgram",
           "howToFix",
           "https://sumo.mozilla.org"
-        )
+        
       );
+      this.maybeCreateAlert(interventions, alert);
     });
 
     this.conflictObserver.conflictingAddons.subscribe((conflictingAddons) => {
-      const id = "conflicting-addons";
-      // The conflict observer provides a list of installed addons that leverage the proxy
-      // permission. This includes the Mozilla VPN extension. If the list of conflicting addons
-      // is 1, it is our extension.
-      if (
-        conflictingAddons.length <= 1 ||
-        this.dismissedAlerts.find((alertId) => alertId == id)
-      ) {
-        console.log(
-          "No conflicting addons found or alert already dismissed. No butter bar alert necessary."
-        );
-        return;
-      }
-
-      this.#mButterBarList.value.push(
-        new ButterBarAlert(
-          id,
-          "alert_conflictingExtensions",
-          "learnWhatToDo",
-          "https://sumo.mozilla.org"
-        )
+      const alert = new ButterBarAlert(
+        "alert_conflictingExtensions",
+        "alert_conflictingExtensions",
+        "learnWhatToDo",
+        "https://sumo.mozilla.org"
       );
+
+      this.maybeCreateAlert(conflictingAddons, alert);
     });
+  }
+
+  maybeCreateAlert(list, alert) {
+    if (list.length == 0) {
+      return;
+    }
+    const { alertId } = alert;
+
+    if (this.alertWasDismissed(alertId) || this.alertInButterBarList(alertId)) {
+      return;
+    }
+    this.#mButterBarList.value.push(alert);
+  }
+
+  alertWasDismissed(id) {
+    return this.#mDismissedAlerts.find((alertId) => alertId == id);
+  }
+
+  alertInButterBarList(id) {
+    return this.#mButterBarList.value.find((alert) => {alert.alertId == id});
   }
 
   removeAlert(id) {
     const newAlertList = this.#mButterBarList.value.filter(
       ({ alertId }) => alertId !== id
     );
-    this.dismissedAlerts.push(id);
+    this.#mDismissedAlerts.push(id);
 
     this.#mButterBarList.set(newAlertList);
+  }
+
+  get butterBarList() {
+    return this.#mButterBarList;
   }
 }
 
