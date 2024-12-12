@@ -53,6 +53,10 @@
   --grey40: #6d6d6e;
   --grey50: #3d3d3d;
   --grey60: #0c0c0d;
+  --blue50: #0060df;
+  --blue60: #0250bb;
+  --blue70: #054096;
+  --blue90: #09204d;
   --main-card-background: #321c64;
   --main-card-text-color: #ffffff;
   --main-card--pill-background: lch(
@@ -72,6 +76,9 @@
   --settings-secondary-text-color: #5b5b66;
   --settings-border-color: #e7e7e7;
   --settings-link-color: var(--action-button-color);
+  --in-copy-link-text-color: var(--blue50);
+  --in-copy-link-text-color-hover: var(--blue70);
+  --in-copy-link-text-color-active: var(--blue90);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -88,6 +95,10 @@
     --settings-secondary-text-color: rgba(255, 255, 255, 0.8);
     --settings-border-color: #e7e7e74d;
     --settings-link-color: rgba(255, 255, 255, 1);
+
+    --in-copy-link-text-color: rgba(255, 255, 255, 1);
+    --in-copy-link-text-color-hover: rgba(255, 255, 255, 0.7);
+    --in-copy-link-text-color-active: rgba(255, 255, 255, 0.4);
   }
 }
 
