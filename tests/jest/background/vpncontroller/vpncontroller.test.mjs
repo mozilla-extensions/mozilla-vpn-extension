@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { describe, expect, test } from "@jest/globals";
+import { beforeEach, describe, expect, test, jest } from "@jest/globals";
 import {
   fromVPNStatusResponse,
   isSplitTunnled,
@@ -178,6 +178,69 @@ describe("fromVPNStatusResponse", () => {
     const result = fromVPNStatusResponse(msg);
     expect(result).not.toBeNull();
     expect(result.state).toBe("NeedsUpdate");
+  });
+});
+
+describe("handleBridgeResponse", () => {
+  /** @type { VPNController}  */
+  let vpnController;
+
+  beforeEach(() => {
+    vpnController = new VPNController({ registerObserver: () => {} });
+    vpnController.postToApp = jest.fn();
+  });
+
+  test("handles vpn-client-down when client is alive", async () => {
+    const state = { alive: true, installed: true };
+
+    await vpnController.handleBridgeResponse(
+      { status: "vpn-client-down" },
+      state
+    );
+
+    expect(vpnController.state.value.installed).toBe(true);
+    expect(vpnController.state.value.alive).toBe(false);
+  });
+
+  test("handles vpn-client-down when client is uninstalled", async () => {
+    const state = { alive: false, installed: false };
+    await vpnController.handleBridgeResponse(
+      { status: "vpn-client-down" },
+      state
+    );
+    expect(vpnController.state.value.installed).toBe(true);
+    expect(vpnController.state.value.alive).toBe(false);
+  });
+
+  test("handles vpn-client-up", async () => {
+    const state = {};
+
+    await vpnController.handleBridgeResponse(
+      { status: "vpn-client-up" },
+      state
+    );
+
+    // Handle bridgeResponse queues Microtasks for each thing it neets,
+    // So queue one up and await it so all others have been called now.
+    await new Promise((r) => queueMicrotask(r));
+
+    expect(vpnController.postToApp).toHaveBeenCalledWith("featurelist");
+    expect(vpnController.postToApp).toHaveBeenCalledWith("status");
+    expect(vpnController.postToApp).toHaveBeenCalledWith("servers");
+    expect(vpnController.postToApp).toHaveBeenCalledWith("disabled_apps");
+    expect(vpnController.postToApp).toHaveBeenCalledWith("settings");
+  });
+
+  test("ignores unknown status", async () => {
+    const state = { alive: true, installed: true };
+
+    await vpnController.handleBridgeResponse(
+      { status: "unknown-status" },
+      state
+    );
+
+    expect(vpnController.state.value.state).not.toBe("Closed");
+    expect(vpnController.postToApp).not.toHaveBeenCalled();
   });
 });
 

@@ -219,3 +219,10 @@ export class vpnStatusResponse {
 export class VPNSettings {
   extensionTelemetryEnabled = false;
 }
+
+export class BridgeResponse {
+  /** @type {string|undefined} */
+  status;
+  /** @type {string|undefined} */
+  error;
+}
