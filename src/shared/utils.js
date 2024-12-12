@@ -23,9 +23,7 @@ export const Utils = {
     return ["win"].includes(os);
   },
 
-  connectingDelay() {
-    return 2500;
-  },
+  connectingDelay: 2500,
 
   // Hack to mitigate FXVPN-217 and FXVPN-222.
   // When transitioning from StateFirefoxVPNConnecting to StateFirefoxVPNEnabled,

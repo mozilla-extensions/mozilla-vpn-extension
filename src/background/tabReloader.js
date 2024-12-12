@@ -66,7 +66,7 @@ export class TabReloader extends Component {
     if (Utils.delayToStateEnabledNeeded(cachedCurrentState, newState.state)) {
       setTimeout(() => {
         TabReloader.onOriginChanged();
-      }, Utils.connectingDelay());
+      }, Utils.connectingDelay);
     } else {
       TabReloader.onOriginChanged();
     }
