@@ -52,7 +52,7 @@ export class ButterBarService extends Component {
         "conflictingProgram",
         "alert_conflictingProgram",
         "howToFix",
-        "https://sumo.mozilla.org"
+        "https://support.mozilla.org/kb/program-your-computer-interferes-mozilla-vpn-exten"
       );
       this.maybeCreateAlert(interventions, alert);
     });
@@ -62,7 +62,7 @@ export class ButterBarService extends Component {
         "alert_conflictingExtensions",
         "alert_conflictingExtensions",
         "learnWhatToDo",
-        "https://sumo.mozilla.org"
+        "https://support.mozilla.org/kb/if-another-extension-interferes-mozilla-vpn"
       );
 
       this.maybeCreateAlert(conflictingAddons, alert);
