@@ -30,7 +30,7 @@ export class VPNCard extends LitElement {
     stability: { type: String },
     hasContext: { type: Boolean },
     connecting: { type: Boolean },
-    allowDisconnect: { type: Boolean }
+    allowDisconnect: { type: Boolean },
   };
 
   constructor() {

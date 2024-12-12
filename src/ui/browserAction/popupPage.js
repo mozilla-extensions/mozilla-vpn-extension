@@ -58,7 +58,7 @@ export class BrowserActionPopup extends LitElement {
     _siteContext: { type: Object },
     hasSiteContext: { type: Boolean },
     _siteContexts: { type: Array },
-    allowDisconnect: { type: Boolean }
+    allowDisconnect: { type: Boolean },
   };
 
   constructor() {

@@ -27,7 +27,7 @@ export class ExtensionController extends Component {
   static properties = {
     state: PropertyType.Bindable,
     toggleConnectivity: PropertyType.Function,
-    allowDisconnect: PropertyType.Bindable
+    allowDisconnect: PropertyType.Bindable,
   };
 
   /**
@@ -52,10 +52,13 @@ export class ExtensionController extends Component {
   async init() {}
 
   toggleConnectivity() {
-    if (this.#mState.value.state === "Connecting" && this.clientState.state === "Disabled") {
-        this.#mState.set(new StateFirefoxVPNDisabled(true));
-        this.vpnController.postToApp("deactivate");
-        return;
+    if (
+      this.#mState.value.state === "Connecting" &&
+      this.clientState.state === "Disabled"
+    ) {
+      this.#mState.set(new StateFirefoxVPNDisabled(true));
+      this.vpnController.postToApp("deactivate");
+      return;
     }
     if (this.#mState.value.enabled) {
       // We are turning off the extension
@@ -153,6 +156,6 @@ export class ExtensionController extends Component {
   }
 
   #mState = property(new FirefoxVPNState());
-  #mAllowDisconnect = property(false)
+  #mAllowDisconnect = property(false);
   mKeepAliveConnection = false;
 }
