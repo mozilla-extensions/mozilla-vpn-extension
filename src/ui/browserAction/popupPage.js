@@ -91,7 +91,7 @@ export class BrowserActionPopup extends LitElement {
         currentState?.state,
         s.state
       )
-        ? Utils.connectingDelay()
+        ? Utils.connectingDelay
         : 0;
       setTimeout(() => {
         this.extState = s;
