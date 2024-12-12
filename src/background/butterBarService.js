@@ -2,10 +2,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+// @ts-check
 import { Component } from "./component.js";
 import { PropertyType } from "../shared/ipc.js";
 
-import { property } from "../shared/property.js";
+import { IBindable, property } from "../shared/property.js";
+import { VPNController } from "./vpncontroller/vpncontroller.js";
+import { ConflictObserver } from "./conflictObserver.js";
+
+/**
+ *
+ * ButterBarService manages 'Butter Bar' alerts shown
+ * in the UI.
+ */
 
 export class ButterBarService extends Component {
   // Gets exposed to UI
@@ -14,12 +23,20 @@ export class ButterBarService extends Component {
     removeAlert: PropertyType.Function,
   };
 
+  /** @type {IBindable<Array<ButterBarAlert>>} */
   // List of alerts passed to the UI
   #mButterBarList = property([]);
 
+  /** @type {Array<String>} */
   // List of alert IDs that have been dismissed
   #mDismissedAlerts = [];
 
+  /**
+   *
+   * @param {*} receiver
+   * @param {VPNController} vpnController
+   * @param {ConflictObserver} conflictObserver
+   */
   constructor(receiver, vpnController, conflictObserver) {
     super(receiver);
     this.vpnController = vpnController;
@@ -51,7 +68,10 @@ export class ButterBarService extends Component {
       this.maybeCreateAlert(conflictingAddons, alert);
     });
   }
-
+  /**
+   * @param {Array} list
+   * @param {ButterBarAlert} alert
+   */
   maybeCreateAlert(list, alert) {
     if (list.length == 0) {
       return;
@@ -61,13 +81,19 @@ export class ButterBarService extends Component {
     if (this.alertWasDismissed(alertId) || this.alertInButterBarList(alertId)) {
       return;
     }
-    this.#mButterBarList.value.push(alert);
+    return this.#mButterBarList.value.push(alert);
   }
 
+  /**
+   * @param {string} id
+   */
   alertWasDismissed(id) {
     return this.#mDismissedAlerts.find((alertId) => alertId == id);
   }
 
+  /**
+   * @param {string} id
+   */
   alertInButterBarList(id) {
     return this.#mButterBarList.value.find((alert) => {
       alert.alertId == id;
@@ -79,8 +105,7 @@ export class ButterBarService extends Component {
       ({ alertId }) => alertId !== id
     );
     this.#mDismissedAlerts.push(id);
-
-    this.#mButterBarList.set(newAlertList);
+    return this.#mButterBarList.set(newAlertList);
   }
 
   get butterBarList() {
@@ -89,6 +114,12 @@ export class ButterBarService extends Component {
 }
 
 export class ButterBarAlert {
+  /**
+   * @param {string} alertId
+   * @param {string} alertMessage
+   * @param {string} linkText
+   * @param {string} linkUrl
+   */
   constructor(alertId, alertMessage, linkText, linkUrl) {
     (this.alertId = alertId),
       (this.alertMessage = alertMessage),
