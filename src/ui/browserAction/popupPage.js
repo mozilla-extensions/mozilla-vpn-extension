@@ -12,7 +12,12 @@ import {
   live,
 } from "../../vendor/lit-all.min.js";
 
-import { vpnController, proxyHandler, extController, butterBarService } from "./backend.js";
+import {
+  vpnController,
+  proxyHandler,
+  extController,
+  butterBarService,
+} from "./backend.js";
 
 import { Utils } from "../../shared/utils.js";
 import { tr } from "../../shared/i18n.js";
@@ -82,9 +87,8 @@ export class BrowserActionPopup extends LitElement {
     butterBarService.butterBarList.subscribe((s) => {
       this.alerts = s;
       this.updatePage();
-     });
+    });
     this.updatePage();
-    
   }
   updatePage() {
     Utils.getCurrentTab().then(async (tab) => {
@@ -180,17 +184,17 @@ export class BrowserActionPopup extends LitElement {
           <main>
             <div class="butter-bar-holder">
               ${this.alerts.map(
-              (alert) => html`
-              <butter-bar
-                .alertId=${alert.alertId}
-                .alertMessage=${alert.alertMessage}
-                .linkText=${alert.linkText}
-                .linkUrl=${alert.linkUrl}
-              >
-              </butter-bar>
-            `
-          )}
-         </div>
+                (alert) => html`
+                  <butter-bar
+                    .alertId=${alert.alertId}
+                    .alertMessage=${alert.alertMessage}
+                    .linkText=${alert.linkText}
+                    .linkUrl=${alert.linkUrl}
+                  >
+                  </butter-bar>
+                `
+              )}
+            </div>
             <vpn-card
               @toggle=${handleVPNToggle}
               .enabled=${this.extState?.enabled}
@@ -696,4 +700,3 @@ const defaultSiteContext = (vpnState = new VPNState(), origin = "") => {
     excluded: false,
   });
 };
-
