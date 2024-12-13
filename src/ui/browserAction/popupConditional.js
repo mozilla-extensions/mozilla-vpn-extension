@@ -5,7 +5,7 @@
 import { ConditionalView } from "../../components/conditional-view.js";
 import { propertySumTrio } from "../../shared/property.js";
 import { Utils } from "../../shared/utils.js";
-import { vpnController, extController } from "./backend.js";
+import { vpnController, onboardingController } from "./backend.js";
 
 export class PopUpConditionalView extends ConditionalView {
   constructor() {
@@ -20,7 +20,7 @@ export class PopUpConditionalView extends ConditionalView {
     propertySumTrio(
       vpnController.state,
       vpnController.featureList,
-      extController.currentOnboardingPage,
+      onboardingController.currentOnboardingPage,
       (state, features, currentPage) => {
         this.slotName = PopUpConditionalView.toSlotname(
           state,

@@ -10,6 +10,7 @@ import { ToolbarIconHandler } from "./toolbarIconHandler.js";
 
 import { VPNController } from "./vpncontroller/index.js";
 import { ExtensionController } from "./extensionController/index.js";
+import { OnboardingController } from "./onboarding.js";
 
 import { expose } from "../shared/ipc.js";
 import { TabReloader } from "./tabReloader.js";
@@ -24,6 +25,7 @@ class Main {
   conflictObserver = new ConflictObserver();
   vpnController = new VPNController(this);
   extController = new ExtensionController(this, this.vpnController);
+  onboardingController = new OnboardingController(this);
   logger = new Logger(this);
   proxyHandler = new ProxyHandler(this, this.vpnController);
   requestHandler = new RequestHandler(
@@ -54,6 +56,7 @@ class Main {
     expose(this.extController);
     expose(this.proxyHandler);
     expose(this.conflictObserver);
+    expose(this.onboardingController);
 
     this.#handlingEvent = false;
     this.#processPendingEvents();

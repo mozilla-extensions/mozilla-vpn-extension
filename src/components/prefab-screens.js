@@ -5,7 +5,7 @@
 import { html, render } from "../vendor/lit-all.min.js";
 import { MessageScreen } from "./message-screen.js";
 import { tr } from "../shared/i18n.js";
-import { extController } from "../ui/browserAction/backend.js";
+import { onboardingController } from "../ui/browserAction/backend.js";
 
 const open = (url) => {
   browser.tabs.create({
@@ -125,11 +125,11 @@ defineMessageScreen(
   html` <p>${tr("onboarding1_body")}</p> `,
   tr("next"),
   () => {
-    extController.nextOnboardingPage();
+    onboardingController.nextOnboardingPage();
   },
   tr("skip"),
   () => {
-    extController.finishOnboarding();
+    onboardingController.finishOnboarding();
   },
   false
 );
@@ -141,11 +141,11 @@ defineMessageScreen(
   html` <p>${tr("onboarding2_body")}</p> `,
   tr("next"),
   () => {
-    extController.nextOnboardingPage();
+    onboardingController.nextOnboardingPage();
   },
   tr("skip"),
   () => {
-    extController.finishOnboarding();
+    onboardingController.finishOnboarding();
   },
   false
 );
@@ -157,7 +157,7 @@ defineMessageScreen(
   html` <p>${tr("onboarding3_body")}</p> `,
   tr("done"),
   () => {
-    extController.finishOnboarding();
+    onboardingController.finishOnboarding();
   },
   tr(" "), // When using something like `null` there is a large vertical gap
   null,

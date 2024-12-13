@@ -275,6 +275,9 @@ export async function fromStorage(
   defaultValue
 ) {
   const storageRetrieval = await storage.get(key);
+  if (typeof storageRetrieval === "undefined") {
+    return defaultValue;
+  }
   const returnValue = storageRetrieval[key];
 
   if (typeof returnValue === "undefined") {
