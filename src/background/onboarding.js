@@ -21,9 +21,9 @@ const FIRST_UNUSED_PAGE = NUMBER_OF_ONBOARDING_PAGES + 1;
  */
 export class OnboardingController extends Component {
   static properties = {
-      nextOnboardingPage: PropertyType.Function,
-      finishOnboarding: PropertyType.Function,
-      currentOnboardingPage: PropertyType.Bindable
+    nextOnboardingPage: PropertyType.Function,
+    finishOnboarding: PropertyType.Function,
+    currentOnboardingPage: PropertyType.Bindable,
   };
 
   /**
@@ -37,14 +37,14 @@ export class OnboardingController extends Component {
 
   async init() {
     this.#mCurrentOnboardingPage.value = await fromStorage(
-        browser.storage.local,
-        ONBOARDING_KEY,
-        FIRST_PAGE
+      browser.storage.local,
+      ONBOARDING_KEY,
+      FIRST_PAGE
     );
-  }    
+  }
 
   get currentOnboardingPage() {
-      return this.#mCurrentOnboardingPage.readOnly;
+    return this.#mCurrentOnboardingPage.readOnly;
   }
 
   nextOnboardingPage() {
@@ -53,11 +53,7 @@ export class OnboardingController extends Component {
 
   finishOnboarding() {
     this.#mCurrentOnboardingPage.set(FIRST_UNUSED_PAGE);
-    putIntoStorage(
-        FIRST_UNUSED_PAGE,
-        browser.storage.local,
-        ONBOARDING_KEY
-        );
+    putIntoStorage(FIRST_UNUSED_PAGE, browser.storage.local, ONBOARDING_KEY);
   }
 
   #mCurrentOnboardingPage = property(FIRST_PAGE);

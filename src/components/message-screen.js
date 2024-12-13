@@ -51,7 +51,9 @@ export class MessageScreen extends LitElement {
   render() {
     let paginationIndicators = [];
     for (let i = 0; i < this.totalPages; i++) {
-      paginationIndicators.push(((i+1) === this.currentPage) ? "circle active" : "circle");
+      paginationIndicators.push(
+        i + 1 === this.currentPage ? "circle active" : "circle"
+      );
     }
 
     return html`
@@ -63,8 +65,11 @@ export class MessageScreen extends LitElement {
           <slot></slot>
         </div>
         <div class="pagination">
-          ${repeat(paginationIndicators, (item) => item.id, (item) => html`
-            <span class="holder"><span class="${item}"></span></span>`
+          ${repeat(
+            paginationIndicators,
+            (item) => item.id,
+            (item) =>
+              html` <span class="holder"><span class="${item}"></span></span>`
           )}
         </div>
         <div class="lower">

@@ -6,7 +6,7 @@ import { html, render } from "../vendor/lit-all.min.js";
 import { MessageScreen } from "./message-screen.js";
 import { tr } from "../shared/i18n.js";
 import { onboardingController } from "../ui/browserAction/backend.js";
-import { NUMBER_OF_ONBOARDING_PAGES } from "../background/onboarding.js"
+import { NUMBER_OF_ONBOARDING_PAGES } from "../background/onboarding.js";
 
 const open = (url) => {
   browser.tabs.create({
@@ -41,14 +41,14 @@ const defineMessageScreen = (
       this.primaryAction = primaryAction;
       this.secondaryAction = secondaryAction;
       if (closeOnClick) {
-        this.onPrimaryAction = function() {
+        this.onPrimaryAction = function () {
           onPrimaryAction();
           window.close();
-        }
-        this.onSecondaryAction = function() {
+        };
+        this.onSecondaryAction = function () {
           onSecondaryAction();
           window.close();
-        }
+        };
       } else {
         this.onPrimaryAction = onPrimaryAction;
         this.onSecondaryAction = onSecondaryAction;
@@ -125,7 +125,7 @@ defineMessageScreen(
 
 // Need to start loop at 1 because of how the strings were added to l10n repo.
 for (let i = 1; i <= NUMBER_OF_ONBOARDING_PAGES; i++) {
-  const isFinalScreen = (i === NUMBER_OF_ONBOARDING_PAGES);
+  const isFinalScreen = i === NUMBER_OF_ONBOARDING_PAGES;
   defineMessageScreen(
     `onboarding-screen-${i}`,
     `onboarding-${i}.svg`,
@@ -133,7 +133,9 @@ for (let i = 1; i <= NUMBER_OF_ONBOARDING_PAGES; i++) {
     html` <p>${tr(`onboarding${i}_body`)}</p> `,
     isFinalScreen ? tr("done") : tr("next"),
     () => {
-      isFinalScreen ? onboardingController.finishOnboarding() : onboardingController.nextOnboardingPage();
+      isFinalScreen
+        ? onboardingController.finishOnboarding()
+        : onboardingController.nextOnboardingPage();
     },
     isFinalScreen ? tr(" ") : tr("skip"), // For final screen need a space - when using something like `null` there is a large vertical gap
     () => {
