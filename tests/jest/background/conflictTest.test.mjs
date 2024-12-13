@@ -6,10 +6,18 @@ import { beforeEach, describe, expect, test, jest } from "@jest/globals";
 
 // Mock the browser API
 const mockGetAll = jest.fn();
+const mockOnInstalled = { addListener: jest.fn() };
+const mockOnUninstalled = { addListener: jest.fn() };
+const mockOnEnabled = { addListener: jest.fn() };
+const mockOnDisabled = { addListener: jest.fn() };
 
 global.browser = {
   management: {
     getAll: mockGetAll,
+    onInstalled: mockOnInstalled,
+    onUninstalled: mockOnUninstalled,
+    onEnabled: mockOnEnabled,
+    onDisabled: mockOnDisabled,
   },
 };
 /**
@@ -38,6 +46,23 @@ import { ConflictObserver } from "../../../src/background/conflictObserver";
 describe("ConflictObserver", () => {
   beforeEach(() => {
     mockGetAll.mockReset();
+  });
+
+  it("should initialize and set up event listeners", () => {
+    const observer = new ConflictObserver();
+
+    expect(mockOnInstalled.addListener).toHaveBeenCalledWith(
+      expect.any(Function)
+    );
+    expect(mockOnUninstalled.addListener).toHaveBeenCalledWith(
+      expect.any(Function)
+    );
+    expect(mockOnEnabled.addListener).toHaveBeenCalledWith(
+      expect.any(Function)
+    );
+    expect(mockOnDisabled.addListener).toHaveBeenCalledWith(
+      expect.any(Function)
+    );
   });
 
   it("Calls getAll on creation", async () => {
