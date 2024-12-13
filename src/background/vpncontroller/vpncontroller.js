@@ -28,6 +28,7 @@ import {
   StateVPNSignedOut,
   StateVPNNeedsUpdate,
   VPNSettings,
+  BridgeResponse,
 } from "./states.js";
 
 const log = Logger.logger("TabHandler");
@@ -96,8 +97,12 @@ export class VPNController extends Component {
       // we could see random timeout when the browser tries to connect to an
       // invalid proxy connection.
       this.#port.onDisconnect.addListener((p) => {
+        const uninstalledHints = [
+          "An unexpected error occurred",
+          "No such native application mozillavpn",
+        ];
         // @ts-ignore
-        if (p.error.message === "No such native application mozillavpn") {
+        if (uninstalledHints.includes(p.error.message)) {
           this.#port = null; // The port is invalid, so we should retry later.
           this.#mState.value = new StateVPNUnavailable();
           return;
@@ -109,6 +114,7 @@ export class VPNController extends Component {
       // If we get an exception here it is super likely the VPN is simply not installed.
       log(e);
       this.#mState.value = new StateVPNUnavailable();
+      this.#port = null;
     }
   }
 
@@ -209,17 +215,29 @@ export class VPNController extends Component {
     }
   }
 
-  // Called in case we get the message directly from
-  // the native messaging bridge, not the client
-  async handleBridgeResponse(response) {
+  /**
+   * Handles a response from the native messaging brige
+   * @param {BridgeResponse} response - The Reponse object from the NM Bridge
+   * @param {VPNState} state - the current state
+   * @returns - Nothing, but may set state, or post messages to the bridge.
+   */
+  async handleBridgeResponse(response, state = this.#mState.value) {
     // We can only get 2 types of messages right now: client-down/up
-    if (response.status && response.status === "vpn-client-down") {
-      if (this.#mState.value.alive) {
-        this.#mState.value = new StateVPNClosed();
+    if (
+      (response.status && response.status === "vpn-client-down") ||
+      (response.error && response.error === "vpn-client-down")
+    ) {
+      // If we have been considering the client open, it is now closed.
+      if (state.alive) {
+        state = new StateVPNClosed();
+        return;
       }
-      return;
+      // If we considered the client uninstalled, it is now installed.
+      if (!state.installed) {
+        state = new StateVPNClosed();
+        return;
+      }
     }
-    // The VPN Just started && connected to Native Messaging
     if (response.status && response.status === "vpn-client-up") {
       queueMicrotask(() => {
         this.postToApp("featurelist");
