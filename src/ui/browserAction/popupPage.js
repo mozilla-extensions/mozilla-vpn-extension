@@ -12,7 +12,12 @@ import {
   live,
 } from "../../vendor/lit-all.min.js";
 
-import { vpnController, proxyHandler, extController } from "./backend.js";
+import {
+  vpnController,
+  proxyHandler,
+  extController,
+  butterBarService,
+} from "./backend.js";
 
 import { Utils } from "../../shared/utils.js";
 import { tr } from "../../shared/i18n.js";
@@ -31,6 +36,7 @@ import "./../../components/vpncard.js";
 import "./../../components/titlebar.js";
 import "./../../components/iconbutton.js";
 import "./../../components/mz-rings.js";
+import "./../../components/butter-bar.js";
 import { SiteContext } from "../../background/proxyHandler/siteContext.js";
 import {
   ServerCity,
@@ -58,6 +64,7 @@ export class BrowserActionPopup extends LitElement {
     _siteContext: { type: Object },
     hasSiteContext: { type: Boolean },
     _siteContexts: { type: Array },
+    alerts: { type: Array },
   };
 
   constructor() {
@@ -74,8 +81,11 @@ export class BrowserActionPopup extends LitElement {
       this._siteContexts = s;
     });
     extController.state.subscribe((s) => {
-      console.log(s);
       this.extState = s;
+      this.updatePage();
+    });
+    butterBarService.butterBarList.subscribe((s) => {
+      this.alerts = s;
       this.updatePage();
     });
     this.updatePage();
@@ -172,6 +182,19 @@ export class BrowserActionPopup extends LitElement {
       <stack-view ${ref(this.stackView)}>
         <section data-title="Mozilla VPN">
           <main>
+            <div class="butter-bar-holder">
+              ${this.alerts.map(
+                (alert) => html`
+                  <butter-bar
+                    .alertId=${alert.alertId}
+                    .alertMessage=${alert.alertMessage}
+                    .linkText=${alert.linkText}
+                    .linkUrl=${alert.linkUrl}
+                  >
+                  </butter-bar>
+                `
+              )}
+            </div>
             <vpn-card
               @toggle=${handleVPNToggle}
               .enabled=${this.extState?.enabled}
@@ -477,6 +500,7 @@ export class BrowserActionPopup extends LitElement {
     main {
       padding: var(--padding-default) var(--padding-default) 0
         var(--padding-default);
+      max-inline-size: var(--window-width);
     }
 
     .positioner.checkbox-positioner {

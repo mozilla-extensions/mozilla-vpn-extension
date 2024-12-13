@@ -14,6 +14,8 @@ import { ExtensionController } from "./extensionController/index.js";
 import { expose } from "../shared/ipc.js";
 import { TabReloader } from "./tabReloader.js";
 import { ConflictObserver } from "./conflictObserver.js";
+import { ButterBarService } from "./butterBarService.js";
+
 const log = Logger.logger("Main");
 
 class Main {
@@ -43,6 +45,11 @@ class Main {
     this.vpnController
   );
   tabReloader = new TabReloader(this, this.extController, this.proxyHandler);
+  butterBarService = new ButterBarService(
+    this,
+    this.vpnController,
+    this.conflictObserver
+  );
 
   async init() {
     log("Hello from the background script!");
@@ -54,6 +61,7 @@ class Main {
     expose(this.extController);
     expose(this.proxyHandler);
     expose(this.conflictObserver);
+    expose(this.butterBarService);
 
     this.#handlingEvent = false;
     this.#processPendingEvents();
