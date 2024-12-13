@@ -12,7 +12,12 @@ import {
   live,
 } from "../../vendor/lit-all.min.js";
 
-import { vpnController, proxyHandler, extController } from "./backend.js";
+import {
+  vpnController,
+  proxyHandler,
+  extController,
+  butterBarService,
+} from "./backend.js";
 
 import { Utils } from "../../shared/utils.js";
 import { tr } from "../../shared/i18n.js";
@@ -30,6 +35,8 @@ import "./../../components/serverlist.js";
 import "./../../components/vpncard.js";
 import "./../../components/titlebar.js";
 import "./../../components/iconbutton.js";
+import "./../../components/mz-rings.js";
+import "./../../components/butter-bar.js";
 import { SiteContext } from "../../background/proxyHandler/siteContext.js";
 import {
   ServerCity,
@@ -57,6 +64,7 @@ export class BrowserActionPopup extends LitElement {
     _siteContext: { type: Object },
     hasSiteContext: { type: Boolean },
     _siteContexts: { type: Array },
+    alerts: { type: Array },
   };
 
   constructor() {
@@ -73,8 +81,11 @@ export class BrowserActionPopup extends LitElement {
       this._siteContexts = s;
     });
     extController.state.subscribe((s) => {
-      console.log(s);
       this.extState = s;
+      this.updatePage();
+    });
+    butterBarService.butterBarList.subscribe((s) => {
+      this.alerts = s;
       this.updatePage();
     });
     this.updatePage();
@@ -157,22 +168,33 @@ export class BrowserActionPopup extends LitElement {
       }
       return this.stackView?.value?.count > 1;
     })();
+
     let title = this.stackView?.value?.currentElement?.dataset?.title;
     title ??= tr("productName");
 
     return html`
       <vpn-titlebar title="${title}" ${ref(this.titleBar)}>
         ${canGoBack ? BrowserActionPopup.backBtn(back) : null}
-        <mz-iconlink
-          alt=${tr("altTextOpenSettingsPage")}
-          href="/ui/settingsPage/index.html"
-          icon="settings-cog"
-          slot="right"
-        ></mz-iconlink>
+        ${!canGoBack
+          ? BrowserActionPopup.settingsIcon(this.openSettingsPanel)
+          : null}
       </vpn-titlebar>
       <stack-view ${ref(this.stackView)}>
         <section data-title="Mozilla VPN">
           <main>
+            <div class="butter-bar-holder">
+              ${this.alerts.map(
+                (alert) => html`
+                  <butter-bar
+                    .alertId=${alert.alertId}
+                    .alertMessage=${alert.alertMessage}
+                    .linkText=${alert.linkText}
+                    .linkUrl=${alert.linkUrl}
+                  >
+                  </butter-bar>
+                `
+              )}
+            </div>
             <vpn-card
               @toggle=${handleVPNToggle}
               .enabled=${this.extState?.enabled}
@@ -228,6 +250,13 @@ export class BrowserActionPopup extends LitElement {
       `;
     };
 
+    const openGiveFeedback = () => {
+      browser.tabs.create({
+        url: "https://qsurvey.mozilla.com/s3/VPN-Extension-Feedback",
+      });
+      window.close();
+    };
+
     return BrowserActionPopup.sitePreferencesTemplate(
       this.currentSiteContext,
       this.openServerList.bind(this),
@@ -237,8 +266,15 @@ export class BrowserActionPopup extends LitElement {
       },
       resetSitePreferences,
       this._siteContext !== null,
-      getExclusionStringElem
+      getExclusionStringElem,
+      openGiveFeedback
     );
+  }
+
+  async openSettingsPanel() {
+    const settingsPanelElement = BrowserActionPopup.createSettingsPanel();
+    await this.stackView.value?.push(settingsPanelElement);
+    this.requestUpdate();
   }
 
   async openServerList() {
@@ -289,7 +325,8 @@ export class BrowserActionPopup extends LitElement {
     },
     removeSiteContext = () => {},
     hasSiteContext = false,
-    getExclusionStringElem = () => {}
+    getExclusionStringElem = () => {},
+    openGiveFeedback = () => {}
   ) {
     const pageLocationPicker = (() => {
       return html`
@@ -342,16 +379,86 @@ export class BrowserActionPopup extends LitElement {
       >
         ${tr("resetPageSettings")}
       </button>
+      <button id="give-feedback" @click=${openGiveFeedback} class="ghost-btn">
+        ${tr("giveFeedback")}
+      </button>
     `;
   }
   static backBtn(back) {
     return html` <mz-iconlink
-      @goBack=${back}
+      @click=${back}
       alt="${tr("back")}"
-      href=""
       icon="arrow-icon-left"
       slot="left"
     ></mz-iconlink>`;
+  }
+
+  static settingsIcon(openSettings) {
+    return html`
+      <mz-iconlink
+        @click=${openSettings}
+        alt=${tr("altTextOpenSettingsPage")}
+        icon="settings-cog"
+        slot="right"
+      ></mz-iconlink>
+    `;
+  }
+
+  static createSettingsPanel() {
+    const viewElement = document.createElement("section");
+    viewElement.classList = ["settings-panel"];
+    viewElement.dataset.title = "Settings";
+
+    const openInNewTab = (url) => {
+      browser.tabs.create({ url });
+      window.close();
+    };
+
+    const settingsLinks = [
+      {
+        title: tr("websitePreferences"),
+        onClick: () => {
+          openInNewTab("/ui/settingsPage/index.html");
+        },
+        iconId: "websitePreferences",
+      },
+      {
+        title: tr("helpCenter"),
+        onClick: () => {
+          openInNewTab(
+            "https://support.mozilla.org/products/firefox-private-network-vpn/settings/add-ons-extensions-and-themes"
+          );
+        },
+        iconId: "helpCenter",
+      },
+      {
+        title: tr("contactSupport"),
+        onClick: () => {
+          openInNewTab(
+            "https://support.mozilla.org/questions/new/firefox-private-network-vpn/form"
+          );
+        },
+        iconId: "contactSupport",
+      },
+    ];
+
+    render(
+      html`
+        <ul id="settingsList">
+          ${settingsLinks.map(
+            (link) => html`
+              <li>
+                <button class="${link.iconId}" @click=${link.onClick}>
+                  ${link.title}
+                </button>
+              </li>
+            `
+          )}
+        </ul>
+      `,
+      viewElement
+    );
+    return viewElement;
   }
   /**
    * @param {ServerCity?} currentCity
@@ -393,6 +500,7 @@ export class BrowserActionPopup extends LitElement {
     main {
       padding: var(--padding-default) var(--padding-default) 0
         var(--padding-default);
+      max-inline-size: var(--window-width);
     }
 
     .positioner.checkbox-positioner {
@@ -497,9 +605,88 @@ export class BrowserActionPopup extends LitElement {
       pointer-events: none;
     }
 
+    #selectLocation {
+      margin-block-end: 0px;
+    }
+
+    #give-feedback {
+      margin-block: 8px 16px;
+      border: none;
+      font-family:;
+      font-size: 15px;
+    }
+
+    #settingsList {
+      width: 100%;
+    }
+
+    #settingsList li {
+      margin: 8px;
+    }
+
+    #settingsList button {
+      inline-size: 100%;
+      text-align: left;
+      block-size: 40px;
+      background: lch(from var(--action-button-color) l c h / 0);
+      padding-left: 48px;
+      position: relative;
+      color: var(--grey50);
+      outline: none;
+      border: 2px solid transparent;
+      margin: 0;
+      font-size: 15px;
+      transition: background 0.2s ease-in-out;
+    }
+
+    #settingsList button::before,
+    #settingsList button::after {
+      content: "";
+      block-size: 24px;
+      inline-size: 24px;
+      display: inline-block;
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-size: contain;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      margin-block: auto;
+    }
+
+    #settingsList button::before {
+      left: 8px;
+    }
+
+    #settingsList button::after {
+      position: absolute;
+      right: 16px;
+      background-image: url("../../assets/img/open-in-web.svg");
+    }
+
+    .contactSupport::before {
+      background-image: url("../../assets/img/mail.svg");
+    }
+
+    .websitePreferences::before {
+      background-image: url("../../assets/img/developer.svg");
+    }
+
+    .helpCenter::before {
+      background-image: url("../../assets/img/question.svg");
+    }
+
     @media (prefers-color-scheme: dark) {
-      .arrow {
+      #settingsList button {
+        color: var(--text-color-headline);
+      }
+      .arrow,
+      #settingsList button::before {
         filter: invert();
+      }
+
+      #settingsList button::after {
+        filter: grayscale(1) brightness(2);
       }
     }
   `;

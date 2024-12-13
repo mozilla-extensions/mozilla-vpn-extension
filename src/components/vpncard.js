@@ -8,11 +8,16 @@ import {
   LitElement,
   classMap,
   styleMap,
+  createRef,
+  ref,
 } from "../vendor/lit-all.min.js";
 import { tr } from "../shared/i18n.js";
-import { resetSizing, fontStyling, positioner } from "./styles.js";
+import { resetSizing, fontStyling, positioner, inCopyLink } from "./styles.js";
 
 import { VPNState } from "../background/vpncontroller/states.js";
+import "./mz-rings.js";
+
+import "./mz-pill.js";
 
 /**
  * @typedef {import("../background/vpncontroller/states.js").VPNState} VPNState
@@ -41,6 +46,7 @@ export class VPNCard extends LitElement {
     this.connecting = false;
   }
   #intervalHandle = null;
+  #shieldElement = createRef();
 
   updated(changedProperties) {
     super.updated(changedProperties);
@@ -119,23 +125,36 @@ export class VPNCard extends LitElement {
       return tr("vpnIsOff");
     };
     return html`
-      <div class="${classMap(boxClasses)}">
-        <main>
-          ${VPNCard.shield(this.enabled, this.connecting)}
-          <div class="infobox">
-            <h1>${vpnHeader()}</h1>
-            ${VPNCard.subline(
+      <div class="stack ${classMap(boxClasses)}">
+        <mz-rings
+          .enabled=${this.enabled}
+          .targetElementRef=${this.#shieldElement}
+        ></mz-rings>
+        <div>
+          <main>
+            ${VPNCard.shield(
               this.enabled,
-              this.stability,
-              this.clientConnected
+              this.connecting,
+              this.#shieldElement
             )}
-            ${timeString}
-          </div>
-          <button class="pill" @click=${this.#toggle}></button>
-        </main>
-        ${this.enabled || this.connecting
-          ? VPNCard.footer(this.cityName, this.countryFlag)
-          : null}
+            <div class="infobox">
+              <h1>${vpnHeader()}</h1>
+              ${VPNCard.subline(
+                this.enabled,
+                this.stability,
+                this.clientConnected
+              )}
+              ${timeString}
+            </div>
+            <mz-pill
+              .enabled=${this.enabled || this.connecting}
+              @click=${this.#toggle}
+            ></mz-pill>
+          </main>
+          ${this.enabled || this.connecting
+            ? VPNCard.footer(this.cityName, this.countryFlag)
+            : null}
+        </div>
       </div>
     `;
   }
@@ -156,9 +175,21 @@ export class VPNCard extends LitElement {
   }
 
   static subline(enabled, stability, clientIsConnected) {
+    const onLinkClick = () => {
+      browser.tabs.create({
+        url: "https://support.mozilla.org/kb/get-started-mozilla-vpn-extension?utm_medium=mozilla-vpn&utm_source=vpn-extension",
+      });
+      window.close();
+    };
+
     if (!enabled) {
       return clientIsConnected
-        ? html`<p class="subline ext-is-off">${tr("extensionVpnIsOff")}</p>`
+        ? html`<p class="subline ext-is-off">
+            ${tr("extensionVpnIsOff")}
+            <a class="in-copy-link" @click=${onLinkClick} href=""
+              >${tr("learnMore")}</a
+            >
+          </p>`
         : null;
     }
     const errorSvg = html`
@@ -177,23 +208,23 @@ export class VPNCard extends LitElement {
     }
   }
 
-  static shield(enabled, connecting) {
+  static shield(enabled, connecting, shieldRef) {
     if (!enabled && !connecting) {
       return html`
-        <svg>
+        <svg ${ref(shieldRef)}>
           <use xlink:href="../../assets/img/globe-shield-off.svg#globe"></use>
         </svg>
       `;
     }
     return html`
-      <svg>
+      <svg ${ref(shieldRef)}>
         <use xlink:href="../../assets/img/globe-shield-on.svg#globe"></use>
       </svg>
     `;
   }
 
   static styles = css`
-    ${resetSizing}${fontStyling}${positioner}
+    ${resetSizing}${fontStyling}${positioner}${inCopyLink}
 
     :host {
       font-size: 1rem;
@@ -203,10 +234,6 @@ export class VPNCard extends LitElement {
     .box {
       border-radius: 8px;
       background: lch(from var(--panel-bg-color) calc(l + 5) c h);
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      flex-direction: column;
       box-shadow: var(--box-shadow-off);
     }
     .box.on,
@@ -299,6 +326,15 @@ export class VPNCard extends LitElement {
     .noSignal .subline {
       color: var(--color-fatal-error);
     }
+    .stack {
+      display: grid;
+      grid-template-rows: 1fr;
+      grid-template-columns: 1fr;
+    }
+    .stack > * {
+      grid-row: 1 / 2;
+      grid-column: 1 / 2;
+    }
 
     svg {
       height: 48px;
@@ -307,60 +343,9 @@ export class VPNCard extends LitElement {
       margin-right: var(--default-padding);
     }
 
-    .pill {
-      width: 45px;
-      height: 24px;
-      border-radius: 30px;
-      border: none;
-      background-color: var(--color-disabled);
-      position: relative;
-      transition: background-color 0.2s ease;
-    }
-
-    .pill:hover {
-      background-color: var(--color-disabled-hover);
-    }
-
-    .pill:active {
-      background-color: var(--color-disabled-active);
-    }
-    .on .pill,
-    .connecting .pill {
-      background-color: var(--color-enabled);
-    }
-
-    .connecting .pill:hover,
-    .on .pill:hover {
-      background-color: var(--color-enabled-hover);
-    }
-
-    .connecting .pill:active,
-    .on .pill:active {
-      background-color: var(--color-enabled-active);
-    }
-
-    .pill::before {
-      content: " ";
-      background: white;
-      display: box;
-      width: 18px;
-      height: 18px;
-      border-radius: 20px;
-      position: absolute;
-      top: 3px;
-      left: 3px;
-      transition: all 0.25s;
-    }
-
-    .connecting .pill::before,
-    .on .pill::before {
-      top: 3px;
-      left: 24px;
-    }
-
     .box.connecting svg,
     .box.connecting .timer,
-    .connecting .pill,
+    .connecting mz-pill,
     .connecting footer {
       opacity: 0.5;
       transition: opacity 0.3s ease;

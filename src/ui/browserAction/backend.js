@@ -28,5 +28,6 @@ export const vpnController = await getExposedObject("VPNController");
 export const extController = await getExposedObject("ExtensionController");
 export const proxyHandler = await getExposedObject("ProxyHandler");
 export const onboardingController = await getExposedObject("OnboardingController");
+export const butterBarService = await getExposedObject("ButterBarService");
 
 export const ready = Promise.all([vpnController, proxyHandler]);

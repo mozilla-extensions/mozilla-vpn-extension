@@ -23,34 +23,17 @@ import { ghostButtonStyles } from "../components/styles.js";
 
 export class IconLinkButton extends LitElement {
   static properties = {
-    href: { attribute: true },
     alt: { attribute: true },
     icon: { attribute: true },
   };
   constructor() {
     super();
-    this.href = "";
     this.alt = "";
     this.icon = "";
   }
-  onClick() {
-    if (this.href == "") {
-      return this.dispatchEvent(new CustomEvent("goBack"));
-    }
-    browser.tabs.create({
-      url: this.href,
-    });
-    window.close();
-  }
   render() {
     return html`
-      <button
-        title="${this.alt}"
-        @click=${() => {
-          this.onClick();
-        }}
-        class="ghost-btn ghost-icon-btn"
-      >
+      <button title="${this.alt}" class="ghost-btn ghost-icon-btn">
         <img aria-hidden="true" src="../../assets/img/${this.icon}.svg" />
       </button>
     `;
