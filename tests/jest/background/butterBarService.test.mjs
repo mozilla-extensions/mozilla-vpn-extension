@@ -61,6 +61,56 @@ describe("ButterBarService", () => {
     expect(butterBarService.butterBarList.value.length).toBe(1);
   });
 
+  test("Alerts are removed when the conflict that triggered them is gone", () => {
+    const conflictObserver = new TestConflictObserver();
+    const butterBarService = new ButterBarService(
+      new TestRegister(),
+      conflictObserver
+    );
+
+    let list = [1];
+    butterBarService.maybeCreateAlert(list, testButterBarAlert);
+    expect(butterBarService.butterBarList.value.length).toBe(1);
+
+    list = [];
+    butterBarService.maybeCreateAlert(list, testButterBarAlert);
+    expect(butterBarService.butterBarList.value.length).toBe(0);
+  });
+
+  test("Alerts are only added to the dismissed list when dismissed from the UI", () => {
+    const conflictObserver = new TestConflictObserver();
+    const butterBarService = new ButterBarService(
+      new TestRegister(),
+      conflictObserver
+    );
+
+    let list = [1];
+    butterBarService.maybeCreateAlert(list, testButterBarAlert);
+    expect(butterBarService.butterBarList.value.length).toBe(1);
+
+    list = [];
+    butterBarService.removeAlert(testButterBarAlert.alertId);
+    expect(butterBarService.dismissedAlerts.length).toBe(0);
+  });
+
+  test("Removed (but not dismissed) alerts are shown in the UI if the same conflict resurfaces", () => {
+    const conflictObserver = new TestConflictObserver();
+    const butterBarService = new ButterBarService(
+      new TestRegister(),
+      conflictObserver
+    );
+
+    let list = [1];
+    butterBarService.maybeCreateAlert(list, testButterBarAlert);
+    expect(butterBarService.butterBarList.value.length).toBe(1);
+
+    butterBarService.removeAlert(testButterBarAlert.alertId);
+    expect(butterBarService.dismissedAlerts.length).toBe(0);
+
+    butterBarService.maybeCreateAlert([1], testButterBarAlert);
+    expect(butterBarService.butterBarList.value.length).toBe(1);
+  });
+
   test("ButterBarService.alertWasDismissed returns true if the ID is in the provided list", () => {
     const conflictObserver = new TestConflictObserver();
     const butterBarService = new ButterBarService(
