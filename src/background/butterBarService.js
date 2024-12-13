@@ -109,7 +109,8 @@ export class ButterBarService extends Component {
       ({ alertId }) => alertId !== id
     );
     this.dismissedAlerts.push(id);
-    return this.butterBarList.set(newAlertList);
+    this.butterBarList.set(newAlertList);
+    return;
   }
 }
 

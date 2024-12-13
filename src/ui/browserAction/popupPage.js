@@ -500,6 +500,7 @@ export class BrowserActionPopup extends LitElement {
     main {
       padding: var(--padding-default) var(--padding-default) 0
         var(--padding-default);
+      max-inline-size: var(--window-width);
     }
 
     .positioner.checkbox-positioner {

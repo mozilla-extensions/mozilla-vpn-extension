@@ -69,6 +69,9 @@ export class ButterBar extends LitElement {
       flex-direction: row;
       justify-content: space-between;
       overflow: clip;
+      width: 320px;
+      word-wrap: anywhere;
+      box-sizing: border-box;
     }
 
     .butter-bar-text {
@@ -76,6 +79,13 @@ export class ButterBar extends LitElement {
       flex: 1;
       font-size: 13px;
       padding: 8px 16px;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      justify-items: center;
+      box-sizing: border-box;
+      width: 280px;
     }
 
     button.butter-bar-close.ghost-btn {
