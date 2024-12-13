@@ -24,7 +24,9 @@ const defineMessageScreen = (
   onPrimaryAction,
   secondaryAction = tr("getHelp"),
   onSecondaryAction = () => open(sumoLink),
-  closeOnClick = true
+  closeOnClick = true,
+  totalPages = 0,
+  currentPage = 0
 ) => {
   const body =
     typeof bodyText === "string" ? html`<p>${bodyText}</p>` : bodyText;
@@ -51,6 +53,8 @@ const defineMessageScreen = (
         this.onSecondaryAction = onSecondaryAction;
       }
       this.identifier = tag;
+      this.totalPages = totalPages;
+      this.currentPage = currentPage;
       render(body, this);
     }
   }
@@ -118,51 +122,28 @@ defineMessageScreen(
   null
 );
 
-defineMessageScreen(
-  "onboarding-screen-1",
-  "onboarding-1.svg",
-  tr("onboarding1_title"),
-  html` <p>${tr("onboarding1_body")}</p> `,
-  tr("next"),
-  () => {
-    onboardingController.nextOnboardingPage();
-  },
-  tr("skip"),
-  () => {
-    onboardingController.finishOnboarding();
-  },
-  false
-);
-
-defineMessageScreen(
-  "onboarding-screen-2",
-  "onboarding-2.svg",
-  tr("onboarding2_title"),
-  html` <p>${tr("onboarding2_body")}</p> `,
-  tr("next"),
-  () => {
-    onboardingController.nextOnboardingPage();
-  },
-  tr("skip"),
-  () => {
-    onboardingController.finishOnboarding();
-  },
-  false
-);
-
-defineMessageScreen(
-  "onboarding-screen-3",
-  "onboarding-3.svg",
-  tr("onboarding3_title"),
-  html` <p>${tr("onboarding3_body")}</p> `,
-  tr("done"),
-  () => {
-    onboardingController.finishOnboarding();
-  },
-  tr(" "), // When using something like `null` there is a large vertical gap
-  null,
-  false
-);
+const NUMBER_ONBOARDING_SCREENS = 3;
+// Need to start loop at 1 because of how the strings were added to l10n repo.
+for (let i = 1; i <= NUMBER_ONBOARDING_SCREENS; i++) {
+  const isFinalScreen = (i === NUMBER_ONBOARDING_SCREENS);
+  defineMessageScreen(
+    `onboarding-screen-${i}`,
+    `onboarding-${i}.svg`,
+    tr(`onboarding${i}_title`),
+    html` <p>${tr(`onboarding${i}_body`)}</p> `,
+    isFinalScreen ? tr("done") : tr("next"),
+    () => {
+      isFinalScreen ? onboardingController.finishOnboarding() : onboardingController.nextOnboardingPage();
+    },
+    isFinalScreen ? tr(" ") : tr("skip"), // For final screen need a space - when using something like `null` there is a large vertical gap
+    () => {
+      isFinalScreen ? null : onboardingController.finishOnboarding();
+    },
+    false,
+    NUMBER_ONBOARDING_SCREENS,
+    i
+  );
+}
 
 defineMessageScreen(
   "unsupported-os-message-screen",

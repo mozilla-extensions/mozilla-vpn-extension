@@ -5,7 +5,7 @@
 import { ConditionalView } from "../../components/conditional-view.js";
 import { propertySumTrio } from "../../shared/property.js";
 import { Utils } from "../../shared/utils.js";
-import { vpnController, onboardingController } from "./backend.js";
+import { vpnController, onboardingController, NUMBER_OF_ONBOARDING_PAGES } from "./backend.js";
 
 export class PopUpConditionalView extends ConditionalView {
   constructor() {
@@ -75,14 +75,8 @@ export class PopUpConditionalView extends ConditionalView {
     if (!state.subscribed) {
       return "MessageSubscription";
     }
-    if (currentOnboardingPage == 1) {
-      return "onboarding-1"
-    }
-    if (currentOnboardingPage == 2) {
-      return "onboarding-2"
-    }
-    if (currentOnboardingPage == 3) {
-      return "onboarding-3"
+    if (currentOnboardingPage >= 1 && currentOnboardingPage <= NUMBER_OF_ONBOARDING_PAGES) {
+      return `onboarding-${currentOnboardingPage}`
     }
 
     return "default";
