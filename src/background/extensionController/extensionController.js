@@ -6,7 +6,6 @@
 
 import { Component } from "../component.js";
 import { VPNController, VPNState } from "../vpncontroller/index.js";
-import { fromStorage, putIntoStorage } from "../vpncontroller/vpncontroller.js";
 import { property } from "../../shared/property.js";
 import { PropertyType } from "../../shared/ipc.js";
 import {
@@ -49,7 +48,7 @@ export class ExtensionController extends Component {
   /** @type {VPNState} */
   clientState;
 
-  async init() { }
+  async init() {}
 
   toggleConnectivity() {
     if (this.#mState.value.enabled) {
