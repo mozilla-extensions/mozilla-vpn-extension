@@ -12,7 +12,7 @@ import {
   ref,
 } from "../vendor/lit-all.min.js";
 import { tr } from "../shared/i18n.js";
-import { resetSizing, fontStyling, positioner } from "./styles.js";
+import { resetSizing, fontStyling, positioner, inCopyLink } from "./styles.js";
 
 import { VPNState } from "../background/vpncontroller/states.js";
 import "./mz-rings.js";
@@ -175,9 +175,21 @@ export class VPNCard extends LitElement {
   }
 
   static subline(enabled, stability, clientIsConnected) {
+    const onLinkClick = () => {
+      browser.tabs.create({
+        url: "https://support.mozilla.org/kb/get-started-mozilla-vpn-extension?utm_medium=mozilla-vpn&utm_source=vpn-extension",
+      });
+      window.close();
+    };
+
     if (!enabled) {
       return clientIsConnected
-        ? html`<p class="subline ext-is-off">${tr("extensionVpnIsOff")}</p>`
+        ? html`<p class="subline ext-is-off">
+            ${tr("extensionVpnIsOff")}
+            <a class="in-copy-link" @click=${onLinkClick} href=""
+              >${tr("learnMore")}</a
+            >
+          </p>`
         : null;
     }
     const errorSvg = html`
@@ -212,7 +224,7 @@ export class VPNCard extends LitElement {
   }
 
   static styles = css`
-    ${resetSizing}${fontStyling}${positioner}
+    ${resetSizing}${fontStyling}${positioner}${inCopyLink}
 
     :host {
       font-size: 1rem;

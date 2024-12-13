@@ -124,6 +124,21 @@ export const fontStyling = css`
   }
 `;
 
+export const inCopyLink = css`
+  a.in-copy-link {
+    margin-inline-start: 2px;
+    color: var(--in-copy-link-text-color);
+  }
+
+  .in-copy-link:hover {
+    color: var(--in-copy-link-text-color-hover);
+  }
+
+  .in-copy-link:active {
+    color: var(--in-copy-link-text-color-active);
+  }
+`;
+
 export const ghostButtonStyles = css`
   button.ghost-btn {
     background-color: transparent;
