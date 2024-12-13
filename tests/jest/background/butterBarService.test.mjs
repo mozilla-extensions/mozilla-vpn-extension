@@ -43,7 +43,7 @@ describe("ButterBarService", () => {
     butterBarService.maybeCreateAlert(list, testButterBarAlert);
     expect(butterBarService.butterBarList.value.length).toBe(1);
 
-    butterBarService.removeAlert("new-alert");
+    butterBarService.dismissAlert("new-alert");
     expect(butterBarService.butterBarList.value.length).toBe(0);
   });
 

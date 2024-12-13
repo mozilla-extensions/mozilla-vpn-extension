@@ -20,6 +20,11 @@ export class ConflictObserver {
 
   constructor() {
     this.updateList();
+
+    browser.management.onInstalled.addListener(this.updateList.bind(this));
+    browser.management.onUninstalled.addListener(this.updateList.bind(this));
+    browser.management.onEnabled.addListener(this.updateList.bind(this));
+    browser.management.onDisabled.addListener(this.updateList.bind(this));
   }
 
   async updateList() {
