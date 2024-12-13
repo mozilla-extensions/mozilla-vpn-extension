@@ -15,9 +15,6 @@ const FIRST_PAGE = 1;
 export const NUMBER_OF_ONBOARDING_PAGES = 3;
 const FIRST_UNUSED_PAGE = NUMBER_OF_ONBOARDING_PAGES + 1;
 
-// const log = Logger.logger("RequestHandler");
-let self;
-
 /**
  * Handles onboarding.
  *
