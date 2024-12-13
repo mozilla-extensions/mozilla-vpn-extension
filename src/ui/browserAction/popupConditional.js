@@ -5,7 +5,8 @@
 import { ConditionalView } from "../../components/conditional-view.js";
 import { propertySumTrio } from "../../shared/property.js";
 import { Utils } from "../../shared/utils.js";
-import { vpnController, onboardingController, NUMBER_OF_ONBOARDING_PAGES } from "./backend.js";
+import { vpnController, onboardingController } from "./backend.js";
+import { NUMBER_OF_ONBOARDING_PAGES } from "../../background/onboarding.js"
 
 export class PopUpConditionalView extends ConditionalView {
   constructor() {

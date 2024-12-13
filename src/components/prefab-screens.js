@@ -6,6 +6,7 @@ import { html, render } from "../vendor/lit-all.min.js";
 import { MessageScreen } from "./message-screen.js";
 import { tr } from "../shared/i18n.js";
 import { onboardingController } from "../ui/browserAction/backend.js";
+import { NUMBER_OF_ONBOARDING_PAGES } from "../background/onboarding.js"
 
 const open = (url) => {
   browser.tabs.create({
@@ -122,10 +123,9 @@ defineMessageScreen(
   null
 );
 
-const NUMBER_ONBOARDING_SCREENS = 3;
 // Need to start loop at 1 because of how the strings were added to l10n repo.
-for (let i = 1; i <= NUMBER_ONBOARDING_SCREENS; i++) {
-  const isFinalScreen = (i === NUMBER_ONBOARDING_SCREENS);
+for (let i = 1; i <= NUMBER_OF_ONBOARDING_PAGES; i++) {
+  const isFinalScreen = (i === NUMBER_OF_ONBOARDING_PAGES);
   defineMessageScreen(
     `onboarding-screen-${i}`,
     `onboarding-${i}.svg`,
@@ -140,7 +140,7 @@ for (let i = 1; i <= NUMBER_ONBOARDING_SCREENS; i++) {
       isFinalScreen ? null : onboardingController.finishOnboarding();
     },
     false,
-    NUMBER_ONBOARDING_SCREENS,
+    NUMBER_OF_ONBOARDING_PAGES,
     i
   );
 }
