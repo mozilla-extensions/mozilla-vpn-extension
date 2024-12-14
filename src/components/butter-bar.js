@@ -29,8 +29,8 @@ export class ButterBar extends LitElement {
       window.close();
     };
 
-    const removeAlert = (id) => {
-      butterBarService.removeAlert(id);
+    const dismissAlert = (id) => {
+      butterBarService.dismissAlert(id);
       this.dispatchEvent(new CustomEvent("resize-popup", { bubbles: true }));
     };
 
@@ -49,7 +49,7 @@ export class ButterBar extends LitElement {
         </div>
         <button
           @click=${() => {
-            removeAlert(this.alertId);
+            dismissAlert(this.alertId);
           }}
           class="butter-bar-close ghost-btn"
         >

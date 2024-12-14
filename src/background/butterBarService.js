@@ -20,7 +20,7 @@ export class ButterBarService extends Component {
   // Gets exposed to UI
   static properties = {
     butterBarList: PropertyType.Bindable,
-    removeAlert: PropertyType.Function,
+    dismissAlert: PropertyType.Function,
   };
 
   /** @type {IBindable<Array<ButterBarAlert>>} */
@@ -73,10 +73,20 @@ export class ButterBarService extends Component {
    * @param {ButterBarAlert} alert
    */
   maybeCreateAlert(list, alert) {
+    const { alertId } = alert;
+    const alertInButterBarList = this.alertInButterBarList(
+      alertId,
+      this.butterBarList.value
+    );
+
     if (list.length == 0) {
+      if (!alertInButterBarList) {
+        return;
+      }
+
+      this.removeAlert(alertId);
       return;
     }
-    const { alertId } = alert;
 
     if (
       this.alertWasDismissed(alertId, this.dismissedAlerts) ||
@@ -84,8 +94,8 @@ export class ButterBarService extends Component {
     ) {
       return;
     }
-
-    return this.butterBarList.value.push(alert);
+    this.butterBarList.set([...this.butterBarList.value, alert]);
+    return;
   }
 
   /**
@@ -104,12 +114,23 @@ export class ButterBarService extends Component {
     return butterBarList.some((alert) => alert.alertId == id);
   }
 
-  removeAlert(id) {
+  // Called from the UI when a user has dismissed the butter bar
+  dismissAlert(id) {
     const newAlertList = this.butterBarList.value.filter(
       ({ alertId }) => alertId !== id
     );
     this.dismissedAlerts.push(id);
     this.butterBarList.set(newAlertList);
+    return;
+  }
+
+  // Removes an alert from the butter bar list without adding
+  // it to the list of dismissed alerts.
+  removeAlert(id) {
+    const newAlertList = this.butterBarList.value.filter(
+      ({ alertId }) => alertId !== id
+    );
+    this.butterBarList.set([...newAlertList]);
     return;
   }
 }
