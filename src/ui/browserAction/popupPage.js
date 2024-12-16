@@ -17,6 +17,7 @@ import {
   proxyHandler,
   extController,
   butterBarService,
+  telemetry,
 } from "./backend.js";
 
 import { Utils } from "../../shared/utils.js";
@@ -129,6 +130,9 @@ export class BrowserActionPopup extends LitElement {
     requestIdleCallback(() => {
       vpnController.postToApp("featurelist");
     });
+    requestIdleCallback(() => {
+      telemetry.record("main_screen");
+    });
   }
 
   get currentSiteContext() {
@@ -153,6 +157,12 @@ export class BrowserActionPopup extends LitElement {
 
   render() {
     const handleVPNToggle = () => {
+      if (!this.enabled) {
+        telemetry.record("used_feature_disable_firefox_protection");
+        telemetry.record("fx_protection_disabled");
+      } else {
+        telemetry.record("fx_protection_enabled");
+      }
       extController.toggleConnectivity();
     };
 
