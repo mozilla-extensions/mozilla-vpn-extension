@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { html, LitElement, when, css } from "../vendor/lit-all.min.js";
+import { html, LitElement, when, repeat, css } from "../vendor/lit-all.min.js";
 import { fontStyling } from "./styles.js";
 import "./titlebar.js";
 
@@ -17,6 +17,8 @@ import "./titlebar.js";
  * - onPrimaryAction -> A function to call when the primary button is clicked
  * - secondaryAction -> The 2ndary button text
  * - onSecondaryAction -> A function to call when the 2ndary action is clicked.
+ * - totalPages -> The number of pages to show in pagination
+ * - currentPage -> The active page for pagination
  */
 
 export class MessageScreen extends LitElement {
@@ -29,6 +31,8 @@ export class MessageScreen extends LitElement {
     secondaryAction: { type: String },
     onSecondaryAction: { type: Function },
     identifier: { type: String },
+    totalPages: { type: Number },
+    currentPage: { type: Number },
   };
   constructor() {
     super();
@@ -40,9 +44,18 @@ export class MessageScreen extends LitElement {
     this.onPrimaryAction = () => {};
     this.onSecondaryAction = () => {};
     this.identifier = "";
+    this.totalPages = 0;
+    this.currentPage = 0;
   }
 
   render() {
+    let paginationIndicators = [];
+    for (let i = 0; i < this.totalPages; i++) {
+      paginationIndicators.push(
+        i + 1 === this.currentPage ? "circle active" : "circle"
+      );
+    }
+
     return html`
       <vpn-titlebar title=${this.titleHeader}></vpn-titlebar>
       <div class="inner">
@@ -50,6 +63,14 @@ export class MessageScreen extends LitElement {
           <img class="${this.identifier}" src="/assets/img/${this.img}" />
           <h1>${this.heading}</h1>
           <slot></slot>
+        </div>
+        <div class="pagination">
+          ${repeat(
+            paginationIndicators,
+            (item) => item.id,
+            (item) =>
+              html` <span class="holder"><span class="${item}"></span></span>`
+          )}
         </div>
         <div class="lower">
           ${when(
@@ -59,7 +80,6 @@ export class MessageScreen extends LitElement {
                 class="primarybtn"
                 @click=${(e) => {
                   this.onPrimaryAction(this, e);
-                  window.close();
                 }}
               >
                 ${this.primaryAction}
@@ -73,7 +93,6 @@ export class MessageScreen extends LitElement {
                 class="secondarybtn"
                 @click=${(e) => {
                   this.onSecondaryAction(this, e);
-                  window.close();
                 }}
               >
                 ${this.secondaryAction}
@@ -133,6 +152,32 @@ export class MessageScreen extends LitElement {
     img.open-mozilla-vpn-message-screen {
       block-size: 108px;
       inline-size: 111px;
+    }
+
+    .pagination {
+      box-sizing: border-box;
+      position: relative;
+      width: 100%;
+      margin: 0px 0px 25px;
+      justify-content: center;
+      right: 4px; // This must be half the width of .circle to truly center it.
+    }
+
+    .holder {
+      display: inline-block;
+      width: 14px;
+    }
+
+    .circle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: var(--grey30);
+      border-radius: 100%;
+    }
+
+    .active {
+      background: var(--action-button-color);
     }
 
     h1 {

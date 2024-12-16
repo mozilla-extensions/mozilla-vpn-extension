@@ -28,6 +28,7 @@ import {
   StateVPNSignedOut,
   StateVPNNeedsUpdate,
   VPNSettings,
+  BridgeResponse,
 } from "./states.js";
 
 const log = Logger.logger("TabHandler");
@@ -96,8 +97,12 @@ export class VPNController extends Component {
       // we could see random timeout when the browser tries to connect to an
       // invalid proxy connection.
       this.#port.onDisconnect.addListener((p) => {
+        const uninstalledHints = [
+          "An unexpected error occurred",
+          "No such native application mozillavpn",
+        ];
         // @ts-ignore
-        if (p.error.message === "No such native application mozillavpn") {
+        if (uninstalledHints.includes(p.error.message)) {
           this.#port = null; // The port is invalid, so we should retry later.
           this.#mState.value = new StateVPNUnavailable();
           return;
@@ -109,6 +114,7 @@ export class VPNController extends Component {
       // If we get an exception here it is super likely the VPN is simply not installed.
       log(e);
       this.#mState.value = new StateVPNUnavailable();
+      this.#port = null;
     }
   }
 
@@ -164,7 +170,7 @@ export class VPNController extends Component {
       // The VPN Client always sends a ".t : string"
       // to determing the message type.
       // If it's not there it's from the bridge.
-      this.handleBridgeResponse(response);
+      this.handleBridgeResponse(response, this.#mState);
       return;
     }
     switch (response.t) {
@@ -209,17 +215,30 @@ export class VPNController extends Component {
     }
   }
 
-  // Called in case we get the message directly from
-  // the native messaging bridge, not the client
-  async handleBridgeResponse(response) {
+  /**
+   * Handles a response from the native messaging brige
+   * @param {BridgeResponse} response - The Reponse object from the NM Bridge
+   * @param {WritableProperty<VPNState>} state - the current state
+   * @returns - Nothing, but may write to state, or post messages to the bridge.
+   */
+  async handleBridgeResponse(response, state) {
+    const currentState = state.value;
     // We can only get 2 types of messages right now: client-down/up
-    if (response.status && response.status === "vpn-client-down") {
-      if (this.#mState.value.alive) {
-        this.#mState.value = new StateVPNClosed();
+    if (
+      (response.status && response.status === "vpn-client-down") ||
+      (response.error && response.error === "vpn-client-down")
+    ) {
+      // If we have been considering the client open, it is now closed.
+      if (currentState.alive) {
+        state.set(new StateVPNClosed());
+        return;
       }
-      return;
+      // If we considered the client uninstalled, it is now installed.
+      if (!currentState.installed) {
+        state.set(new StateVPNClosed());
+        return;
+      }
     }
-    // The VPN Just started && connected to Native Messaging
     if (response.status && response.status === "vpn-client-up") {
       queueMicrotask(() => {
         this.postToApp("featurelist");
@@ -299,17 +318,22 @@ const MOZILLA_VPN_SERVERS_KEY = "mozillaVpnServers";
    * @param {T} defaultValue - The Default value, in case it does not exist. 
    * @returns {Promise<T>} - Returns a copy of the state, or the same in case of missing data.
    */
-async function fromStorage(
+export async function fromStorage(
   storage = browser.storage.local,
-  key = MOZILLA_VPN_SERVERS_KEY,
+  key,
   defaultValue
 ) {
-  const { mozillaVpnServers } = await storage.get(key);
-  if (typeof mozillaVpnServers === "undefined") {
+  const storageRetrieval = await storage.get(key);
+  if (typeof storageRetrieval === "undefined") {
+    return defaultValue;
+  }
+  const returnValue = storageRetrieval[key];
+
+  if (typeof returnValue === "undefined") {
     return defaultValue;
   }
   // @ts-ignore
-  return mozillaVpnServers;
+  return returnValue;
 }
 
 /**  data into storage, to make sure we can recreate it next time using
@@ -317,10 +341,10 @@ async function fromStorage(
  * @param {browser.storage.StorageArea} storage - The storage area to look for
  * @param {String} key - The key to put the state in
  */
-function putIntoStorage(
+export function putIntoStorage(
   data = {},
   storage = browser.storage.local,
-  key = MOZILLA_VPN_SERVERS_KEY
+  key
 ) {
   // @ts-ignore
   storage.set({ [key]: data });

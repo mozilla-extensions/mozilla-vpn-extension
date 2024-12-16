@@ -76,6 +76,9 @@ export class TabHandler extends Component {
   }
 
   async maybeShowIcon() {
+    if (!this.siteContexts) {
+      return;
+    }
     const currentTab = await Utils.getCurrentTab();
     if (!currentTab) {
       return;
