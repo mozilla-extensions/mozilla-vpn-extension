@@ -11,6 +11,18 @@ describe("property()", () => {
     const prop = property(obj);
     expect(prop.value.x).toBe(obj.x);
   });
+  test("Property Values are sealed", () => {
+    const obj = { x: "hello" };
+    const prop = property(obj);
+    expect(prop.value.x).toBe(obj.x);
+    try {
+      obj.x = 32;
+    } catch (error) {
+      expect(error.toString()).toBe(
+        "TypeError: Cannot assign to read only property 'x' of object '#<Object>'"
+      );
+    }
+  });
   test("Listeners are notified of Changes", async () => {
     const obj = { x: "hello" };
     const prop = property(obj);
