@@ -17,11 +17,11 @@ const sumoLink =
   "https://support.mozilla.org/products/firefox-private-network-vpn";
 
 const closeAfter = (f) => {
-    if(f){
-      f();
-    }
-    window.close();
-}
+  if (f) {
+    f();
+  }
+  window.close();
+};
 
 const defineMessageScreen = (
   tag,
@@ -31,7 +31,7 @@ const defineMessageScreen = (
   primaryAction,
   onPrimaryAction,
   secondaryAction = tr("getHelp"),
-  onSecondaryAction = () => closeAfter (()=>open(sumoLink)),
+  onSecondaryAction = () => closeAfter(() => open(sumoLink)),
   totalPages = 0,
   currentPage = 0
 ) => {
@@ -73,7 +73,8 @@ defineMessageScreen(
   tr("bodySubscribeNow"),
   tr("btnSubscribeNow"),
   () => {
-    () => closeAfter (()=>open("https://www.mozilla.org/products/vpn#pricing"));
+    () =>
+      closeAfter(() => open("https://www.mozilla.org/products/vpn#pricing"));
   }
 );
 
@@ -84,7 +85,8 @@ defineMessageScreen(
   tr("bodyNeedsUpdate2"),
   tr("btnDownloadNow"),
   () => {
-    () => closeAfter (()=>open("https://www.mozilla.org/products/vpn/download/"));
+    () =>
+      closeAfter(() => open("https://www.mozilla.org/products/vpn/download/"));
   }
 );
 
@@ -105,7 +107,8 @@ defineMessageScreen(
   `,
   tr("btnDownloadNow"),
   () => {
-    () => closeAfter (()=>open("https://www.mozilla.org/products/vpn/download/"));
+    () =>
+      closeAfter(() => open("https://www.mozilla.org/products/vpn/download/"));
   }
 );
 
