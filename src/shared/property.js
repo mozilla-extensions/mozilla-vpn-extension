@@ -47,6 +47,8 @@ export class WritableProperty extends IBindable {
    */
   constructor(initialvalue) {
     super();
+    Object.freeze(initialvalue);
+    Object.seal(initialvalue);
     this.#innerValue = initialvalue;
   }
   /** @returns {T}  */
@@ -64,6 +66,7 @@ export class WritableProperty extends IBindable {
   set(value) {
     this.#innerValue = value;
     Object.freeze(value);
+    Object.seal(value);
     // Notify subscribtions
     this.#subscriptions.forEach((s) => s(value));
   }
