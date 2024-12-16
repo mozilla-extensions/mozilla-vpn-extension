@@ -170,7 +170,7 @@ export class VPNController extends Component {
       // The VPN Client always sends a ".t : string"
       // to determing the message type.
       // If it's not there it's from the bridge.
-      this.handleBridgeResponse(response);
+      this.handleBridgeResponse(response, this.#mState);
       return;
     }
     switch (response.t) {
@@ -218,23 +218,24 @@ export class VPNController extends Component {
   /**
    * Handles a response from the native messaging brige
    * @param {BridgeResponse} response - The Reponse object from the NM Bridge
-   * @param {VPNState} state - the current state
-   * @returns - Nothing, but may set state, or post messages to the bridge.
+   * @param {WritableProperty<VPNState>} state - the current state
+   * @returns - Nothing, but may write to state, or post messages to the bridge.
    */
-  async handleBridgeResponse(response, state = this.#mState.value) {
+  async handleBridgeResponse(response, state) {
+    const currentState = state.value;
     // We can only get 2 types of messages right now: client-down/up
     if (
       (response.status && response.status === "vpn-client-down") ||
       (response.error && response.error === "vpn-client-down")
     ) {
       // If we have been considering the client open, it is now closed.
-      if (state.alive) {
-        state = new StateVPNClosed();
+      if (currentState.alive) {
+        state.set(new StateVPNClosed());
         return;
       }
       // If we considered the client uninstalled, it is now installed.
-      if (!state.installed) {
-        state = new StateVPNClosed();
+      if (!currentState.installed) {
+        state.set(new StateVPNClosed());
         return;
       }
     }

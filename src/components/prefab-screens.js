@@ -86,7 +86,7 @@ defineMessageScreen(
   "needs-update-message-screen",
   "message-update.svg",
   tr("headerNeedsUpdate"),
-  tr("bodyNeedsUpdate"),
+  tr("bodyNeedsUpdate2"),
   tr("btnDownloadNow"),
   () => {
     open("https://www.mozilla.org/products/vpn/download/");

@@ -3,9 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { ConditionalView } from "../../components/conditional-view.js";
-import { propertySumTrio } from "../../shared/property.js";
+import { propertySum } from "../../shared/property.js";
 import { Utils } from "../../shared/utils.js";
-import { vpnController, onboardingController } from "./backend.js";
+import { vpnController, onboardingController, telemetry } from "./backend.js";
 import { NUMBER_OF_ONBOARDING_PAGES } from "../../background/onboarding.js";
 
 export class PopUpConditionalView extends ConditionalView {
@@ -18,10 +18,7 @@ export class PopUpConditionalView extends ConditionalView {
     const deviceOs = await browser.runtime.getPlatformInfo();
     const supportedPlatform = Utils.isSupportedOs(deviceOs.os);
 
-    propertySumTrio(
-      vpnController.state,
-      vpnController.featureList,
-      onboardingController.currentOnboardingPage,
+    propertySum(
       (state, features, currentPage) => {
         this.slotName = PopUpConditionalView.toSlotname(
           state,
@@ -29,7 +26,15 @@ export class PopUpConditionalView extends ConditionalView {
           supportedPlatform,
           currentPage
         );
-      }
+        if (this.slotName == !"default") {
+          requestIdleCallback(() => {
+            telemetry.record("error_screen", { error: this.slotName });
+          });
+        }
+      },
+      vpnController.state,
+      vpnController.featureList,
+      onboardingController.currentOnboardingPage
     );
 
     // Messages may dispatch an event requesting to send a Command to the VPN

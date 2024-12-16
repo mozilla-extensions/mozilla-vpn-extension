@@ -16,6 +16,7 @@ import { expose } from "../shared/ipc.js";
 import { TabReloader } from "./tabReloader.js";
 import { ConflictObserver } from "./conflictObserver.js";
 import { ButterBarService } from "./butterBarService.js";
+import { Telemetry } from "./telemetry.js";
 
 const log = Logger.logger("Main");
 
@@ -32,6 +33,11 @@ class Main {
   proxyHandler = new ProxyHandler(this, this.vpnController);
   requestHandler = new RequestHandler(
     this,
+    this.extController,
+    this.proxyHandler
+  );
+  telemetry = new Telemetry(
+    this.vpnController,
     this.extController,
     this.proxyHandler
   );
@@ -65,6 +71,7 @@ class Main {
     expose(this.conflictObserver);
     expose(this.onboardingController);
     expose(this.butterBarService);
+    expose(this.telemetry);
 
     this.#handlingEvent = false;
     this.#processPendingEvents();

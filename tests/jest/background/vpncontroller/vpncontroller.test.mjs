@@ -12,6 +12,7 @@ import {
   VPNSettings,
   vpnStatusResponse,
 } from "../../../../src/background/vpncontroller";
+import { property } from "../../../../src/shared/property";
 
 describe("isSplitTunneled", () => {
   const cases = [
@@ -191,25 +192,26 @@ describe("handleBridgeResponse", () => {
   });
 
   test("handles vpn-client-down when client is alive", async () => {
-    const state = { alive: true, installed: true };
-
+    const state = property({ alive: true, installed: true });
     await vpnController.handleBridgeResponse(
       { status: "vpn-client-down" },
       state
     );
 
-    expect(vpnController.state.value.installed).toBe(true);
-    expect(vpnController.state.value.alive).toBe(false);
+    expect(state.value.installed).toBe(true);
+    expect(state.value.alive).toBe(false);
   });
 
   test("handles vpn-client-down when client is uninstalled", async () => {
-    const state = { alive: false, installed: false };
+    const state = property({ alive: false, installed: false });
+
     await vpnController.handleBridgeResponse(
       { status: "vpn-client-down" },
       state
     );
-    expect(vpnController.state.value.installed).toBe(true);
-    expect(vpnController.state.value.alive).toBe(false);
+
+    expect(state.value.installed).toBe(true);
+    expect(state.value.alive).toBe(false);
   });
 
   test("handles vpn-client-up", async () => {
@@ -232,14 +234,14 @@ describe("handleBridgeResponse", () => {
   });
 
   test("ignores unknown status", async () => {
-    const state = { alive: true, installed: true };
+    const state = property({ alive: false, installed: false });
 
     await vpnController.handleBridgeResponse(
       { status: "unknown-status" },
       state
     );
 
-    expect(vpnController.state.value.state).not.toBe("Closed");
+    expect(state.value.state).not.toBe("Closed");
     expect(vpnController.postToApp).not.toHaveBeenCalled();
   });
 });
