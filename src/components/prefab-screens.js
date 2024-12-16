@@ -5,6 +5,8 @@
 import { html, render } from "../vendor/lit-all.min.js";
 import { MessageScreen } from "./message-screen.js";
 import { tr } from "../shared/i18n.js";
+import { onboardingController } from "../ui/browserAction/backend.js";
+import { NUMBER_OF_ONBOARDING_PAGES } from "../background/onboarding.js";
 
 const open = (url) => {
   browser.tabs.create({
@@ -14,6 +16,13 @@ const open = (url) => {
 const sumoLink =
   "https://support.mozilla.org/products/firefox-private-network-vpn";
 
+const closeAfter = (f) => {
+    if(f){
+      f();
+    }
+    window.close();
+}
+
 const defineMessageScreen = (
   tag,
   img,
@@ -21,8 +30,10 @@ const defineMessageScreen = (
   bodyText,
   primaryAction,
   onPrimaryAction,
-  secondarAction = tr("getHelp"),
-  onSecondaryAction = () => open(sumoLink)
+  secondaryAction = tr("getHelp"),
+  onSecondaryAction = () => closeAfter (()=>open(sumoLink)),
+  totalPages = 0,
+  currentPage = 0
 ) => {
   const body =
     typeof bodyText === "string" ? html`<p>${bodyText}</p>` : bodyText;
@@ -34,10 +45,12 @@ const defineMessageScreen = (
       this.img = img;
       this.heading = heading;
       this.primaryAction = primaryAction;
+      this.secondaryAction = secondaryAction;
       this.onPrimaryAction = onPrimaryAction;
-      this.secondaryAction = secondarAction;
       this.onSecondaryAction = onSecondaryAction;
       this.identifier = tag;
+      this.totalPages = totalPages;
+      this.currentPage = currentPage;
       render(body, this);
     }
   }
@@ -60,7 +73,7 @@ defineMessageScreen(
   tr("bodySubscribeNow"),
   tr("btnSubscribeNow"),
   () => {
-    open("https://www.mozilla.org/products/vpn#pricing");
+    () => closeAfter (()=>open("https://www.mozilla.org/products/vpn#pricing"));
   }
 );
 
@@ -71,7 +84,7 @@ defineMessageScreen(
   tr("bodyNeedsUpdate2"),
   tr("btnDownloadNow"),
   () => {
-    open("https://www.mozilla.org/products/vpn/download/");
+    () => closeAfter (()=>open("https://www.mozilla.org/products/vpn/download/"));
   }
 );
 
@@ -92,7 +105,7 @@ defineMessageScreen(
   `,
   tr("btnDownloadNow"),
   () => {
-    open("https://www.mozilla.org/products/vpn/download/");
+    () => closeAfter (()=>open("https://www.mozilla.org/products/vpn/download/"));
   }
 );
 
@@ -104,6 +117,29 @@ defineMessageScreen(
   null,
   null
 );
+
+// Need to start loop at 1 because of how the strings were added to l10n repo.
+for (let i = 1; i <= NUMBER_OF_ONBOARDING_PAGES; i++) {
+  const isFinalScreen = i === NUMBER_OF_ONBOARDING_PAGES;
+  defineMessageScreen(
+    `onboarding-screen-${i}`,
+    `onboarding-${i}.svg`,
+    tr(`onboarding${i}_title`),
+    html` <p>${tr(`onboarding${i}_body`)}</p> `,
+    isFinalScreen ? tr("done") : tr("next"),
+    () => {
+      isFinalScreen
+        ? onboardingController.finishOnboarding()
+        : onboardingController.nextOnboardingPage();
+    },
+    isFinalScreen ? tr(" ") : tr("skip"), // For final screen need a space - when using something like `null` there is a large vertical gap
+    () => {
+      isFinalScreen ? null : onboardingController.finishOnboarding();
+    },
+    NUMBER_OF_ONBOARDING_PAGES,
+    i
+  );
+}
 
 defineMessageScreen(
   "unsupported-os-message-screen",
