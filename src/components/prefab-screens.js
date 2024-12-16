@@ -16,6 +16,13 @@ const open = (url) => {
 const sumoLink =
   "https://support.mozilla.org/products/firefox-private-network-vpn";
 
+const closeAfter = (f) => {
+    if(f){
+      f();
+    }
+    window.close();
+}
+
 const defineMessageScreen = (
   tag,
   img,
@@ -24,8 +31,7 @@ const defineMessageScreen = (
   primaryAction,
   onPrimaryAction,
   secondaryAction = tr("getHelp"),
-  onSecondaryAction = () => open(sumoLink),
-  closeOnClick = true,
+  onSecondaryAction = () => closeAfter (()=>open(sumoLink)),
   totalPages = 0,
   currentPage = 0
 ) => {
@@ -40,19 +46,8 @@ const defineMessageScreen = (
       this.heading = heading;
       this.primaryAction = primaryAction;
       this.secondaryAction = secondaryAction;
-      if (closeOnClick) {
-        this.onPrimaryAction = function () {
-          onPrimaryAction();
-          window.close();
-        };
-        this.onSecondaryAction = function () {
-          onSecondaryAction();
-          window.close();
-        };
-      } else {
-        this.onPrimaryAction = onPrimaryAction;
-        this.onSecondaryAction = onSecondaryAction;
-      }
+      this.onPrimaryAction = onPrimaryAction;
+      this.onSecondaryAction = onSecondaryAction;
       this.identifier = tag;
       this.totalPages = totalPages;
       this.currentPage = currentPage;
@@ -78,7 +73,7 @@ defineMessageScreen(
   tr("bodySubscribeNow"),
   tr("btnSubscribeNow"),
   () => {
-    open("https://www.mozilla.org/products/vpn#pricing");
+    () => closeAfter (()=>open("https://www.mozilla.org/products/vpn#pricing"));
   }
 );
 
@@ -89,7 +84,7 @@ defineMessageScreen(
   tr("bodyNeedsUpdate2"),
   tr("btnDownloadNow"),
   () => {
-    open("https://www.mozilla.org/products/vpn/download/");
+    () => closeAfter (()=>open("https://www.mozilla.org/products/vpn/download/"));
   }
 );
 
@@ -110,7 +105,7 @@ defineMessageScreen(
   `,
   tr("btnDownloadNow"),
   () => {
-    open("https://www.mozilla.org/products/vpn/download/");
+    () => closeAfter (()=>open("https://www.mozilla.org/products/vpn/download/"));
   }
 );
 
@@ -141,7 +136,6 @@ for (let i = 1; i <= NUMBER_OF_ONBOARDING_PAGES; i++) {
     () => {
       isFinalScreen ? null : onboardingController.finishOnboarding();
     },
-    false,
     NUMBER_OF_ONBOARDING_PAGES,
     i
   );
