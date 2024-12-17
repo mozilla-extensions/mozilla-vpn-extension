@@ -21,6 +21,7 @@ body {
 .limit-panel-height {
   max-height: calc(var(--window-max-height) - var(--nav-height));
   max-block-size: calc(var(--window-max-height)- var(--nav-height));
+  overflow-y: scroll;
 }
 
 .needsSlotted > * {

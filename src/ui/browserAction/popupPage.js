@@ -197,7 +197,7 @@ export class BrowserActionPopup extends LitElement {
           : null}
       </vpn-titlebar>
       <stack-view ${ref(this.stackView)}>
-        <section data-title="Mozilla VPN">
+        <section data-title="Mozilla VPN" class="limit-panel-height">
           <main>
             <div class="butter-bar-holder">
               ${this.alerts.map(
@@ -571,12 +571,12 @@ export class BrowserActionPopup extends LitElement {
 
     vpn-card {
       display: block;
-      margin-bottom: calc(var(--padding-default) * 1);
+      margin-bottom: 24px;
     }
 
     h1 {
       margin-block: 0px important!;
-      padding-block: 8px 16px !important;
+      padding-block: 0px 16px !important;
     }
 
     .origin.bold {
