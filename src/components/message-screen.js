@@ -165,6 +165,11 @@ export class MessageScreen extends LitElement {
       inline-size: 111px;
     }
 
+    img.onboarding-screen-4 {
+      margin-top: 24px;
+      max-height: 68px;
+      margin-bottom: 0px;
+    }
     @media (prefers-color-scheme: dark) {
       img.onboarding-screen-4 {
         filter: invert();
@@ -175,7 +180,7 @@ export class MessageScreen extends LitElement {
       flex-direction: row;
       width: 100%;
       justify-content: space-between;
-      align-items: center;
+      align-items: baseline;
     }
 
     .pagination {
