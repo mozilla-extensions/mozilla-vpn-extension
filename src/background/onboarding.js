@@ -12,7 +12,7 @@ import { fromStorage, putIntoStorage } from "./vpncontroller/vpncontroller.js";
 
 const ONBOARDING_KEY = "mozillaVpnOnboarding";
 const FIRST_PAGE = 1;
-export const NUMBER_OF_ONBOARDING_PAGES = 3;
+export const NUMBER_OF_ONBOARDING_PAGES = 4;
 const FIRST_UNUSED_PAGE = NUMBER_OF_ONBOARDING_PAGES + 1;
 
 /**
@@ -36,6 +36,7 @@ export class OnboardingController extends Component {
   }
 
   async init() {
+    return; // DEBUG
     this.#mCurrentOnboardingPage.value = await fromStorage(
       browser.storage.local,
       ONBOARDING_KEY,
