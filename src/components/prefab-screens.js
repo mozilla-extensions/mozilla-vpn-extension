@@ -22,41 +22,6 @@ const closeAfter = (f) => {
   }
   window.close();
 };
-
-const defineMessageScreen = (
-  tag,
-  img,
-  heading,
-  bodyText,
-  primaryAction,
-  onPrimaryAction,
-  secondaryAction = tr("getHelp"),
-  onSecondaryAction = () => closeAfter(() => open(sumoLink)),
-  totalPages = 0,
-  currentPage = 0
-) => {
-  const body =
-    typeof bodyText === "string" ? html`<p>${bodyText}</p>` : bodyText;
-
-  class Temp extends MessageScreen {
-    connectedCallback() {
-      super.connectedCallback();
-      this.titleHeader = tr("productName");
-      this.img = img;
-      this.heading = heading;
-      this.primaryAction = primaryAction;
-      this.secondaryAction = secondaryAction;
-      this.onPrimaryAction = onPrimaryAction;
-      this.onSecondaryAction = onSecondaryAction;
-      this.identifier = tag;
-      this.totalPages = totalPages;
-      this.currentPage = currentPage;
-      render(body, this);
-    }
-  }
-  customElements.define(tag, Temp);
-};
-
 const sendToApp = (customElement, command = "") => {
   customElement.dispatchEvent(
     new CustomEvent("requestMessage", {
@@ -66,92 +31,130 @@ const sendToApp = (customElement, command = "") => {
   );
 };
 
-defineMessageScreen(
-  "subscribenow-message-screen",
-  "message-header.svg",
-  "Subscribe to Mozilla VPN",
-  tr("bodySubscribeNow"),
-  tr("btnSubscribeNow"),
-  () => {
+const defineMessageScreen = (
+  args = {
+    tag,
+    img,
+    heading,
+    bodyText,
+    primaryAction,
+    onPrimaryAction,
+    secondaryAction: tr("getHelp"),
+    onSecondaryAction: () => closeAfter(() => open(sumoLink)),
+    totalPages: 0,
+    currentPage: 0,
+  }
+) => {
+  const body =
+    typeof args.bodyText === "string"
+      ? html`<p>${args.bodyText}</p>`
+      : args.bodyText;
+
+  class Temp extends MessageScreen {
+    connectedCallback() {
+      super.connectedCallback();
+      this.titleHeader = tr("productName");
+      this.img = args.img;
+      this.heading = args.heading;
+      this.primaryAction = args.primaryAction;
+      this.secondaryAction = args.secondaryAction;
+      this.onPrimaryAction = args.onPrimaryAction;
+      this.onSecondaryAction = args.onSecondaryAction;
+      this.identifier = args.tag;
+      this.totalPages = args.totalPages;
+      this.currentPage = args.currentPage;
+      render(body, this);
+    }
+  }
+  customElements.define(args.tag, Temp);
+};
+
+defineMessageScreen({
+  tag: "subscribenow-message-screen",
+  img: "message-header.svg",
+  heading: "Subscribe to Mozilla VPN",
+  bodyText: tr("bodySubscribeNow"),
+  primaryAction: tr("btnSubscribeNow"),
+  onPrimaryAction: () => {
     () =>
       closeAfter(() => open("https://www.mozilla.org/products/vpn#pricing"));
-  }
-);
+  },
+});
 
-defineMessageScreen(
-  "needs-update-message-screen",
-  "message-update.svg",
-  tr("headerNeedsUpdate"),
-  tr("bodyNeedsUpdate2"),
-  tr("btnDownloadNow"),
-  () => {
+defineMessageScreen({
+  tag: "needs-update-message-screen",
+  img: "message-update.svg",
+  heading: tr("headerNeedsUpdate"),
+  bodyText: tr("bodyNeedsUpdate2"),
+  primaryAction: tr("btnDownloadNow"),
+  onPrimaryAction: () => {
     () =>
       closeAfter(() => open("https://www.mozilla.org/products/vpn/download/"));
-  }
-);
+  },
+});
 
-defineMessageScreen(
-  "signin-message-screen",
-  "message-signin.svg",
-  tr("headerSignedOut"),
-  tr("bodySignedOut")
-);
+defineMessageScreen({
+  tag: "signin-message-screen",
+  img: "message-signin.svg",
+  heading: tr("headerSignedOut"),
+  bodyText: tr("bodySignedOut"),
+});
 
-defineMessageScreen(
-  "install-message-screen",
-  "message-install.svg",
-  tr("headerInstallMsg"),
-  html`
+defineMessageScreen({
+  tag: "install-message-screen",
+  img: "message-install.svg",
+  heading: tr("headerInstallMsg"),
+  bodyText: html`
     <p>${tr("bodyInstallMsg")}</p>
     <p class="footnote">${tr("bodyInstallMsgFooter")}</p>
   `,
-  tr("btnDownloadNow"),
-  () => {
+  primaryAction: tr("btnDownloadNow"),
+  onPrimaryAction: () => {
     () =>
       closeAfter(() => open("https://www.mozilla.org/products/vpn/download/"));
-  }
-);
+  },
+});
 
-defineMessageScreen(
-  "open-mozilla-vpn-message-screen",
-  "message-open.svg",
-  tr("headerOpenMozillaVPN"),
-  html` <p>${tr("bodyOpenMsg")}</p> `,
-  null,
-  null
-);
+defineMessageScreen({
+  tag: "open-mozilla-vpn-message-screen",
+  img: "message-open.svg",
+  heading: tr("headerOpenMozillaVPN"),
+  bodyText: html` <p>${tr("bodyOpenMsg")}</p> `,
+  onPrimaryAction: null,
+  primaryAction: null,
+});
 
 // Need to start loop at 1 because of how the strings were added to l10n repo.
 for (let i = 1; i <= NUMBER_OF_ONBOARDING_PAGES; i++) {
   const isFinalScreen = i === NUMBER_OF_ONBOARDING_PAGES;
-  defineMessageScreen(
-    `onboarding-screen-${i}`,
-    `onboarding-${i}.svg`,
-    tr(`onboarding${i}_title`),
-    html` <p>${tr(`onboarding${i}_body`)}</p> `,
-    isFinalScreen ? tr("done") : tr("next"),
-    () => {
+  defineMessageScreen({
+    tag: `onboarding-screen-${i}`,
+    img: `onboarding-${i}.svg`,
+    heading: tr(`onboarding${i}_title`),
+    bodyText: html` <p>${tr(`onboarding${i}_body`)}</p> `,
+    primaryAction: isFinalScreen ? tr("done") : tr("next"),
+    onPrimaryAction: () => {
       isFinalScreen
         ? onboardingController.finishOnboarding()
         : onboardingController.nextOnboardingPage();
     },
-    isFinalScreen ? tr(" ") : tr("skip"), // For final screen need a space - when using something like `null` there is a large vertical gap
-    () => {
+    secondaryAction: isFinalScreen ? tr(" ") : tr("skip"), // For final screen need a space - when using something like `null` there is a large vertical gap
+    onSecondaryAction: () => {
       isFinalScreen ? null : onboardingController.finishOnboarding();
     },
-    NUMBER_OF_ONBOARDING_PAGES,
-    i
-  );
+    totalPages: NUMBER_OF_ONBOARDING_PAGES,
+    currentPage: i,
+  });
 }
 
-defineMessageScreen(
-  "unsupported-os-message-screen",
-  "message-os.svg",
-  tr("headerUnsupportedOSMessage"),
-  html`
+defineMessageScreen({
+  tag: "unsupported-os-message-screen",
+  img: "message-os.svg",
+  heading: tr("headerUnsupportedOSMessage"),
+  bodyText: html`
     <p>${tr("bodyUnsupportedOSMessage")}</p>
     <p class="footnote">${tr("footnoteUnsupportedOSMessage")}</p>
   `,
-  null,
-  null
-);
+  onPrimaryAction: null,
+  primaryAction: null,
+});
