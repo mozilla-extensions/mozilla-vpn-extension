@@ -137,7 +137,6 @@ export class ExtensionController extends Component {
 
     switch (newClientState.state) {
       case "Enabled":
-        this.mKeepAliveConnection = true;
         maybeSet(new StateFirefoxVPNEnabled(false, getTime()));
         return;
       case "Disabled":
@@ -148,6 +147,7 @@ export class ExtensionController extends Component {
         this.#mState.set(new StateFirefoxVPNDisabled(false));
         return;
       case "OnPartial":
+        this.mKeepAliveConnection = true;
         maybeSet(new StateFirefoxVPNEnabled(true, getTime()));
         return;
       default:
