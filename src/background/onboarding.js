@@ -36,7 +36,6 @@ export class OnboardingController extends Component {
   }
 
   async init() {
-    return; // DEBUG
     this.#mCurrentOnboardingPage.value = await fromStorage(
       browser.storage.local,
       ONBOARDING_KEY,

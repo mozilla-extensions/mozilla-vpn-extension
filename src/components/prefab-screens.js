@@ -154,9 +154,23 @@ defineMessageScreen({
   img: `../logos/logo-dark.svg`,
   heading: tr(`telemetry_screen_header`),
   bodyText: html`
-    <p>${tr("telemetry_screen_descr")}</p>
+    <p>
+      ${(() => {
+        const input = tr("telemetry_screen_descr", "AAAAAAAAAAAAAAAA");
+        const parts = input.split("AAAAAAAAAAAAAAAA");
+        return html`
+          ${parts[0]}
+          <a href="https://www.mozilla.org/privacy/subscription-services/"
+            >${tr("privacy_notice_link_name")}</a
+          >
+          ${parts[1]}
+        `;
+      })()}
+    </p>
     <div class="row">
-      <p>${tr("telemetry_toggle_text")}</p>
+      <p style="font-family: 'Inter Semi Bold';text-align: left;">
+        ${tr("telemetry_toggle_text")}
+      </p>
       <mz-pill
         .enabled=${telemetry.telemetryEnabled.value}
         @click=${(e) => {
