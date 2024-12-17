@@ -58,6 +58,7 @@ export class ExtensionController extends Component {
     ) {
       this.#mState.set(new StateFirefoxVPNDisabled(true));
       this.vpnController.postToApp("deactivate");
+      this.mKeepAliveConnection = false;
       return;
     }
     if (this.#mState.value.enabled) {
