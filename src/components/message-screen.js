@@ -133,6 +133,7 @@ export class MessageScreen extends LitElement {
     }
     img {
       margin-block: 16px;
+      max-height: 140px;
     }
 
     img.subscribenow-message-screen,
