@@ -5,7 +5,10 @@
 import { html, render } from "../vendor/lit-all.min.js";
 import { MessageScreen } from "./message-screen.js";
 import { tr } from "../shared/i18n.js";
-import { onboardingController } from "../ui/browserAction/backend.js";
+import {
+  onboardingController,
+  telemetry,
+} from "../ui/browserAction/backend.js";
 import { NUMBER_OF_ONBOARDING_PAGES } from "../background/onboarding.js";
 
 const open = (url) => {
@@ -125,27 +128,49 @@ defineMessageScreen({
 });
 
 // Need to start loop at 1 because of how the strings were added to l10n repo.
-for (let i = 1; i <= NUMBER_OF_ONBOARDING_PAGES; i++) {
-  const isFinalScreen = i === NUMBER_OF_ONBOARDING_PAGES;
+// We need to stop the looop at NUMBER_OF_ONBOARDING_PAGES-1 -> as we want the Telemetry page to
+// be last and it has special logic.
+for (let i = 1; i <= NUMBER_OF_ONBOARDING_PAGES - 1; i++) {
   defineMessageScreen({
     tag: `onboarding-screen-${i}`,
     img: `onboarding-${i}.svg`,
     heading: tr(`onboarding${i}_title`),
     bodyText: html` <p>${tr(`onboarding${i}_body`)}</p> `,
-    primaryAction: isFinalScreen ? tr("done") : tr("next"),
+    primaryAction: tr("next"),
     onPrimaryAction: () => {
-      isFinalScreen
-        ? onboardingController.finishOnboarding()
-        : onboardingController.nextOnboardingPage();
+      onboardingController.nextOnboardingPage();
     },
-    secondaryAction: isFinalScreen ? tr(" ") : tr("skip"), // For final screen need a space - when using something like `null` there is a large vertical gap
+    secondaryAction: tr("skip"),
     onSecondaryAction: () => {
-      isFinalScreen ? null : onboardingController.finishOnboarding();
+      onboardingController.finishOnboarding();
     },
     totalPages: NUMBER_OF_ONBOARDING_PAGES,
     currentPage: i,
   });
 }
+
+defineMessageScreen({
+  tag: `onboarding-screen-${NUMBER_OF_ONBOARDING_PAGES}`,
+  img: `../logos/logo-dark.svg`,
+  heading: tr(`telemetry_screen_header`),
+  bodyText: html`
+    <p>${tr("telemetry_screen_descr")}</p>
+    <div class="row">
+      <p>${tr("telemetry_toggle_text")}</p>
+      <mz-pill
+        .enabled=${telemetry.telemetryEnabled.value}
+        @click=${(e) => {
+          telemetry.setTelemetryEnabled(!telemetry.telemetryEnabled.value);
+          e.target.enabled = !telemetry.telemetryEnabled.value;
+        }}
+      ></mz-pill>
+    </div>
+  `,
+  onPrimaryAction: () => {
+    onboardingController.finishOnboarding();
+  },
+  primaryAction: tr("done"),
+});
 
 defineMessageScreen({
   tag: "unsupported-os-message-screen",
