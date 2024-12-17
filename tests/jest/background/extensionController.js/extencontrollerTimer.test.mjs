@@ -139,7 +139,7 @@ describe("ExtensionController", () => {
       testController.state.set(new StateVPNEnabled());
       expect(target.state.value.enabled).toBe(true);
     });
-    test("If Firefox was launched when the VPN client was ON, turning the VPN client OFF, should NOT turn the VPN extension OFF.", () => {
+    test("If the client is unexpectedly deactivated from StateOnPartial, the extension should attempt to reactivate.", () => {
       const testController = new TestController(new StateVPNClosed());
 
       const target = new ExtensionController(
@@ -147,10 +147,10 @@ describe("ExtensionController", () => {
         testController
       );
       expect(target.state.value.enabled).toBe(false);
-      testController.state.set(new StateVPNEnabled());
+      testController.state.set(new StateVPNOnPartial());
       expect(target.state.value.enabled).toBe(true);
       // Given that the client did an unexpected disconnect,
-      // the extension should ask to re-enable instatnly
+      // the extension should ask to re-enable instantly
       // without disconnecting
       testController.state.set(new StateVPNDisabled());
       // We should have sent a reconnect
