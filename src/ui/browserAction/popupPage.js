@@ -135,6 +135,9 @@ export class BrowserActionPopup extends LitElement {
       vpnController.postToApp("featurelist");
     });
     requestIdleCallback(() => {
+      vpnController.postToApp("interventions");
+    });
+    requestIdleCallback(() => {
       telemetry.record("main_screen");
     });
   }
