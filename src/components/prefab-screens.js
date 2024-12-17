@@ -91,8 +91,7 @@ defineMessageScreen({
   bodyText: tr("bodyNeedsUpdate2"),
   primaryAction: tr("btnDownloadNow"),
   onPrimaryAction: () => {
-    () =>
-      closeAfter(() => open("https://www.mozilla.org/products/vpn/download/"));
+    closeAfter(() => open("https://www.mozilla.org/products/vpn/download/"));
   },
 });
 
@@ -113,8 +112,7 @@ defineMessageScreen({
   `,
   primaryAction: tr("btnDownloadNow"),
   onPrimaryAction: () => {
-    () =>
-      closeAfter(() => open("https://www.mozilla.org/products/vpn/download/"));
+    closeAfter(() => open("https://www.mozilla.org/products/vpn/download/"));
   },
 });
 
