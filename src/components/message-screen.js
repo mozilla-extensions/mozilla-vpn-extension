@@ -55,12 +55,19 @@ export class MessageScreen extends LitElement {
         i + 1 === this.currentPage ? "circle active" : "circle"
       );
     }
+    const isOnboarding = (this.totalPages !== 0);
+    let imgString;
+    if (isOnboarding) {
+      imgString = html`<img class="${this.identifier}" src="/assets/img/${this.img}" height="145" />`
+    } else {
+      imgString = html`<img class="${this.identifier}" src="/assets/img/${this.img}"/>`
+    }
 
     return html`
       <vpn-titlebar title=${this.titleHeader}></vpn-titlebar>
       <div class="inner">
         <div class="upper">
-          <img class="${this.identifier}" src="/assets/img/${this.img}" />
+          ${imgString}
           <h1>${this.heading}</h1>
           <slot></slot>
         </div>
