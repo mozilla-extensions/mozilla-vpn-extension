@@ -179,6 +179,7 @@ defineMessageScreen({
     </div>
   `,
   onPrimaryAction: () => {
+    telemetry.record("has_completed_onboarding");
     onboardingController.finishOnboarding();
   },
   primaryAction: tr("done"),
