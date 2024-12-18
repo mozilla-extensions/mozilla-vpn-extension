@@ -60,33 +60,33 @@ export class PopUpConditionalView extends ConditionalView {
    * @returns {String}
    */
   static toSlotname(state, features, supportedPlatform, currentOnboardingPage) {
-    if (!supportedPlatform && !features.webExtension) {
-      return "MessageOSNotSupported";
-    }
-    if (!state.installed) {
-      return "MessageInstallVPN";
-    }
-    if (state.needsUpdate) {
-      return "MessageUpdateClient";
-    }
-    if (!state.alive) {
-      return "MessageOpenMozillaVPN";
-    }
-    if (!features.webExtension) {
-      return "MessageOSNotSupported";
-    }
-    if (!state.authenticated) {
-      return "MessageSignIn";
-    }
-    if (!state.subscribed) {
-      return "MessageSubscription";
-    }
-    if (
-      currentOnboardingPage >= 1 &&
-      currentOnboardingPage <= NUMBER_OF_ONBOARDING_PAGES
-    ) {
-      return `onboarding-${currentOnboardingPage}`;
-    }
+    // if (!supportedPlatform && !features.webExtension) {
+    //   return "MessageOSNotSupported";
+    // }
+    // if (!state.installed) {
+    //   return "MessageInstallVPN";
+    // }
+    // if (state.needsUpdate) {
+      // return "MessageUpdateClient";
+    // }
+    // if (!state.alive) {
+    //   return "MessageOpenMozillaVPN";
+    // }
+    // if (!features.webExtension) {
+    //   return "MessageOSNotSupported";
+    // }
+    // if (!state.authenticated) {
+    //   return "MessageSignIn";
+    // }
+    // if (!state.subscribed) {
+    //   return "MessageSubscription";
+    // }
+    // if (
+    //   currentOnboardingPage >= 1 &&
+    //   currentOnboardingPage <= NUMBER_OF_ONBOARDING_PAGES
+    // ) {
+    //   return `onboarding-${currentOnboardingPage}`;
+    // }
 
     return "default";
   }

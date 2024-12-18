@@ -508,7 +508,6 @@ export class BrowserActionPopup extends LitElement {
     ${fontStyling}${resetSizing}${ghostButtonStyles}${inUseLabel}${positioner}
     section {
       background-color: var(--panel-bg-color);
-      max-block-size: calc(var(--window-max-height) - var(--nav-height));
     }
 
     section.limit-panel-height {
@@ -571,12 +570,12 @@ export class BrowserActionPopup extends LitElement {
 
     vpn-card {
       display: block;
-      margin-bottom: 24px;
+      margin-bottom: 16px;
     }
 
     h1 {
-      margin-block: 0px important!;
-      padding-block: 0px 16px !important;
+      margin-block: 0 simportant!;
+      padding-block: 8px 16px !important;
     }
 
     .origin.bold {
