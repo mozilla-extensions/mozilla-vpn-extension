@@ -74,11 +74,16 @@ export class ButterBar extends LitElement {
       box-sizing: border-box;
     }
 
+    .butter-bar-text p {
+      margin: 0;
+      line-height: 21px;
+    }
+
     .butter-bar-text {
       text-align: center;
       flex: 1;
       font-size: 13px;
-      padding: 8px 16px;
+      padding: 10px 16px;
       box-sizing: border-box;
       display: flex;
       justify-content: center;

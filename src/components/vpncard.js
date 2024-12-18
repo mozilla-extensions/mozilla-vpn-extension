@@ -297,6 +297,11 @@ export class VPNCard extends LitElement {
       --shield-color: var(--color-enabled);
     }
 
+    div.stack,
+    .box.stable {
+      max-block-size: 156px;
+    }
+
     .infobox {
       flex: 4;
     }
