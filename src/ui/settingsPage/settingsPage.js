@@ -9,7 +9,7 @@ import {
   createRef,
   ref,
 } from "../../vendor/lit-all.min.js";
-import { fontSizing, resetSizing } from "../../components/styles.js";
+import { fontStyling, resetSizing } from "../../components/styles.js";
 import { getExposedObject } from "../../shared/ipc.js";
 import "./tableElement.js";
 import { tr } from "../../shared/i18n.js";
@@ -21,18 +21,22 @@ import { settingTypo } from "./styles.js";
 export class SettingsPage extends LitElement {
   static properties = {
     contexts: { type: Object },
+    serverList: { type: Object },
   };
   constructor() {
     super();
     this.contexts = new Map();
     this.vpnController = getExposedObject("VPNController");
     this.vpnController.then((c) => {
-      c.state.subscribe((state) => (this.serverList = state.servers));
+      c.servers.subscribe((servers) => (this.serverList = servers));
     });
     this.proxyHandler = getExposedObject("ProxyHandler");
     this.proxyHandler.then((p) => {
       p.siteContexts.subscribe((context) => (this.contexts = context));
     });
+    getExposedObject("Telemetry").then((t) =>
+      t.record("used_feature_settings_page")
+    );
   }
 
   connectedCallback() {
@@ -41,39 +45,22 @@ export class SettingsPage extends LitElement {
   filterInput = createRef();
 
   render() {
+    document.title = tr("settingsPageTitle");
     // Step 1 Filter the List, so only items that include the website are here
     const filteredList = filter(this.contexts, this.filterInput.value?.value);
     // Let's render the view!
     return html`
       <header>
-        <picture class="icon" alt="${tr("productName")}">
-          <!-- User prefers light mode: -->
-          <source
-            srcset="../../assets/logos/logo-dark.svg"
-            media="(prefers-color-scheme: light)"
-          />
-          <!-- User prefers dark mode: -->
-          <source
-            srcset="../../assets/logos/logo-light.svg"
-            media="(prefers-color-scheme: dark)"
-          />
-          <!-- User has no color preference: -->
-          <img
-            src="../../assets/logos/logo-dark.svg"
-            alt="${tr("productName")}"
-          />
-        </picture>
-        <h1>${tr("productName")}</h1>
+        <img
+          class="invert_darkmode"
+          src="/assets/logos/logo-wide.svg"
+          alt="${tr("productName")}"
+        />
       </header>
       <main>
-        <h2>${tr("headlineWebsitePreferences")}</h2>
-        <p>
-          <!-- TODO: Check if those strings are the ones we want to publish. -->
-          You can manage VPN preferences for each website in the Mozilla VPN for
-          Firefox extension.
-        </p>
+        <h2>${tr("websitePreferences")}</h2>
+        <p class="secondary subtitle">${tr("settingsPageSubtitle")}</p>
         <div>
-          <img />
           <input
             type="text"
             placeholder=${tr("placeholderSearchWebsites")}
@@ -99,7 +86,7 @@ export class SettingsPage extends LitElement {
   }
 
   static styles = css`
-    ${fontSizing}
+    ${fontStyling}
     ${resetSizing}
     ${settingTypo}
 
@@ -121,16 +108,24 @@ export class SettingsPage extends LitElement {
       flex-direction: column;
       align-items: center;
     }
-    * {
-      color: var(--text-color-primary);
+
+    h2 {
+      color: var(--text-color-headline);
     }
+
+    .subtitle {
+      font-size: 16px;
+      line-height: 24px;
+      margin-block-end: 16px;
+    }
+
     header {
       display: flex;
       flex-direction: row;
       padding: 20px 30px;
-      border-bottom: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--settings-border-color);
       width: 100%;
-      margin-bottom: 16px;
+      margin-bottom: 32px;
     }
     main {
       width: calc(min(70%, 920px));
@@ -144,14 +139,13 @@ export class SettingsPage extends LitElement {
 
     input {
       margin-bottom: 32px;
-      padding: 10px 20px;
-      padding-left: 30px;
+      padding: 10px 20px 10px 48px;
       color: black;
       width: calc(max(50%, 300px));
       background-image: url("../../assets/img/search-icon.svg");
-      background-position: 2.5px 6px;
+      background-position: 12px 6px;
       background-repeat: no-repeat;
-      border: 2px solid var(--border-color);
+      border: 1px solid var(--border-color);
       border-radius: 5px;
     }
 
@@ -161,6 +155,27 @@ export class SettingsPage extends LitElement {
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      max-width: 640px;
+    }
+
+    .secondary {
+      color: var(--settings-secondary-text-color);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .invert_darkmode {
+        filter: invert();
+      }
+    }
+
+    h3 {
+      margin-top: 32px;
+      font-family: "Inter Semi Bold";
+      color: var(--text-color-headline);
+    }
+    .emptyState p {
+      opacity: 0.8;
+      text-align: center;
     }
   `;
 }
@@ -185,7 +200,7 @@ export const noElementPlaceHolder = () => {
     <div class="emptyState">
       <img aria-hidden="true" src="../../assets/img/country-tabs.svg" />
       <h3>${tr("headlineNoWebsitePreferences")}</h3>
-      <p>${tr("noWebsitePreferencesSubText")}</p>
+      <p class="secondary">${tr("noWebsitePreferencesSubText")}</p>
     </div>
   `;
 };

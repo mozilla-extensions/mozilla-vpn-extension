@@ -9,9 +9,15 @@ import { TabHandler } from "./tabHandler.js";
 import { ToolbarIconHandler } from "./toolbarIconHandler.js";
 
 import { VPNController } from "./vpncontroller/index.js";
+import { ExtensionController } from "./extensionController/index.js";
+import { OnboardingController } from "./onboarding.js";
 
 import { expose } from "../shared/ipc.js";
 import { TabReloader } from "./tabReloader.js";
+import { ConflictObserver } from "./conflictObserver.js";
+import { ButterBarService } from "./butterBarService.js";
+import { Telemetry } from "./telemetry.js";
+
 const log = Logger.logger("Main");
 
 class Main {
@@ -19,17 +25,39 @@ class Main {
   #pendingEvents = [];
 
   observers = new Set();
+  conflictObserver = new ConflictObserver();
   vpnController = new VPNController(this);
+  extController = new ExtensionController(this, this.vpnController);
+  onboardingController = new OnboardingController(this);
   logger = new Logger(this);
   proxyHandler = new ProxyHandler(this, this.vpnController);
   requestHandler = new RequestHandler(
     this,
-    this.vpnController,
+    this.extController,
     this.proxyHandler
   );
-  tabHandler = new TabHandler(this, this.vpnController, this.proxyHandler);
-  toolbarIconHandler = new ToolbarIconHandler(this, this.vpnController);
-  tabReloader = new TabReloader(this, this.proxyHandler);
+  telemetry = new Telemetry(
+    this.vpnController,
+    this.extController,
+    this.proxyHandler
+  );
+  tabHandler = new TabHandler(
+    this,
+    this.extController,
+    this.proxyHandler,
+    this.vpnController
+  );
+  toolbarIconHandler = new ToolbarIconHandler(
+    this,
+    this.extController,
+    this.vpnController
+  );
+  tabReloader = new TabReloader(this, this.extController, this.proxyHandler);
+  butterBarService = new ButterBarService(
+    this,
+    this.vpnController,
+    this.conflictObserver
+  );
 
   async init() {
     log("Hello from the background script!");
@@ -38,8 +66,12 @@ class Main {
       await observer.init();
     }
     expose(this.vpnController);
-    expose(this.tabHandler);
+    expose(this.extController);
     expose(this.proxyHandler);
+    expose(this.conflictObserver);
+    expose(this.onboardingController);
+    expose(this.butterBarService);
+    expose(this.telemetry);
 
     this.#handlingEvent = false;
     this.#processPendingEvents();

@@ -6,8 +6,9 @@ import {
   styleMap,
   createRef,
   ref,
+  when,
 } from "../vendor/lit-all.min.js";
-import { resetSizing } from "./styles.js";
+import { fontStyling, ghostButtonStyles, resetSizing } from "./styles.js";
 
 import { tr } from "../shared/i18n.js";
 
@@ -91,7 +92,12 @@ export class ServerList extends LitElement {
      * @property {ServerCity} detail.city - The new City
      * @property {ServerCountry} detail.country - The City's country
      */
-    const country = this.openedCountries.find((c) => c.cities.includes(city));
+    let country = this.openedCountries.find((c) => c.cities.includes(city));
+    if (!country) {
+      // Find country for cities selected from a search filtered list
+      // where this.openedCountries is []
+      country = this.serverList.find((c) => c.cities.includes(city));
+    }
     return new CustomEvent("selectedCityChanged", {
       detail: { city, country },
     });
@@ -126,12 +132,34 @@ export class ServerList extends LitElement {
         @change=${() => this.requestUpdate()}
         @input=${() => this.requestUpdate()}
       />
+      <label
+        class="default-location-item"
+        @click=${() =>
+          when(this.selectedCity != null, () => {
+            this.dispatchEvent(this.#changeCityEvent(null));
+          })}
+      >
+        <input
+          class="default-location-btn"
+          type="radio"
+          .checked=${this.selectedCity == null}
+        />
+        <span class="defaultCitySection">
+          <span class="default-location-headline"
+            >${tr("defaultLocationHeader")}</span
+          >
+          <span class="default-location-subline text-secondary">
+            ${tr("useDefaultLocationExplainer")}
+          </span>
+        </span>
+      </label>
+      <hr />
       ${countrylistHolder(filteredList, countryListProvider)}
     `;
   }
 
   static styles = css`
-    ${resetSizing}
+    ${resetSizing} ${ghostButtonStyles} ${fontStyling}
 
     :host {
       display: flex;
@@ -139,14 +167,21 @@ export class ServerList extends LitElement {
       align-items: center;
     }
 
+    .default-location-btn {
+      margin-block: 4px auto;
+    }
+
+    .defaultCitySection {
+      display: flex;
+      flex-direction: column;
+    }
+
     #moz-vpn-server-list-panel {
       width: 100%;
-      block-size: var(--panelSize);
-      max-block-size: var(--panelSize);
-      min-block-size: var(--panelSize);
       overflow-x: hidden;
       overflow-y: hidden;
     }
+
     .server-list-item {
       display: flex;
       flex-direction: column;
@@ -161,53 +196,56 @@ export class ServerList extends LitElement {
       pointer-events: none;
     }
 
+    .default-location-headline,
+    .server-country-name {
+      font-family: "Inter Semi Bold";
+      font-size: 16px;
+      line-height: 24px;
+    }
+
     .server-country-name {
       padding-block: 0;
       padding-inline-end: 0;
       padding-inline-start: 20px;
-      font-family: var(--font-family);
-      font-weight: bold;
       pointer-events: none;
       color: var(--text-color-primary);
     }
 
+    .default-location-item,
     .server-city-list-item,
     .server-city-list-visibility-btn {
       display: flex;
       flex-direction: row;
-      block-size: 40px;
+
       border-radius: 4px;
       margin-block-start: 4px;
       margin-block-end: 4px;
       margin-inline-start: 8px;
       margin-inline-end: 8px;
       inline-size: calc(100% - 16px);
+      position: relative;
     }
+    .server-city-list-item,
     .server-city-list-visibility-btn {
-      align-items: center;
+      block-size: 40px;
+    }
+
+    .default-location-item {
+      padding: 8px 8px 24px;
+      border-bottom: 1px solid var(--divider-color);
+      border-radius: 0px;
+      margin-inline: 16px;
+      width: calc(var(--window-width) - 32px);
+    }
+
+    .default-location-item input {
+      margin-right: 16px;
     }
 
     /* We need to temporarily use !important for this button to make sure the right color applies */
     .server-city-list-visibility-btn {
       display: flex;
-      background-color: var(--panel-bg-color) !important;
-      border-radius: 4px;
-      border: none;
-      transition: background-color 0.3s ease;
-    }
-
-    .server-city-list-visibility-btn:hover {
-      background-color: var(--button-bg-hover-color-secondary) !important;
-    }
-
-    .server-city-list-visibility-btn:focus {
-      outline: 2px solid var(--button-bg-focus-color-primary);
-      outline-offset: 2px;
-    }
-
-    .server-city-list-visibility-btn:active {
-      background-color: var(--button-bg-active-color-secondary) !important;
-      outline: none;
+      align-items: center;
     }
 
     .toggle {
@@ -220,6 +258,11 @@ export class ServerList extends LitElement {
       transition: transform 0.275s ease-in-out;
       inline-size: 24px;
       height: 24px;
+    }
+    @media (prefers-color-scheme: dark) {
+      .toggle {
+        filter: invert(1);
+      }
     }
 
     .opened .toggle {
@@ -236,6 +279,13 @@ export class ServerList extends LitElement {
       list-style-type: none;
       visibility: hidden;
       margin-left: 48px;
+    }
+
+    .default-location-subline,
+    .server-city-name {
+      font-size: 14px;
+      line-height: 21px;
+      opacity: 0.875;
     }
 
     .opened .server-city-list {
@@ -265,23 +315,25 @@ export class ServerList extends LitElement {
 
     .server-city-name {
       font-family: var(--fontMetropolisLight);
-      font-weight: 300;
       color: var(--text-color-primary);
       padding-inline-start: 18px;
     }
 
     input.search {
-      margin-bottom: 16px;
-      padding: 10px 20px;
-      padding-left: 30px;
-      color: var(--text-color-invert);
-      width: calc(max(50%, 300px));
+      margin-block: 16px;
+      padding: 10px 20px 10px 32px;
+      width: calc(max(50%, 312px));
       background-image: url("../../assets/img/search-icon.svg");
-      background-position: 2.5px 6px;
+      background-position: 5px 6px;
       background-repeat: no-repeat;
-      border: 2px solid var(--border-color);
-      border-radius: 5px;
-      color: black;
+      border: 1px solid var(--input-border);
+      border-radius: var(--button-border-radius);
+      font-size: 14px;
+      color: var(--grey40);
+    }
+
+    input.search::placeholder {
+      opacity: 1;
     }
   `;
 }
@@ -314,7 +366,7 @@ export const cityItem = (city, selectedCity, selectCity) => {
         <input
           class="server-radio-btn"
           type="radio"
-          .checked=${city.name === selectedCity.name}
+          .checked=${city.name === selectedCity?.name}
           data-country-code="${city.code}"
           data-city-name="${city.name}"
         />
@@ -357,7 +409,7 @@ export const countryListItem = (
       data-country-code="${serverCountry.code}"
       @click=${onclick}
     >
-      <button class="server-city-list-visibility-btn ">
+      <button class="server-city-list-visibility-btn ghost-btn">
         <div class="toggle"></div>
         <img
           class="server-country-flag"

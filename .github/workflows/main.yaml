@@ -26,9 +26,11 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
+        with:
+          submodules: true
       - uses: actions/setup-node@v4
         with:
-          node-version: "latest"
+          node-version: 22
       - run: npm install
       - run: npm run build
       - name: Uploading
@@ -42,9 +44,11 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
+        with:
+          submodules: true
       - uses: actions/setup-node@v4
         with:
-          node-version: "latest"
+          node-version: 22
       - run: npm install
       - run: npm run lint
 
@@ -54,9 +58,11 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
+        with:
+          submodules: true
       - uses: actions/setup-node@v4
         with:
-          node-version: "latest"
+          node-version: 22
       - run: npm install
       - run: npm run test
 

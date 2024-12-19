@@ -19,37 +19,65 @@ export const Utils = {
     return currentTab[0];
   },
 
+  isSupportedOs(os) {
+    return ["win"].includes(os);
+  },
+
+  isViableClientVersion: (clientVersion) => {
+    // TODO we should do something better here
+    // We'll likely want to update the minimumViableClient
+    // out of band at some point.
+    const minimumViableClient = "2.25.0";
+    return parseInt(clientVersion) < parseInt(minimumViableClient);
+  },
+
   /**
    * Formats and retrieves the hostname from a given URL.
-   * @param {string} url - The URL to format.
-   * @returns {string} - The formatted hostname. Is empty if not valid for extension context.
+   * @param {string} url - URL to format.
+   * @returns {string} -  URL sans prefixes.
    */
-  getFormattedHostname(url) {
+  stripPrefixesFromUrl(url) {
     // Handle sites being viewed in reader mode
     // TODO... other prefixes(?)
     const readerPrefix = "about:reader?url=";
     if (url.startsWith(readerPrefix)) {
       const encodedUrl = url.slice(readerPrefix.length);
-      url = decodeURIComponent(encodedUrl);
+      return decodeURIComponent(encodedUrl);
     }
-    const getHostname = (aUrl) => {
-      try {
-        const urlObj = new URL(aUrl);
-        return urlObj.hostname;
-      } catch (e) {
-        return null;
-      }
-    };
-    let hostname = getHostname(url);
+    return url;
+  },
 
-    // Use the entire URL if hostname is not valid (like about:debugging)
-    if (!hostname || hostname === "") {
+  /**
+   * Formats and retrieves the domain from a given URL.
+   * @param {string} url - URL from which to retrieve the domain name.
+   * @returns {string} - The domain name, or the url if a valid (within the context of the extension) domain name is not derived.
+   */
+  getTopLevelDomain(url) {
+    url = this.stripPrefixesFromUrl(url);
+
+    try {
+      // Create a URL object from the input URL
+      let parsedUrl = new URL(url);
+
+      // Split the hostname to remove any subdomains or prefixes
+      let domainParts = parsedUrl.hostname.split(".");
+
+      // If the domain has more than two parts, remove subdomains (e.g., "reader.example.com" becomes "example.com")
+      if (domainParts.length > 2) {
+        return domainParts.slice(-2).join(".");
+      }
+
+      // If it's already just a domain name, return it
+      return parsedUrl.hostname ? parsedUrl.hostname : url;
+    } catch (error) {
+      // Handle invalid URLs
       return url;
     }
-    return hostname;
   },
 
   isValidForProxySetting: (url) => {
+    url = Utils.stripPrefixesFromUrl(url);
+
     try {
       const urlObj = new URL(url);
       return urlObj.protocol === "https:" || urlObj.protocol === "http:";
@@ -57,16 +85,20 @@ export const Utils = {
       return false;
     }
   },
-  nameFor: (
-    countryCode = "de",
-    cityCode = "ber",
-    serverList = [new ServerCountry()]
-  ) => {
+
+  nameFor: (countryCode = "", cityCode = "", serverList = []) => {
+    return Utils.getCity(countryCode, cityCode, serverList)?.name;
+  },
+
+  getCity: (countryCode = "", cityCode = "", serverList = []) => {
     if (!serverList) {
+      return "";
+    }
+    if (serverList.length === 0) {
       return "";
     }
     return serverList
       .find((sc) => sc.code === countryCode)
-      ?.cities.find((c) => c.code === cityCode)?.name;
+      ?.cities.find((c) => c.code === cityCode);
   },
 };

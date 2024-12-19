@@ -4,12 +4,16 @@
 
 import { html, css, LitElement } from "../../vendor/lit-all.min.js";
 
-import { vpnController, proxyHandler } from "../browserAction/backend.js";
+import {
+  vpnController,
+  proxyHandler,
+  telemetry,
+} from "../browserAction/backend.js";
 
 import { Utils } from "../../shared/utils.js";
 import { tr } from "../../shared/i18n.js";
 
-import { fontSizing, resetSizing } from "../../components/styles.js";
+import { fontStyling, resetSizing } from "../../components/styles.js";
 
 /**
  * This is the Component for the Page Action Popup.
@@ -17,7 +21,7 @@ import { fontSizing, resetSizing } from "../../components/styles.js";
  */
 export class PageActionPopup extends LitElement {
   static properties = {
-    vpnState: { type: Object },
+    servers: { type: Object },
     pageURL: { type: String },
     _siteContext: { type: Object },
   };
@@ -31,14 +35,14 @@ export class PageActionPopup extends LitElement {
       if (!Utils.isValidForProxySetting(tab.url)) {
         return;
       }
-      const hostname = Utils.getFormattedHostname(tab.url);
+      const hostname = Utils.getTopLevelDomain(tab.url);
       this.pageURL = hostname;
       if (proxyHandler.siteContexts.value.has(this.pageURL)) {
         this._siteContext = proxyHandler.siteContexts.value.get(this.pageURL);
       }
     });
 
-    vpnController.state.subscribe((s) => (this.vpnState = s));
+    vpnController.servers.subscribe((s) => (this.servers = s));
   }
 
   render() {
@@ -50,14 +54,14 @@ export class PageActionPopup extends LitElement {
         : "dark";
 
     const contextDescriptionText = () => {
-      return excluded ? "Protection for this site:" : "Location for this site:";
+      return excluded ? "websiteProtection" : "titleServerList";
     };
 
     const getLocationText = () => {
       if (excluded) {
         return "Off";
       }
-      const servers = this.vpnState?.servers;
+      const servers = this.servers;
       return servers
         .find((sc) => sc.code === this._siteContext?.countryCode)
         ?.cities.find((c) => c.code === this._siteContext?.cityCode)?.name;
@@ -66,51 +70,56 @@ export class PageActionPopup extends LitElement {
     const getSrc = () => {
       return excluded
         ? `./../../assets/logos/logo-${scheme}-excluded.svg`
-        : `./../../assets/flags/${this._siteContext?.countryCode}.png`;
+        : `./../../assets/flags/${this._siteContext?.countryCode.toUpperCase()}.png`;
     };
 
     const removeContext = () => {
+      this._siteContext.excluded
+        ? telemetry.record("used_feature_page_action_revoke_exclude")
+        : telemetry.record("used_feature_page_action_revoke_geopref");
       proxyHandler.removeContextForOrigin(this._siteContext.origin);
     };
 
-    const resetButtonClasses = () => {
-      return excluded ? "primary" : "secondary";
-    };
-
     const resetButtonContent = () => {
-      return excluded ? "Turn on" : "Remove custom location";
+      return excluded ? "turnOnProtection" : "removeCustomLocation";
     };
 
     return html`
-      <h1>${tr("productName")}</h1>
-      <p id="context-description">${contextDescriptionText()}</p>
+      <div class="wrapper">
+        <h1>${tr("productName")}</h1>
+        <p id="context-description">${tr(contextDescriptionText())}</p>
 
-      <div class="flex">
-        <img id="context-img" src="${getSrc()}" />
-        <p id="context-location">${getLocationText()}</p>
+        <div class="flex line-height">
+          <img id="context-img" src="${getSrc()}" />
+          <p id="context-location">${getLocationText()}</p>
+        </div>
       </div>
       <div class="flex">
-        <button
-          class="${resetButtonClasses()}"
-          id="removeContext"
-          @click="${removeContext}"
-        >
-          ${resetButtonContent()}
+        <button id="removeContext" @click="${removeContext}">
+          ${tr(resetButtonContent())}
         </button>
       </div>
     `;
   }
 
   static styles = css`
-    ${fontSizing}${resetSizing}
+    ${fontStyling}${resetSizing}
 
     h1 {
       font-size: 13px;
-      font-weight: 600;
-      margin-block: 0px 0.5rem;
-      padding-block-end: 1rem;
-      text-align: center;
-      border-bottom: 1px solid rgb(173, 173, 173, 0.8);
+      margin-block: 0px;
+      font-weight: normal;
+      font-family: "Inter Regular";
+      color: var(--grey40);
+      line-height: 21px;
+    }
+
+    .wrapper {
+      padding: 16px;
+    }
+
+    .line-height {
+      block-size: 21px;
     }
 
     .flex {
@@ -122,8 +131,8 @@ export class PageActionPopup extends LitElement {
     }
 
     #context-img {
-      margin-inline-end: 0.5rem;
-      block-size: 1rem;
+      margin-inline-end: 8px;
+      inline-size: 16px;
       margin-block: auto;
     }
 
@@ -132,44 +141,42 @@ export class PageActionPopup extends LitElement {
     } */
 
     p {
-      margin-block: 0.5rem;
+      margin-block: auto;
+      font-size: 13px;
     }
 
     button {
-      margin-block-start: 1rem;
-      margin-inline: auto 0;
-      font-weight: 500;
-      padding: 4px 16px;
+      margin-block: 8px;
+      margin-inline: 8px;
+      padding: 4px 8px;
       min-block-size: 32px;
       border-radius: 4px;
       border: none;
-      background: none;
+      background: rgba(255, 255, 255, 0);
+      width: 100%;
+      position: relative;
+      font-size: 13px;
+      text-align: left;
+      color: var(--button-secondary-text-color);
       transition: background 0.1s ease;
     }
 
-    .primary {
-      background: var(--button-primary-bg-default);
-      color: var(--button-primary-text-color);
+    button::before {
+      content: "";
+      height: 1px;
+      width: 100%;
+      position: absolute;
+      top: -8px;
+      left: 0;
+      right: 0;
+      background-color: #c4c3c5;
     }
 
-    .primary:hover {
-      background: var(--button-primary-bg-hover);
-    }
-
-    .primary:active {
-      background: var(--button-primary-bg-active);
-    }
-
-    .secondary {
-      background: var(--button-secondary-bg-default);
-      color: var(--button-secondary-text-color);
-    }
-
-    .secondary:hover {
+    button:hover {
       background: var(--button-secondary-bg-hover);
     }
 
-    .secondary:active {
+    button:active {
       background: var(--button-secondary-bg-active);
     }
   `;

@@ -10,8 +10,10 @@ export const ProxyUtils = {
    * @readonly
    * @type {string}
    */
-  getSiteContextsStorageKey() {
-    return "siteContexts";
+  SiteContextsStorageKey: "siteContexts",
+
+  getDirectProxyInfoObject() {
+    return { type: "direct" };
   },
 
   /**
@@ -53,6 +55,7 @@ export const ProxyUtils = {
     if (!matches) {
       return null;
     }
+
     return { ...matches.groups };
   },
 };

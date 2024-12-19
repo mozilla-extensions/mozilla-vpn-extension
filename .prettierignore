@@ -2,6 +2,7 @@
 build
 coverage
 src/vendor/*
+src/_locales/*
 **/*.yml
 **/*.md
 *.md

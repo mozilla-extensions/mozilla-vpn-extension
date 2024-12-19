@@ -61,20 +61,24 @@ export class StackView extends LitElement {
    * @param {HTMLElement} element - The element to push on top of the stack, must be an htmlelement
    */
   async push(element) {
+    const currentEl = this.currentElement;
+
     // Set it to "spawn outside of the box"
     const rect = this.getBoundingClientRect();
     this.baseStyleElement(element);
-    element.style.transition = `all 0s`;
     element.style.transform = `translateX(${rect.width}px)`;
     // Mount it into the component and wait to render
     this.viewStack = [...this.viewStack, element];
     this.requestUpdate();
     await this.updateComplete;
     // Now animate it to slide into 0/0
-    await new Promise((r) => setTimeout(r, this.animationTime * 1000));
+    await new Promise((r) => setTimeout(r, this.animationTime * 500));
     requestAnimationFrame(() => {
-      element.style.transition = `all ${this.animationTime}s`;
+      currentEl.style.opacity = ".5";
+      currentEl.style.transform = `translateX(-10px)`;
+
       element.style.transform = `translateX(0px)`;
+      element.style.opacity = 1;
     });
   }
 
@@ -82,12 +86,18 @@ export class StackView extends LitElement {
     const top = this.currentElement;
     const rect = this.getBoundingClientRect();
     top.style.transform = `translateX(${rect.width}px)`;
+
+    // Move the underlying item back into position
+    // and restore opacity
+    const bottom = this.#bottomElement;
+    bottom.style.transform = "translateX(0px)";
+    bottom.style.opacity = "1";
+
     // Wait for the popout animation to finish.
     // then we pop out the element and re render with the new top element as top.
     await new Promise((r) => setTimeout(r, this.animationTime * 1000));
     requestAnimationFrame(() => {
       this.requestUpdate();
-      top.style.transition = `all 0s`;
     });
     return this.viewStack.pop();
   }
@@ -120,7 +130,7 @@ export class StackView extends LitElement {
   /** @param {HTMLElement} element */
   baseStyleElement(element) {
     element.style.gridArea = "1 / 1 / span 1 / span 1";
-    element.style.transition = `all ${this.animationTime}s`;
+    element.style.transition = `all ${this.animationTime}s ease-in-out`;
     element.style.transform = `translateX(0px)`;
   }
   styleSelf() {

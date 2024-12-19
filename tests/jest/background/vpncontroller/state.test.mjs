@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 import { describe, expect, test } from "@jest/globals";
 import {
   StateVPNDisabled,
@@ -19,58 +23,5 @@ describe("VPN State Machine", () => {
   test("Can Create all States", () => {
     const result = STATE_CONSTRUCTORS.map((state) => new state());
     expect(result.length).toBe(STATE_CONSTRUCTORS.length);
-  });
-
-  test("Can Create a State from another keeping data", () => {
-    const stateA = new VPNState();
-    // Servers is persistent, so if we call new State(oldState)
-    stateA.servers.push({ cities: [], code: "de", name: "GERMONY" });
-    stateA.isExcluded = true;
-
-    const endstate = STATE_CONSTRUCTORS.reduce(
-      (state, nextstate) => new nextstate(state),
-      stateA
-    );
-    expect(endstate.servers[0].name).toBe(stateA.servers[0].name);
-    expect(endstate.servers[0].code).toBe(stateA.servers[0].code);
-    expect(endstate.isExcluded).toBe(stateA.isExcluded);
-  });
-
-  test("The Proxy Field is Set in 'Enabled' and Removed on Other states", () => {
-    const testState = new StateVPNEnabled();
-    // Servers is persistent, so if we call new State(oldState)
-    testState.loophole = "aaa";
-
-    expect(new StateVPNEnabled(testState).loophole).toBe(testState.loophole);
-    expect(new StateVPNDisabled(testState).loophole).toBe(false);
-    expect(new StateVPNUnavailable(testState).loophole).toBe(false);
-    expect(new VPNState(testState).loophole).toBe(false);
-  });
-  test("The ExitServer Field is Set in 'Enabled' and Removed on Other states", () => {
-    const testCity = new ServerCity();
-    testCity.code = "de";
-    testCity.name = "Berlino";
-    testCity.servers = [];
-    const testState = new StateVPNEnabled(
-      {
-        exitServerCity: testCity,
-      },
-      "aaa"
-    );
-
-    expect(testState.exitServerCity.code).toBe(testCity.code);
-
-    expect(new StateVPNEnabled(testState).exitServerCity.code).toBe(
-      testState.exitServerCity.code
-    );
-    expect(new StateVPNDisabled(testState).exitServerCity.code).toBe(
-      testState.exitServerCity.code
-    );
-    expect(new StateVPNUnavailable(testState).exitServerCity.code).toBe(
-      testState.exitServerCity.code
-    );
-    expect(new VPNState(testState).exitServerCity.code).toBe(
-      testState.exitServerCity.code
-    );
   });
 });

@@ -3,7 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { Component } from "./component.js";
-import { VPNController, VPNState } from "./vpncontroller/index.js";
+import {
+  ExtensionController,
+  FirefoxVPNState,
+} from "./extensionController/index.js";
 
 /**
  * ToolbarIconHandler updates the browserAction (toolbar) icon
@@ -14,20 +17,27 @@ export class ToolbarIconHandler extends Component {
   /**
    *
    * @param {*} receiver
-   * @param {VPNController} controller
+   * @param {ExtensionController} extController
    */
-  constructor(receiver, controller) {
+  constructor(receiver, extController, vpnController) {
     super(receiver);
-    this.controller = controller;
+    this.extController = extController;
+    this.vpnController = vpnController;
   }
 
-  // TODO Use TBD ExtensionState
-  /** @type {VPNState | undefined} */
-  controllerState;
+  /** @type {FirefoxVPNState | undefined} */
+  extState;
+
+  vpnState;
 
   async init() {
-    this.controller.state.subscribe((s) => {
-      this.controllerState = s;
+    this.extController.state.subscribe((s) => {
+      this.extState = s;
+      this.maybeUpdateBrowserActionIcon();
+    });
+
+    this.vpnController.state.subscribe((s) => {
+      this.vpnState = s;
       this.maybeUpdateBrowserActionIcon();
     });
 
@@ -37,24 +47,53 @@ export class ToolbarIconHandler extends Component {
       .addEventListener("change", (e) => {
         this.maybeUpdateBrowserActionIcon();
       });
+
+    // Catch changes between private and non-private browsing windows
+    browser.windows.onFocusChanged.addListener(
+      this.maybeUpdateBrowserActionIcon.bind(this)
+    );
+
+    // Catch changes between private and non-private browsing modes
+    // when a new window is opened.
+    browser.windows.onCreated.addListener(
+      this.maybeUpdateBrowserActionIcon.bind(this)
+    );
   }
 
-  maybeUpdateBrowserActionIcon() {
-    // TODO: Checkl onboarding status
-    // and show icon with blue dot if
-    // onboarding is not complete...
-
-    const scheme =
-      window.matchMedia &&
-      !!window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "light"
-        : "dark";
-
+  setIcon(scheme, status, id) {
     browser.browserAction.setIcon({
       path: {
-        16: `./../assets/logos/browserAction/logo-${scheme}-${this.controllerState.state.toLowerCase()}.svg`,
-        32: `./../assets/logos/browserAction/logo-${scheme}-${this.controllerState.state.toLowerCase()}.svg`,
+        16: `./../assets/logos/browserAction/logo-${scheme}-${status}.svg`,
+        32: `./../assets/logos/browserAction/logo-${scheme}-${status}.svg`,
       },
+      windowId: id,
     });
+  }
+
+  async maybeUpdateBrowserActionIcon() {
+    const windowInfo = await browser.windows.getCurrent();
+    if (!windowInfo) {
+      return;
+    }
+
+    const darkMode =
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+    const scheme = darkMode || windowInfo.incognito ? "light" : "dark";
+
+    let status = ["Connecting", "Enabled"].includes(this.extState.state)
+      ? "enabled"
+      : "disabled";
+
+    const stability = this.vpnState?.connectionHealth;
+
+    if (!stability || stability == "Stable") {
+      return this.setIcon(scheme, status, windowInfo.id);
+    }
+
+    status = stability === "Unstable" ? "unstable" : "disabled";
+
+    return this.setIcon(scheme, status, windowInfo.id);
   }
 }

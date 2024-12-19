@@ -2,7 +2,25 @@
  * License, v. 2.0. If a copy of the MPL was not distributed wtesth this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { describe, expect, test, jest } from "@jest/globals";
+import { beforeEach, describe, expect, test, jest } from "@jest/globals";
+
+// Mock the browser API
+const mockQuery = jest.fn();
+const mockReload = jest.fn();
+
+global.browser = {
+  tabs: {
+    query: mockQuery,
+    reload: mockReload,
+  },
+};
+const makeTab = (host, active = true, id = 0) => {
+  return {
+    url: `https://${host}/index.html`,
+    active,
+    id,
+  };
+};
 
 import { TabReloader } from "../../../src/background/tabReloader";
 describe("TabReloader", () => {
@@ -10,11 +28,6 @@ describe("TabReloader", () => {
     /**
      * @returns {browser.tabs.Tab}
      */
-    const makeTab = (host) => {
-      return {
-        url: `https://${host}/index.html`,
-      };
-    };
     test("Returns a function", () => {
       const func = TabReloader.matches("");
       expect(typeof func).toBe("function");
@@ -35,60 +48,24 @@ describe("TabReloader", () => {
       expect(out.length).toBe(1);
     });
   });
-  describe("TabReloader::needsDiscard", () => {
-    /**
-     * @returns {browser.tabs.Tab}
-     */
-    const makeTestCase = (result, discarded, active, audible) => {
-      return [{ discarded, active, audible }, result];
-    };
-    const testCases = [
-      // Not discareded Background tab => true
-      makeTestCase(true, false, false, false),
-      // Not discarded Background tab but playing audio => false
-      makeTestCase(false, false, false, true),
-      // Active Tab => false (will reload)
-      makeTestCase(false, false, true, false),
-      // Active Tab && Playing audio  => false
-      makeTestCase(false, false, true, true),
-      // Discarded Tabs => False
-      makeTestCase(false, true, false, false),
-      makeTestCase(false, true, false, true),
-      makeTestCase(false, true, true, false),
-      makeTestCase(false, true, true, true),
-    ];
-    testCases.forEach(([o, expected]) => {
-      test(`needsDiscard(${JSON.stringify(o)}) => ${expected}`, () => {
-        expect(TabReloader.needsDiscard(o)).toBe(expected);
-      });
+
+  describe("TabReloader::onOriginChanged", () => {
+    beforeEach(() => {
+      mockQuery.mockReset();
+      mockReload.mockReset();
     });
-  });
-  describe("TabReloader::needsReload", () => {
-    /**
-     * @returns {browser.tabs.Tab}
-     */
-    const makeTestCase = (result, discarded, active, audible) => {
-      return [{ discarded, active, audible }, result];
-    };
-    const testCases = [
-      // Not discareded Background tab => true
-      makeTestCase(false, false, false, false),
-      // Not discarded Background tab but playing audio => false
-      makeTestCase(false, false, false, true),
-      // Active Tab => true
-      makeTestCase(true, false, true, false),
-      // Active Tab && Playing audio  => *FALSE*
-      makeTestCase(false, false, true, true),
-      // Discarded Tabs => False
-      makeTestCase(false, true, false, false),
-      makeTestCase(false, true, false, true),
-      makeTestCase(false, true, true, false),
-      makeTestCase(false, true, true, true),
-    ];
-    testCases.forEach(([o, expected]) => {
-      test(`needsReload(${JSON.stringify(o)}) => ${expected}`, () => {
-        expect(TabReloader.needsReload(o)).toBe(expected);
-      });
+
+    it("Only reloads an active tab", async () => {
+      mockQuery.mockReturnValue(
+        Promise.resolve([
+          makeTab("google.com", true, 10),
+          makeTab("google.com", true, 11), // we can have 2 active tabs in multiple windows
+          makeTab("schmoogle.com", true, 99),
+        ])
+      );
+
+      await TabReloader.onOriginChanged("google.com");
+      expect(mockReload).toHaveBeenCalledTimes(2);
     });
   });
 });

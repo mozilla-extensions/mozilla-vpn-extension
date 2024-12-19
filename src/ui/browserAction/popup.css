@@ -3,9 +3,27 @@
    file, You can obtain one at http://mozilla.org/MPL/2.0/. 
 */
 
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  overscroll-behavior: none;
+}
+
 body {
   width: var(--window-width);
   background-color: var(--panel-bg-color);
   padding: 0;
   margin: 0;
+}
+
+.limit-panel-height {
+  max-height: calc(var(--window-max-height) - var(--nav-height));
+  max-block-size: calc(var(--window-max-height)- var(--nav-height));
+  overflow-y: scroll;
+}
+
+.needsSlotted > * {
+  display: none;
 }

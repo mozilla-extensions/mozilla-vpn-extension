@@ -9,13 +9,26 @@ import {
   render,
   createRef,
   ref,
+  live,
 } from "../../vendor/lit-all.min.js";
 
-import { vpnController, proxyHandler } from "./backend.js";
+import {
+  vpnController,
+  proxyHandler,
+  extController,
+  butterBarService,
+  telemetry,
+} from "./backend.js";
 
 import { Utils } from "../../shared/utils.js";
 import { tr } from "../../shared/i18n.js";
-import { fontSizing, resetSizing } from "../../components/styles.js";
+import {
+  fontStyling,
+  ghostButtonStyles,
+  resetSizing,
+  inUseLabel,
+  positioner,
+} from "../../components/styles.js";
 
 // Other components used
 import "./../../components/stackview.js";
@@ -23,8 +36,11 @@ import "./../../components/serverlist.js";
 import "./../../components/vpncard.js";
 import "./../../components/titlebar.js";
 import "./../../components/iconbutton.js";
+import "./../../components/mz-rings.js";
+import "./../../components/butter-bar.js";
 import { SiteContext } from "../../background/proxyHandler/siteContext.js";
 import {
+  ServerCity,
   ServerCountry,
   VPNState,
 } from "../../background/vpncontroller/states.js";
@@ -42,36 +58,69 @@ import {
  */
 export class BrowserActionPopup extends LitElement {
   static properties = {
+    servers: { type: Object },
     vpnState: { type: Object },
+    extState: { type: Object },
     pageURL: { type: String },
     _siteContext: { type: Object },
     hasSiteContext: { type: Boolean },
+    _siteContexts: { type: Array },
+    allowDisconnect: { type: Boolean },
+    alerts: { type: Array },
   };
 
   constructor() {
     super();
     this.pageURL = null;
     this._siteContext = null;
+    /** @type {VPNState} */
+    this.vpnState = null;
     browser.tabs.onUpdated.addListener(() => this.updatePage());
     browser.tabs.onActivated.addListener(() => this.updatePage());
     vpnController.state.subscribe((s) => (this.vpnState = s));
+    vpnController.servers.subscribe((s) => (this.servers = s));
+    proxyHandler.siteContexts.subscribe((s) => {
+      this._siteContexts = s;
+    });
+    extController.state.subscribe((s) => {
+      this.extState = s;
+      this.updatePage();
+    });
+    butterBarService.butterBarList.subscribe((s) => {
+      this.alerts = s;
+      this.updatePage();
+    });
     this.updatePage();
+    extController.allowDisconnect.subscribe((s) => {
+      this.allowDisconnect = s;
+    });
   }
   updatePage() {
-    /** @type {VPNState} */
-    this.vpnState = null;
     Utils.getCurrentTab().then(async (tab) => {
       if (!Utils.isValidForProxySetting(tab.url)) {
         this.pageURL = null;
         this._siteContext = null;
+        this.hasSiteContext = false;
         return;
       }
-      const hostname = Utils.getFormattedHostname(tab.url);
+      const hostname = Utils.getTopLevelDomain(tab.url);
       this.pageURL = hostname;
-      if (proxyHandler.siteContexts.value.has(this.pageURL)) {
+      if (this._siteContexts.has(this.pageURL)) {
         this._siteContext = proxyHandler.siteContexts.value.get(this.pageURL);
       }
     });
+    this.resizePopup();
+  }
+
+  // Hackfix for FXVPN-178
+  // Extension's height does not respond when elements leave the DOM
+  resizePopup() {
+    const conditionalView = document.getElementById("conditional-view");
+    if (!conditionalView) {
+      return;
+    }
+    document.body.style.height = conditionalView.offsetHeight + "px";
+    document.body.style.height = "auto";
   }
 
   connectedCallback() {
@@ -81,6 +130,15 @@ export class BrowserActionPopup extends LitElement {
     });
     requestIdleCallback(() => {
       vpnController.postToApp("servers");
+    });
+    requestIdleCallback(() => {
+      vpnController.postToApp("featurelist");
+    });
+    requestIdleCallback(() => {
+      vpnController.postToApp("interventions");
+    });
+    requestIdleCallback(() => {
+      telemetry.record("main_screen");
     });
   }
 
@@ -94,7 +152,7 @@ export class BrowserActionPopup extends LitElement {
     if (value) {
       proxyHandler.addSiteContext(value);
     } else {
-      proxyHandler.removeContextForOrigin(this._siteContext.origin);
+      proxyHandler.removeContextForOrigin(this.pageURL);
     }
     this._siteContext = value;
   }
@@ -105,60 +163,84 @@ export class BrowserActionPopup extends LitElement {
   stackView = createRef();
 
   render() {
+    const handleVPNToggle = () => {
+      if (!this.enabled) {
+        telemetry.record("used_feature_disable_firefox_protection");
+        telemetry.record("fx_protection_disabled");
+      } else {
+        telemetry.record("fx_protection_enabled");
+      }
+      extController.toggleConnectivity();
+    };
+
     const back = () => {
       this.stackView?.value?.pop().then(() => {
         this.requestUpdate();
       });
     };
+
     const canGoBack = (() => {
       if (!this.stackView.value) {
         return false;
       }
       return this.stackView?.value?.count > 1;
     })();
+
     let title = this.stackView?.value?.currentElement?.dataset?.title;
     title ??= tr("productName");
-
-    let card = html`
-      <vpn-card
-        .enabled=${this.vpnState?.connected}
-        .cityName=${this.vpnState?.exitServerCity?.name}
-        .countryFlag=${this.vpnState?.exitServerCountry?.code}
-        .connectedSince=${this.vpnState?.connectedSince}
-      ></vpn-card>
-    `;
-    if (!this.vpnState.alive) {
-      card = html`<vpn-card-placeholder></vpn-card-placeholder>`;
-    }
 
     return html`
       <vpn-titlebar title="${title}" ${ref(this.titleBar)}>
         ${canGoBack ? BrowserActionPopup.backBtn(back) : null}
-        <mz-iconlink
-          alt=${tr("altTextOpenSettingsPage")}
-          href="/ui/settingsPage/index.html"
-          icon="settings-cog"
-          slot="right"
-        ></mz-iconlink>
+        ${!canGoBack
+          ? BrowserActionPopup.settingsIcon(this.openSettingsPanel)
+          : null}
       </vpn-titlebar>
       <stack-view ${ref(this.stackView)}>
-        <section data-title="Mozilla VPN">
-          <main>${card} ${this.locationSettings()}</main>
+        <section data-title="Mozilla VPN" class="limit-panel-height">
+          <main>
+            <div class="butter-bar-holder">
+              ${this.alerts.map(
+                (alert) => html`
+                  <butter-bar
+                    .alertId=${alert.alertId}
+                    .alertMessage=${alert.alertMessage}
+                    .linkText=${alert.linkText}
+                    .linkUrl=${alert.linkUrl}
+                  >
+                  </butter-bar>
+                `
+              )}
+            </div>
+            <vpn-card
+              @toggle=${handleVPNToggle}
+              .enabled=${this.extState?.enabled}
+              .clientConnected=${this.vpnState?.connected}
+              .cityName=${this.vpnState?.exitServerCity?.name}
+              .countryFlag=${this.vpnState?.exitServerCountry?.code}
+              .connectedSince=${this.extState?.connectedSince}
+              .stability=${this.vpnState?.connectionHealth}
+              .hasContext=${this._siteContext}
+              .connecting=${this.extState?.connecting}
+              .allowDisconnect=${this.allowDisconnect}
+            ></vpn-card>
+            ${this.locationSettings()}
+          </main>
         </section>
       </stack-view>
     `;
   }
 
   locationSettings() {
-    if (!this.pageURL) {
+    if (!this.pageURL || !this.extState.enabled) {
       return null;
     }
-    const resetSitePrefrences = async () => {
+    const resetSitePreferences = async () => {
       this.currentSiteContext = null;
     };
     const toggleExcludeWebsite = async () => {
       if (this.currentSiteContext.excluded) {
-        resetSitePrefrences();
+        resetSitePreferences();
         return;
       }
       const new_cntxt = {
@@ -169,120 +251,252 @@ export class BrowserActionPopup extends LitElement {
       this.currentSiteContext = new_cntxt;
     };
 
-    return BrowserActionPopup.sitePrefrencesTemplate(
+    const getExclusionStringElem = (origin) => {
+      const originPlaceholder = "dummyString";
+      const localizedString = tr("excludePageFor", originPlaceholder);
+      // Create a new <p> element
+      const el = document.createElement("p");
+
+      // Replace "dummyString" with <span>origin</span>
+      const parts = localizedString.split(originPlaceholder);
+      return html`
+        <p class="text-secondary">
+          ${parts.at(0)}
+          <span class="origin bold">${origin}</span>
+          ${parts.at(-1)}
+        </p>
+      `;
+    };
+
+    const openGiveFeedback = () => {
+      browser.tabs.create({
+        url: "https://qsurvey.mozilla.com/s3/VPN-Extension-Feedback",
+      });
+      window.close();
+    };
+
+    return BrowserActionPopup.sitePreferencesTemplate(
       this.currentSiteContext,
       this.openServerList.bind(this),
       toggleExcludeWebsite,
       (ctx = new SiteContext()) => {
-        return Utils.nameFor(
-          ctx.countryCode,
-          ctx.cityCode,
-          this.vpnState.servers
-        );
+        return Utils.nameFor(ctx.countryCode, ctx.cityCode, this.servers);
       },
-      resetSitePrefrences,
-      this._siteContext !== null
+      resetSitePreferences,
+      this._siteContext !== null,
+      getExclusionStringElem,
+      openGiveFeedback
     );
   }
 
-  openServerList() {
-    const onSelectServerResult = (event) => {
-      this.stackView.value?.pop().then(() => {
-        this.requestUpdate();
-      });
-      const city = event?.detail?.city;
-      const country = event?.detail?.country;
-      if (city) {
-        const newSiteContext = new SiteContext({
-          cityCode: city.code,
-          countryCode: country.code,
-          origin: this.pageURL,
-          excluded: false,
-        });
-        this.currentSiteContext = newSiteContext;
-      }
-    };
-    const serverListElement = BrowserActionPopup.createServerList(
-      this.vpnState.servers,
-      onSelectServerResult
+  async openSettingsPanel() {
+    const settingsPanelElement = BrowserActionPopup.createSettingsPanel();
+    await this.stackView.value?.push(settingsPanelElement);
+    this.requestUpdate();
+  }
+
+  async openServerList() {
+    let serverListResult = Promise.withResolvers();
+
+    const ctx = this._siteContext;
+    const serverListSelectedCity = Utils.getCity(
+      ctx?.countryCode,
+      ctx?.cityCode,
+      this.servers
     );
-    this.stackView.value?.push(serverListElement).then(() => {
+
+    const serverListElement = BrowserActionPopup.createServerList(
+      serverListSelectedCity,
+      this.servers,
+      (e) => serverListResult.resolve(e.detail)
+    );
+    // Push onto the Stackview and request an update as the
+    // we read the stackview's top for the titlebar
+    await this.stackView.value?.push(serverListElement);
+    this.requestUpdate();
+
+    const { city, country } = await serverListResult.promise;
+    // We're done with the server list, pop it off the stackview
+    this.stackView.value?.pop().then(() => {
       this.requestUpdate();
     });
+    if (!city) {
+      // Remove the site context
+      this.currentSiteContext = null;
+      return;
+    }
+    const newSiteContext = new SiteContext({
+      cityCode: city.code,
+      countryCode: country.code,
+      origin: this.pageURL,
+      excluded: false,
+    });
+    this.currentSiteContext = newSiteContext;
   }
 
-  static sitePrefrencesTemplate(
+  static sitePreferencesTemplate(
     siteContext = new SiteContext(),
     openServerList = () => {},
-    tooggleExcluded = () => {},
+    toggleExcluded = () => {},
     getNameForContext = (ctx = new SiteContext()) => {
       return "";
     },
     removeSiteContext = () => {},
-    hasSiteContext = false
+    hasSiteContext = false,
+    getExclusionStringElem = () => {},
+    openGiveFeedback = () => {}
   ) {
     const pageLocationPicker = (() => {
-      if (siteContext.excluded) {
-        return null;
-      }
       return html`
-        <h2>${tr("titleServerList")}</h2>
-        <div class="row" id="selectPageLocation" @click=${openServerList}>
-          <img
-            src="../../assets//flags/${siteContext.countryCode}.png"
-            height="24"
-            width="24"
-          />
-          <p>${getNameForContext(siteContext)}</p>
+        <h2 class="select-location-title">${tr("selectWebsiteLocation")}</h2>
+        <button
+          class="row ghost-btn "
+          id="selectPageLocation"
+          .disabled=${live(siteContext.excluded)}
+          @click=${openServerList}
+        >
+          <div class="positioner">
+            <img
+              src="../../assets/flags/${siteContext.countryCode.toUpperCase()}.png"
+              height="16"
+              width="16"
+              class="flag"
+            />
+          </div>
+          <p class="text-secondary">${getNameForContext(siteContext)}</p>
+          ${hasSiteContext && !siteContext.excluded
+            ? html`<span class="in-use in-use-light"> In Use </span>`
+            : null}
           <img
             src="../../assets/img/arrow-icon-right.svg"
             height="12"
             width="12"
             class="arrow"
           />
-        </div>
+        </button>
       `;
     })();
 
     return html`
       <h1>${tr("titlePageSettings")}</h1>
       <div class="row">
-        <input
-          type="checkbox"
-          ?checked=${siteContext.excluded}
-          @click=${tooggleExcluded}
-        />
-        <p>${tr("exludePageFor", siteContext.origin)}</p>
+        <div class="positioner checkbox-positioner">
+          <input
+            type="checkbox"
+            .checked=${live(siteContext.excluded)}
+            @click=${toggleExcluded}
+          />
+        </div>
+        ${getExclusionStringElem(siteContext.origin)}
       </div>
       ${pageLocationPicker}
-      ${hasSiteContext
-        ? html`<button id="selectLocation" @click=${removeSiteContext}>
-            ${tr("resetPageSettings")}
-          </button>`
-        : null}
+      <button
+        id="selectLocation"
+        class=${hasSiteContext ? "" : "disabled"}
+        @click=${removeSiteContext}
+      >
+        ${tr("resetPageSettings")}
+      </button>
+      <button id="give-feedback" @click=${openGiveFeedback} class="ghost-btn">
+        ${tr("giveFeedback")}
+      </button>
     `;
   }
   static backBtn(back) {
-    return html`<img
-      slot="left"
-      src="../../assets/img/arrow-icon-left.svg"
+    return html` <mz-iconlink
       @click=${back}
-    />`;
+      alt="${tr("back")}"
+      icon="arrow-icon-left"
+      slot="left"
+    ></mz-iconlink>`;
+  }
+
+  static settingsIcon(openSettings) {
+    return html`
+      <mz-iconlink
+        @click=${openSettings}
+        alt=${tr("altTextOpenSettingsPage")}
+        icon="settings-cog"
+        slot="right"
+      ></mz-iconlink>
+    `;
+  }
+
+  static createSettingsPanel() {
+    const viewElement = document.createElement("section");
+    viewElement.classList = ["settings-panel"];
+    viewElement.dataset.title = "Settings";
+
+    const openInNewTab = (url) => {
+      browser.tabs.create({ url });
+      window.close();
+    };
+
+    const settingsLinks = [
+      {
+        title: tr("websitePreferences"),
+        onClick: () => {
+          openInNewTab("/ui/settingsPage/index.html");
+        },
+        iconId: "websitePreferences",
+      },
+      {
+        title: tr("helpCenter"),
+        onClick: () => {
+          openInNewTab(
+            "https://support.mozilla.org/products/firefox-private-network-vpn/settings/add-ons-extensions-and-themes"
+          );
+        },
+        iconId: "helpCenter",
+      },
+      {
+        title: tr("contactSupport"),
+        onClick: () => {
+          openInNewTab(
+            "https://support.mozilla.org/questions/new/firefox-private-network-vpn/form"
+          );
+        },
+        iconId: "contactSupport",
+      },
+    ];
+
+    render(
+      html`
+        <ul id="settingsList">
+          ${settingsLinks.map(
+            (link) => html`
+              <li>
+                <button class="${link.iconId}" @click=${link.onClick}>
+                  ${link.title}
+                </button>
+              </li>
+            `
+          )}
+        </ul>
+      `,
+      viewElement
+    );
+    return viewElement;
   }
   /**
-   *
+   * @param {ServerCity?} currentCity
    * @param { import("./../../components/serverlist.js").ServerCountryList } list - The ServerList to Render
    * @param {($0: Event)=>{} } onResult - A callback fired when a city or "back" is clicked.
    *                                    - Contains an HTML Event with Optinal
    *                                    - { detail.city : ServerCity }
    * @returns {HTMLElement} - An already rendered Element, ready to put into the DOM
    */
-  static createServerList(list = [], onResult = () => {}) {
+  static createServerList(currentCity = null, list = [], onResult = () => {}) {
     const viewElement = document.createElement("section");
-    viewElement.dataset.title = "Select Location";
+    viewElement.classList = ["limit-panel-height"];
+    viewElement.dataset.title = tr("titleServerList");
     render(
       html`
-        <server-list .serverList=${list} @selectedCityChanged=${onResult}>
+        <server-list
+          .selectedCity=${currentCity}
+          .serverList=${list}
+          @selectedCityChanged=${onResult}
+        >
         </server-list>
       `,
       viewElement
@@ -291,71 +505,90 @@ export class BrowserActionPopup extends LitElement {
   }
 
   static styles = css`
-    ${fontSizing}${resetSizing}
+    ${fontStyling}${resetSizing}${ghostButtonStyles}${inUseLabel}${positioner}
     section {
       background-color: var(--panel-bg-color);
     }
 
-    main {
-      padding: var(--padding-default);
+    section.limit-panel-height {
+      overflow-y: scroll;
     }
+
+    main {
+      padding: var(--padding-default) var(--padding-default) 0
+        var(--padding-default);
+      max-inline-size: var(--window-width);
+    }
+
+    .positioner.checkbox-positioner {
+      margin-block: 0px auto;
+    }
+
     * {
       color: var(--text-color-primary);
       font-family: var(--font-family);
     }
+
     .row {
       display: flex;
-      justify-content: center;
       align-items: center;
     }
-    .row p {
-      flex: 1;
-      flex-grow: 1;
+
+    .in-use {
+      margin: auto auto auto 8px;
     }
-    .row img:first-child {
-      margin-right: var(--padding-default);
+
+    .arrow {
+      margin: auto 0 auto auto;
     }
-    .row img:last-of-type {
-      margin-left: var(--padding-default);
+
+    .flag {
+      margin: auto;
     }
+
     #selectPageLocation {
-      transition: all 0.15s ease;
-      background: transparent;
-      border-radius: 10px;
-      padding: calc(var(--padding-default) / 2) 0px;
+      padding: 0;
       position: relative;
+      margin-block: 0px;
+      color: var(--text-secondary-color);
+      display: flex;
+      height: 40;
+      justify-content: flex-start;
     }
+
     #selectPageLocation:hover {
       cursor: default;
     }
-    #selectPageLocation:hover::before {
-      content: " ";
-      opacity: 0.9;
-    }
+
     #selectPageLocation::before {
-      content: " ";
-      z-index: -1;
-      opacity: 0;
-      background: lch(from var(--panel-bg-color) calc(l - 15) c h);
-      transform: all 0.5s ease;
-      background: white;
-      width: 105%;
-      height: 105%;
-      border-radius: 5px;
-      position: absolute;
-      top: -2.5%;
-      left: -2.5%;
+      inset: 0px -8px;
+    }
+
+    #selectPageLocation p {
+      text-align: left;
     }
 
     vpn-card {
       display: block;
-      margin-bottom: calc(var(--padding-default) * 1);
+      margin-bottom: 16px;
     }
-    h1,
-    h2,
+
+    h1 {
+      margin-block: 0 simportant!;
+      padding-block: 8px 16px !important;
+    }
+
+    .origin.bold {
+      word-break: break-word;
+      max-width: 260px;
+    }
     h3 {
-      margin-top: calc(var(--padding-default) / 2);
-      margin-bottom: calc(var(--padding-default) / 2);
+      margin-block: calc(var(--padding-default) / 2) 0px;
+    }
+
+    h2 {
+      margin-block-start: var(--padding-default);
+      margin-block-end: 0px !important;
     }
 
     input {
@@ -364,6 +597,7 @@ export class BrowserActionPopup extends LitElement {
       border: 1px solid var(--border-color);
       background-color: var(--panel-bg-color);
     }
+
     input + p {
       margin-left: var(--padding-default);
     }
@@ -372,27 +606,104 @@ export class BrowserActionPopup extends LitElement {
       width: 100%;
       border-radius: 4px;
       padding: 8px, 16px, 8px, 16px;
-      size: 16px;
-      font-weight: 600;
-      border: 1px solid var(--action-button-color);
+      font-size: 16px;
+      border: 2px solid var(--action-button-color);
       color: var(--action-button-color);
       background-color: transparent;
       padding: 10px;
-      margin-top: var(--padding-default);
+      margin-block: var(--padding-default);
+      font-weight: normal;
+      font-family: "Inter Semi Bold";
     }
 
-    .disabled {
-      cursor: not-allowed;
-      pointer-events: none;
+    #selectPageLocation:disabled,
+    #selectLocation.disabled {
       opacity: 0.5;
+      pointer-events: none;
+    }
+
+    #selectLocation {
+      margin-block-end: 0px;
+    }
+
+    #give-feedback {
+      margin-block: 8px 16px;
+      border: none;
+      font-family:;
+      font-size: 15px;
+    }
+
+    #settingsList {
+      width: 100%;
+    }
+
+    #settingsList li {
+      margin: 8px;
+    }
+
+    #settingsList button {
+      inline-size: 100%;
+      text-align: left;
+      block-size: 40px;
+      background: lch(from var(--action-button-color) l c h / 0);
+      padding-left: 48px;
+      position: relative;
+      color: var(--grey50);
+      outline: none;
+      border: 2px solid transparent;
+      margin: 0;
+      font-size: 15px;
+      transition: background 0.2s ease-in-out;
+    }
+
+    #settingsList button::before,
+    #settingsList button::after {
+      content: "";
+      block-size: 24px;
+      inline-size: 24px;
+      display: inline-block;
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-size: contain;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      margin-block: auto;
+    }
+
+    #settingsList button::before {
+      left: 8px;
+    }
+
+    #settingsList button::after {
+      position: absolute;
+      right: 16px;
+      background-image: url("../../assets/img/open-in-web.svg");
+    }
+
+    .contactSupport::before {
+      background-image: url("../../assets/img/mail.svg");
+    }
+
+    .websitePreferences::before {
+      background-image: url("../../assets/img/developer.svg");
+    }
+
+    .helpCenter::before {
+      background-image: url("../../assets/img/question.svg");
     }
 
     @media (prefers-color-scheme: dark) {
-      .arrow {
+      #settingsList button {
+        color: var(--text-color-headline);
+      }
+      .arrow,
+      #settingsList button::before {
         filter: invert();
       }
-      #selectPageLocation::before {
-        background: lch(from var(--panel-bg-color) calc(l + 15) c h);
+
+      #settingsList button::after {
+        filter: grayscale(1) brightness(2);
       }
     }
   `;

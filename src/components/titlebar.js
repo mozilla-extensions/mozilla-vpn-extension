@@ -50,8 +50,10 @@ export class TitleBar extends LitElement {
       margin: 0;
       font-size: 16px;
       line-height: 24px;
-      font-weight: 600;
+      font-family: "Inter Semi Bold";
       grid-column: 2/3;
+      font-weight: normal;
+      color: var(--text-color-headline);
     }
     nav {
       display: grid;
@@ -62,20 +64,9 @@ export class TitleBar extends LitElement {
 
       justify-items: center;
       align-items: center;
-      height: 48px;
+      block-size: var(--nav-height);
       padding: 0px 16px;
-      border-bottom: 1px solid var(--border-color);
-      margin-bottom: 5px;
-    }
-    /**
-        * We expect inside the slots to be gray, 
-        * so given those svg do not react to prefers-color-scheme 
-        * let's just invert them and prey that looks okay :)
-        */
-    @media (prefers-color-scheme: dark) {
-      .slots {
-        filter: invert();
-      }
+      border-bottom: 1px solid var(--divider-color);
     }
   `;
 }

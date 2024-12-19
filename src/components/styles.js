@@ -82,32 +82,144 @@ export const resetSizing = css`
   }
 `;
 
-export const fontSizing = css`
+export const fontStyling = css`
   * {
     font-family: var(--font-family);
   }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  p,
+  span,
+  button {
+    font-weight: normal;
+  }
   h1 {
-    font-weight: 600;
     font-size: 18px;
     line-height: 27px;
+    font-family: "Inter Semi Bold";
   }
   h2 {
-    font-weight: 600;
-    font-size: 16px;
-    line-height: 24px;
+    font-size: 14px;
+    line-height: 21px;
+    font-family: "Inter Semi Bold";
   }
   h3 {
-    font-weight: normal;
     font-size: 16px;
   }
   p,
   em,
   span {
-    font-weight: 400;
     font-size: 14px;
     line-height: 21px;
   }
   .bold {
-    font-weight: 600;
+    font-family: "Inter Semi Bold";
+  }
+
+  .text-secondary {
+    color: var(--text-secondary-color);
+  }
+`;
+
+export const inCopyLink = css`
+  a.in-copy-link {
+    margin-inline-start: 2px;
+    color: var(--in-copy-link-text-color);
+  }
+
+  .in-copy-link:hover {
+    color: var(--in-copy-link-text-color-hover);
+  }
+
+  .in-copy-link:active {
+    color: var(--in-copy-link-text-color-active);
+  }
+`;
+
+export const ghostButtonStyles = css`
+  button.ghost-btn {
+    background-color: transparent;
+    border: none;
+    border-radius: var(--button-border-radius);
+    outline: none !important;
+    min-block-size: 40px;
+    position: relative;
+  }
+
+  .ghost-icon-btn {
+    inline-size: 40px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+  .ghost-btn::before {
+    content: " ";
+    pointer-events: none;
+    background: lch(from var(--button-ghost-bg-color) l c h / 0);
+    transition: var(--button-transition);
+    border-radius: var(--button-border-radius);
+    position: absolute;
+    inset: 0px;
+  }
+
+  .ghost-btn:hover::before,
+  #settingsList button:hover {
+    background: lch(from var(--button-ghost-bg-color) l c h / 0.1);
+  }
+
+  .ghost-btn:focus-visible::before,
+  #settingsList button:focus-visible {
+    border: 2px solid lch(from var(--button-ghost-bg-color) l c h / 0.5);
+  }
+
+  .ghost-btn:active::before,
+  #settingsList button:active {
+    background: lch(from var(--button-ghost-bg-color) l c h / 0.15);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .ghost-icon-btn img {
+      filter: invert(1);
+    }
+  }
+`;
+
+export const positioner = css`
+  .positioner {
+    inline-size: 24px;
+    block-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-inline-end: 8px;
+    flex: 0 0 auto;
+  }
+`;
+
+export const inUseLabel = css`
+  .in-use {
+    font-size: 11px;
+    font-weight: bold;
+    margin: 0px 10px;
+    padding: 6px 10px;
+    background: var(--main-card--pill-background);
+    opacity: 0.9;
+    border-radius: 6px;
+    line-height: inherit;
+  }
+
+  .in-use-light {
+    background-color: #e7e7e7;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .in-use {
+      background: rgba(255, 255, 255, 0.15);
+    }
   }
 `;

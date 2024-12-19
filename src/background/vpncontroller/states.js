@@ -4,8 +4,6 @@
 
 // @ts-check
 
-const MOZILLA_VPN_SERVERS_KEY = "mozillaVpnServers";
-
 /**
  * Commands we know we can send
  * to the vpn
@@ -16,17 +14,35 @@ export const REQUEST_TYPES = [
   "disabled_apps",
   "status",
   "deactivate",
+  "focus",
+  "openAuth",
+  "telemetry",
+  "session_start",
+  "session_stop",
+  "interventions",
+  "settings",
 ];
 
 export class VPNState {
   // Name of the current state
   state = "";
+  // Whether the Native Message adapter exists
+  installed = true;
   // If the Native Message adapter is alive
   alive = false;
   // True if the VPN is enabled.
   connected = false;
   // True if firefox is split-tunneled
   isExcluded = false;
+  // True if a subscription is found
+  subscribed = true;
+  // True if it is authenticated
+  authenticated = false;
+  // Can be "Stable", "Unstable", "NoSignal"
+  connectionHealth = "Stable";
+
+  // True if the client version is post v2.23 but not latest
+  needsUpdate = false;
   /**
    * A socks:// url to connect to
    * to bypass the vpn.
@@ -34,74 +50,16 @@ export class VPNState {
    * @type {string | boolean}
    */
   loophole = false;
-  /** @type {Array <ServerCountry> } */
-  servers = [];
 
   /** @type {ServerCity | undefined } */
   exitServerCity = new ServerCity();
 
   /** @type {ServerCountry | undefined } */
   exitServerCountry = new ServerCountry();
-  /**
-   * Timestamp since the VPN connection was established
-   */
-  connectedSince = 0;
-  /**
-   * Constructs state of another state, moving
-   * non essential data.
-   *
-   * @param {VPNState?} other
-   */
-  constructor(other) {
-    if (!other) {
-      return;
-    }
-    if (other.servers) {
-      this.servers = [...other.servers];
-    }
-    if (other.isExcluded != null) {
-      this.isExcluded = other.isExcluded;
-    }
-    this.exitServerCity = other.exitServerCity;
-    this.exitServerCountry = other.exitServerCountry;
-  }
 
-  /**
-   * Takes a state, fetches data from storage and then
-   * constructs a copy with the data included.
-   *
-   * @param {VPNState} state - The state to replicate
-   * @param {browser.storage.StorageArea} storage - The storage area to look for
-   * @param {String} key - The key to put the state in
-   * @returns {Promise<VPNState>} - Returns a copy of the state, or the same in case of missing data.
-   */
-  static async fromStorage(
-    state = new StateVPNUnavailable(null),
-    storage = browser.storage.local,
-    key = MOZILLA_VPN_SERVERS_KEY
-  ) {
-    const { mozillaVpnServers } = await storage.get(MOZILLA_VPN_SERVERS_KEY);
-    if (typeof mozillaVpnServers === "undefined") {
-      await storage.set({ [MOZILLA_VPN_SERVERS_KEY]: [] });
-      return state;
-    }
-    // @ts-ignore
-    return new state.constructor({
-      servers: mozillaVpnServers,
-    });
-  }
-  /**  Puts a state's data into storage, to make sure we can recreate it next time using
-   * @param {VPNState} state - The state to replicate
-   * @param {browser.storage.StorageArea} storage - The storage area to look for
-   */
-  static putIntoStorage(
-    state = new StateVPNUnavailable(null),
-    storage = browser.storage.local,
-    key = MOZILLA_VPN_SERVERS_KEY
-  ) {
-    // @ts-ignore
-    storage.set({ [key]: state.servers });
-  }
+  static NoSignal = "NoSignal";
+  static Unstable = "Unstable";
+  static Stable = "Stable";
 }
 
 /**
@@ -111,46 +69,100 @@ export class VPNState {
 export class StateVPNUnavailable extends VPNState {
   state = "Unavailable";
   alive = false;
+  installed = false;
+}
+export class StateVPNClosed extends VPNState {
+  state = "Closed";
+  alive = false;
+  installed = true;
   connected = false;
 }
 
 /**
- * This state is used if the VPN Client is
- * alive but the Connection is Disabled
+ * Helper base class to imply the vpn process is installed and
+ * running
  */
-export class StateVPNDisabled extends VPNState {
-  state = "Disabled";
+class StateVPNOpened extends VPNState {
   alive = true;
-  connected = false;
+  installed = true;
+}
+
+export class StateVPNNeedsUpdate extends StateVPNOpened {
+  state = "NeedsUpdate";
+  needsUpdate = true;
+}
+
+export class StateVPNSignedOut extends StateVPNOpened {
+  state = "SignedOut";
+  authenticated = false;
+}
+
+export class StateVPNSubscriptionNeeded extends StateVPNSignedOut {
+  state = "SubscriptionNeeded";
+  subscribed = false;
+  authenticated = true;
 }
 
 /**
  * This state is used if the VPN Client is
  * alive but the Connection is Disabled
  */
-export class StateVPNEnabled extends VPNState {
+export class StateVPNDisabled extends StateVPNSubscriptionNeeded {
+  state = "Disabled";
+  connected = false;
+  subscribed = true;
+
   /**
    *
-   * @param {VPNState} other -
-   * @param {string|boolean} aloophole - False if loophole is not supported,
+   * @param {ServerCity | undefined} exitServerCity
+   * @param {ServerCountry | undefined } exitServerCountry
    */
-  constructor(other, aloophole, connectedSince) {
-    super(other);
-    if (other) {
-      this.loophole = other.loophole;
-      this.exitServerCity = other.exitServerCity;
-      this.exitServerCountry = other.exitServerCountry;
-      this.connectedSince = other.connectedSince;
-    }
-    if (aloophole) {
-      this.loophole = aloophole;
-    }
-    if (connectedSince) {
-      this.connectedSince = connectedSince;
-    }
+  constructor(exitServerCity, exitServerCountry) {
+    super();
+    this.exitServerCity = exitServerCity;
+    this.exitServerCountry = exitServerCountry;
   }
+}
 
+/**
+ * This state is used if the VPN Client is
+ * alive but the Connection is Disabled
+ */
+export class StateVPNEnabled extends StateVPNDisabled {
+  /**
+   *
+   * @param {string|boolean} aloophole - False if loophole is not supported,
+   * @param {ServerCity | undefined} exitServerCity
+   * @param {ServerCountry | undefined } exitServerCountry
+   */
+  constructor(
+    exitServerCity,
+    exitServerCountry,
+    aloophole,
+    connectionHealth = "Stable"
+  ) {
+    super(exitServerCity, exitServerCountry);
+    this.exitServerCity = exitServerCity;
+    this.exitServerCountry = exitServerCountry;
+    this.loophole = aloophole;
+    if (
+      ![VPNState.NoSignal, VPNState.Stable, VPNState.Unstable].includes(
+        connectionHealth
+      )
+    ) {
+      throw new Error(
+        `${connectionHealth} is not a Valid Value for ConnectionHealth`
+      );
+    }
+    this.connectionHealth = connectionHealth;
+  }
   state = "Enabled";
+  subscribed = true;
+  connected = true;
+}
+
+export class StateVPNOnPartial extends StateVPNEnabled {
+  state = "OnPartial";
   alive = true;
   connected = true;
 }
@@ -179,4 +191,38 @@ export class ServerCountry {
   cities = [];
   code = "";
   name = "";
+}
+
+// This is what the client response when calling status
+export class vpnStatusResponse {
+  t = "status";
+  status = {
+    location: {
+      exit_country_code: "",
+      exit_city_name: "",
+      entry_country_code: "",
+      entry_city_name: "",
+    },
+    authenticated: false,
+    connectedSince: "0",
+    app: "MozillaVPN::CustomState",
+    vpn: "Controller::StateOn",
+    connectionHealth: "Stable",
+    localProxy: {
+      available: false,
+      url: "https://localhost:8080",
+    },
+    version: "2.25.0",
+  };
+}
+
+export class VPNSettings {
+  extensionTelemetryEnabled = false;
+}
+
+export class BridgeResponse {
+  /** @type {string|undefined} */
+  status;
+  /** @type {string|undefined} */
+  error;
 }

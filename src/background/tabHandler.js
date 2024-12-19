@@ -5,8 +5,15 @@
 import { Component } from "./component.js";
 import { Logger } from "./logger.js";
 import { Utils } from "../shared/utils.js";
-import { VPNController, VPNState } from "./vpncontroller/index.js";
 import { PropertyType } from "../shared/ipc.js";
+import {
+  ExtensionController,
+  FirefoxVPNState,
+} from "./extensionController/index.js";
+import { ProxyHandler } from "./proxyHandler/index.js";
+import { VPNController } from "./vpncontroller/vpncontroller.js";
+
+import { tr } from "../../shared/i18n.js";
 
 const log = Logger.logger("TabHandler");
 
@@ -27,29 +34,35 @@ export class TabHandler extends Component {
   /**
    *
    * @param {*} receiver
-   * @param {VPNController} controller
+   * @param {ExtensionController} extController
+   * @param {ProxyHandler} proxyHandler
+   * @param {VPNController} vpnController
    */
-  constructor(receiver, controller, proxyHandler) {
+  constructor(receiver, extController, proxyHandler, vpnController) {
     super(receiver);
-    this.controller = controller;
+    this.extController = extController;
     this.proxyHandler = proxyHandler;
+    this.vpnController = vpnController;
   }
 
-  /** @type {VPNState | undefined} */
-  controllerState;
+  /** @type {FirefoxVPNState | undefined} */
+  extState;
 
   siteContexts;
   currentHostname;
   currentContext;
+  servers;
 
   async init() {
     log("Initializing TabHandler");
-    this.controller.state.subscribe((s) => {
-      this.controllerState = s;
+    this.vpnController.servers.subscribe((s) => {
+      this.servers = s;
+      console.log("servers", s);
+    });
+
+    this.extController.state.subscribe((s) => {
+      this.extState = s;
       this.maybeShowIcon();
-      if (this.currentPort && this.currentPort.name === "pageAction") {
-        this.sendDataToCurrentPopup();
-      }
     });
 
     this.proxyHandler.siteContexts.subscribe((siteContexts) => {
@@ -63,12 +76,18 @@ export class TabHandler extends Component {
   }
 
   async maybeShowIcon() {
+    if (!this.siteContexts) {
+      return;
+    }
     const currentTab = await Utils.getCurrentTab();
-    if (this.controllerState.state !== "Enabled") {
+    if (!currentTab) {
+      return;
+    }
+    if (this.extState.state !== "Enabled") {
       return browser.pageAction.hide(currentTab.id);
     }
 
-    this.currentHostname = await Utils.getFormattedHostname(currentTab.url);
+    this.currentHostname = await Utils.getTopLevelDomain(currentTab.url);
     this.currentContext = this.siteContexts.get(this.currentHostname);
 
     if (this.currentContext && this.currentContext.excluded) {
@@ -79,27 +98,33 @@ export class TabHandler extends Component {
         path: `../assets/logos/logo-dark-excluded.svg`,
         tabId: currentTab.id,
       });
+      browser.pageAction.setTitle({
+        tabId: currentTab.id,
+        title: tr("offForWebsite"),
+      });
       return browser.pageAction.show(currentTab.id);
     }
 
     if (this.currentContext && this.currentContext.countryCode) {
       browser.pageAction.setIcon({
-        path: `../assets/flags/${this.currentContext.countryCode}.png`,
+        path: `../assets/flags/${this.currentContext.countryCode.toUpperCase()}.png`,
         tabId: currentTab.id,
+      });
+
+      browser.pageAction.setTitle({
+        tabId: currentTab.id,
+        title: tr(
+          "websiteLocationLabel",
+          Utils.nameFor(
+            this.currentContext.countryCode,
+            this.currentContext.cityCode,
+            this.servers
+          )
+        ),
       });
       return browser.pageAction.show(currentTab.id);
     }
 
     return browser.pageAction.hide(currentTab.id);
-  }
-
-  popupData() {
-    return {
-      type: "tabInfo",
-      currentHostname: this.currentHostname,
-      siteContexts: this.siteContexts,
-      servers: this.controllerState.servers,
-      currentContext: this.currentContext,
-    };
   }
 }

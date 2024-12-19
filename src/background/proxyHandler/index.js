@@ -4,3 +4,4 @@
 
 export { SiteContext } from "./siteContext.js";
 export { ProxyHandler } from "./proxyHandler.js";
+export { ProxyUtils } from "./proxyUtils.js";

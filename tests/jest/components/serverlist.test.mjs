@@ -235,7 +235,7 @@ describe("Serverlist Templates", () => {
     document.body.append(element);
     // Wait for lit to render to the dom
     await element.requestUpdate();
-    const button = element.shadowRoot.querySelector("input[type='radio']");
+    const button = element.shadowRoot.querySelector(".server-radio-btn");
     expect(button.dataset.cityName).not.toBeNull();
     button.click();
 
@@ -259,10 +259,72 @@ describe("Serverlist Templates", () => {
     document.body.append(element);
     // Wait for lit to render to the dom
     await element.requestUpdate();
-    const button = element.shadowRoot.querySelector("input[type='radio']");
+    const button = element.shadowRoot.querySelector(".server-radio-btn");
     expect(button.dataset.cityName).not.toBeNull();
     button.click();
 
+    const isOk = await Promise.race([
+      newCityEmitted,
+      // Queue a microtask to make sure all events have been processed
+      new Promise((res) => queueMicrotask(() => res(true))),
+    ]);
+    expect(isOk).toBe(true);
+  });
+
+  test("Serverlist element emits a *{city:null}* if default city is selected", async () => {
+    /** @type {ServerList} */
+    const element = document.createElement("server-list");
+    const newCityEmitted = new Promise((res) => {
+      element.addEventListener("selectedCityChanged", (e) => {
+        expect(e.detail.city).toBeNull();
+        res(true);
+      });
+    });
+    element.serverList = testServerList;
+    // Set the active city to the one we will click
+    element.selectedCity = testServerList[0].cities[0];
+    document.body.append(element);
+    // Wait for lit to render to the dom
+    await element.requestUpdate();
+    const button = element.shadowRoot.querySelector(".default-location-btn");
+    button.click();
+
+    const isOk = await Promise.race([
+      newCityEmitted,
+      // Queue a microtask to make sure all events have been processed
+      new Promise((res) => queueMicrotask(() => res(true))),
+    ]);
+    expect(isOk).toBe(true);
+  });
+
+  test("Serverlist element selects 'default city' if none is selected", async () => {
+    /** @type {ServerList} */
+    const element = document.createElement("server-list");
+    element.serverList = testServerList;
+    element.selectedCity = null;
+    document.body.append(element);
+    // Wait for lit to render to the dom
+    await element.requestUpdate();
+    const button = element.shadowRoot.querySelector(".default-location-btn");
+    expect(button.checked).toBe(true);
+  });
+  test("Serverlist element ignores clicks on 'default city' if none is already selected", async () => {
+    /** @type {ServerList} */
+    const element = document.createElement("server-list");
+    element.serverList = testServerList;
+    element.selectedCity = null;
+    document.body.append(element);
+    // Wait for lit to render to the dom
+    await element.requestUpdate();
+    const button = element.shadowRoot.querySelector(".default-location-btn");
+    expect(button.checked).toBe(true);
+
+    const newCityEmitted = new Promise((_, err) => {
+      element.addEventListener("selectedCityChanged", (e) => {
+        err(e.detail.city.name);
+      });
+    });
+    button.click();
     const isOk = await Promise.race([
       newCityEmitted,
       // Queue a microtask to make sure all events have been processed
