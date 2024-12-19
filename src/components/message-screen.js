@@ -128,6 +128,10 @@ export class MessageScreen extends LitElement {
       flex-direction: column;
       align-items: center;
     }
+
+    .lower {
+      padding-bottom: 16px;
+    }
     .inner {
       width: 85%;
       justify-content: space-between;
@@ -245,7 +249,8 @@ export class MessageScreen extends LitElement {
       background-color: transparent;
       color: var(--action-button-color);
       block-size: 40px;
-      margin-block-end: 24px;
+      font-family: "Inter Semi Bold";
+      font-size: 16px;
     }
     .primarybtn {
       background-color: var(--action-button-color);

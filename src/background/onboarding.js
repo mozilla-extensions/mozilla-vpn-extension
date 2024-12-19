@@ -12,7 +12,7 @@ import { fromStorage, putIntoStorage } from "./vpncontroller/vpncontroller.js";
 
 const ONBOARDING_KEY = "mozillaVpnOnboarding";
 const FIRST_PAGE = 1;
-export const NUMBER_OF_ONBOARDING_PAGES = 4;
+export const NUMBER_OF_ONBOARDING_PAGES = 3;
 const FIRST_UNUSED_PAGE = NUMBER_OF_ONBOARDING_PAGES + 1;
 
 /**

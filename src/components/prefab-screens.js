@@ -72,6 +72,9 @@ const defineMessageScreen = (
   customElements.define(args.tag, Temp);
 };
 
+const getHelpUrl =
+  "https://support.mozilla.org/products/firefox-private-network-vpn/settings/add-ons-extensions-and-themes";
+
 defineMessageScreen({
   tag: "subscribenow-message-screen",
   img: "message-header.svg",
@@ -81,6 +84,10 @@ defineMessageScreen({
   onPrimaryAction: () => {
     () =>
       closeAfter(() => open("https://www.mozilla.org/products/vpn#pricing"));
+  },
+  secondaryAction: tr("getHelp"),
+  onSecondaryAction: () => {
+    close(() => open(getHelpUrl));
   },
 });
 
@@ -93,6 +100,10 @@ defineMessageScreen({
   onPrimaryAction: () => {
     closeAfter(() => open("https://www.mozilla.org/products/vpn/download/"));
   },
+  secondaryAction: tr("getHelp"),
+  onSecondaryAction: () => {
+    close(() => open(getHelpUrl));
+  },
 });
 
 defineMessageScreen({
@@ -100,6 +111,10 @@ defineMessageScreen({
   img: "message-signin.svg",
   heading: tr("headerSignedOut"),
   bodyText: tr("bodySignedOut"),
+  secondaryAction: tr("getHelp"),
+  onSecondaryAction: () => {
+    close(() => open(getHelpUrl));
+  },
 });
 
 defineMessageScreen({
@@ -114,6 +129,10 @@ defineMessageScreen({
   onPrimaryAction: () => {
     closeAfter(() => open("https://www.mozilla.org/products/vpn/download/"));
   },
+  secondaryAction: tr("getHelp"),
+  onSecondaryAction: () => {
+    close(() => open(getHelpUrl));
+  },
 });
 
 defineMessageScreen({
@@ -123,12 +142,16 @@ defineMessageScreen({
   bodyText: html` <p>${tr("bodyOpenMsg")}</p> `,
   onPrimaryAction: null,
   primaryAction: null,
+  secondaryAction: tr("getHelp"),
+  onSecondaryAction: () => {
+    close(() => open(getHelpUrl));
+  },
 });
 
 // Need to start loop at 1 because of how the strings were added to l10n repo.
 // We need to stop the looop at NUMBER_OF_ONBOARDING_PAGES-1 -> as we want the Telemetry page to
 // be last and it has special logic.
-for (let i = 1; i <= NUMBER_OF_ONBOARDING_PAGES - 1; i++) {
+for (let i = 1; i <= NUMBER_OF_ONBOARDING_PAGES; i++) {
   defineMessageScreen({
     tag: `onboarding-screen-${i}`,
     img: `onboarding-${i}.svg`,
@@ -136,7 +159,11 @@ for (let i = 1; i <= NUMBER_OF_ONBOARDING_PAGES - 1; i++) {
     bodyText: html` <p>${tr(`onboarding${i}_body`)}</p> `,
     primaryAction: tr("next"),
     onPrimaryAction: () => {
-      onboardingController.nextOnboardingPage();
+      if (i < NUMBER_OF_ONBOARDING_PAGES) {
+        onboardingController.nextOnboardingPage();
+      } else {
+        onboardingController.finishOnboarding();
+      }
     },
     secondaryAction: tr("skip"),
     onSecondaryAction: () => {
@@ -148,44 +175,6 @@ for (let i = 1; i <= NUMBER_OF_ONBOARDING_PAGES - 1; i++) {
 }
 
 defineMessageScreen({
-  tag: `onboarding-screen-${NUMBER_OF_ONBOARDING_PAGES}`,
-  img: `../logos/logo-dark.svg`,
-  heading: tr(`telemetry_screen_header`),
-  bodyText: html`
-    <p>
-      ${(() => {
-        const input = tr("telemetry_screen_descr", "AAAAAAAAAAAAAAAA");
-        const parts = input.split("AAAAAAAAAAAAAAAA");
-        return html`
-          ${parts[0]}
-          <a href="https://www.mozilla.org/privacy/subscription-services/"
-            >${tr("privacy_notice_link_name")}</a
-          >
-          ${parts[1]}
-        `;
-      })()}
-    </p>
-    <div class="row">
-      <p style="font-family: 'Inter Semi Bold';text-align: left;">
-        ${tr("telemetry_toggle_text")}
-      </p>
-      <mz-pill
-        .enabled=${telemetry.telemetryEnabled.value}
-        @click=${(e) => {
-          telemetry.setTelemetryEnabled(!telemetry.telemetryEnabled.value);
-          e.target.enabled = !telemetry.telemetryEnabled.value;
-        }}
-      ></mz-pill>
-    </div>
-  `,
-  onPrimaryAction: () => {
-    telemetry.record("has_completed_onboarding");
-    onboardingController.finishOnboarding();
-  },
-  primaryAction: tr("done"),
-});
-
-defineMessageScreen({
   tag: "unsupported-os-message-screen",
   img: "message-os.svg",
   heading: tr("headerUnsupportedOSMessage"),
@@ -195,4 +184,8 @@ defineMessageScreen({
   `,
   onPrimaryAction: null,
   primaryAction: null,
+  secondaryAction: tr("getHelp"),
+  onSecondaryAction: () => {
+    close(() => open(getHelpUrl));
+  },
 });
