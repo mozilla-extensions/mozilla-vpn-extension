@@ -11,6 +11,7 @@ import {
   createRef,
   ref,
 } from "../vendor/lit-all.min.js";
+
 import { tr } from "../shared/i18n.js";
 import { resetSizing, fontStyling, positioner, inCopyLink } from "./styles.js";
 
