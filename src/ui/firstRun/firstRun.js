@@ -2,19 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import {
-  html,
-  css,
-  LitElement,
-  createRef,
-  ref,
-} from "../../vendor/lit-all.min.js";
+import { html, css, LitElement } from "../../vendor/lit-all.min.js";
 import {
   fontStyling,
   inCopyLink,
   resetSizing,
 } from "../../components/styles.js";
-import { getExposedObject } from "../../shared/ipc.js";
 import { tr } from "../../shared/i18n.js";
 import "../../components/mz-pill.js";
 import { telemetry } from "../../ui/browserAction/backend.js";
@@ -26,38 +19,39 @@ export class FirstRunPage extends LitElement {
   static properties = {
     contexts: { type: Object },
     serverList: { type: Object },
+    telemEnabled: { type: Boolean },
   };
   constructor() {
     super();
-    this.contexts = new Map();
-    this.vpnController = getExposedObject("VPNController");
-    this.vpnController.then((c) => {
-      c.servers.subscribe((servers) => (this.serverList = servers));
+
+    telemetry.telemetryEnabled.subscribe((s) => {
+      this.telemEnabled = s;
     });
-    this.proxyHandler = getExposedObject("ProxyHandler");
-    this.proxyHandler.then((p) => {
-      p.siteContexts.subscribe((context) => (this.contexts = context));
-    });
-    getExposedObject("Telemetry").then((t) =>
-      t.record("used_feature_settings_page")
-    );
   }
 
   connectedCallback() {
     super.connectedCallback();
   }
-  filterInput = createRef();
 
   render() {
-    document.title = tr("Mozilla VPN");
+    document.title = "Mozilla VPN";
     return html`
       <main>
-        <h1>${tr("thankYouForInstalling")}</h1>
+        <h1>${tr("thankYouForAdding")}</h1>
         <div class="flex-row">
           <img src="firstrun.svg" />
           <div class="copy">
-            <p class="body-first">
-              ${tr("first-install-body")}
+            <p class="bold p1">${tr("optionalDataCollection")}</p>
+            <p class="p1">${tr("first-install-body")}</p>
+
+            <p>${tr("telemetryListHeader")}</p>
+            <ul>
+              <li>${tr("technicalData")}</li>
+              <li>${tr("interactionData")}</li>
+            </ul>
+
+            <p class="p1">
+              ${tr("privacyPolicyIntro")}
               <a
                 class="in-copy-link"
                 href="https://addons.mozilla.org/firefox/addon/mozilla-vpn-extension/privacy/"
@@ -65,63 +59,75 @@ export class FirstRunPage extends LitElement {
               >
             </p>
 
-            <div class="pill-copy-wrapper">
-              <p class="bold pill-copy">${tr("telemetry_toggle_text")}</p>
-              <mz-pill
-                .enabled=${telemetry.telemetryEnabled.value}
+            <p class="p1">${tr("telemetryOptOutInstructions")}</p>
+
+            <div class="checkbox-copy-wrapper">
+              <input
+                type="checkbox"
+                .checked=${this.telemEnabled}
                 @click=${(e) => {
-                  telemetry.setTelemetryEnabled(
-                    !telemetry.telemetryEnabled.value
-                  );
-                  e.target.enabled = !telemetry.telemetryEnabled.value;
+                  telemetry.setTelemetryEnabled(!this.telemEnabled);
+                  e.target.checked = !this.telemEnabled;
                 }}
-              >
-              </mz-pill>
+              />
+              <label class="pill-copy">${tr("telemetryCheckboxLabel")}</label>
             </div>
-            <p>${tr("first-install-footer")}</p>
-            <p>${tr("toOpenTheExtension")}</p>
+            <p class="bold">${tr("toContinueToTheExtension")}</p>
           </div>
         </div>
       </main>
     `;
-  }
-  removeOrigin(origin) {
-    this.proxyHandler.then((handler) => {
-      handler.removeContextForOrigin(origin);
-    });
   }
 
   static styles = css`
     ${fontStyling}
     ${resetSizing}
     ${inCopyLink}
+    
     main {
       width: 100vw;
       height: 100vh;
-      padding: 0 24px 24px 24px;
+      padding: 0 24px 80px 24px;
       display: flex;
       flex-align: center;
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      max-width: 900px;
+      max-width: 1100px;
       margin-inline: auto;
-      padding-block-end: 80px;
     }
+
+    input {
+      margin-inline-end: 8px;
+    }
+
+    ul {
+      margin-block-end: 16px;
+      padding-inline-start: 16px;
+      list-style: disc;
+    }
+
     .pill-copy-wrapper,
     div.flex-row {
       display: flex;
       flex-direction: row;
+      align-items: flex-start;
+    }
+
+    .p1,
+    ul {
+      margin-block-end: 24px;
     }
 
     img {
-      margin-inline-end: 74px;
+      margin-inline-end: 32px;
+      max-inline-size: 300px;
     }
 
-    .pill-copy-wrapper {
-      justify-content: space-between;
+    .checkbox-copy-wrapper {
       margin-block: 32px;
-      max-width: 400px;
+      display: flex;
+      flex-direction: row;
     }
 
     h1 {
@@ -144,17 +150,37 @@ export class FirstRunPage extends LitElement {
     }
 
     p,
-    a {
+    a,
+    li {
       font-size: 16px;
       line-height: 27px;
     }
 
-    p {
-      padding-block-end: 16px;
+    @media (prefers-color-scheme: dark) {
+      h1 {
+        color: rgba(255, 255, 255, 1);
+      }
+      p.bold, a, li, label {
+        color: rgba(255, 255, 255, .9);
+      }
+      p, li {
+        color: rgba(255, 255, 255, .7);
+      }
     }
 
-    p.body-first {
-      padding-block-end: 0px;
+    @media only screen and (max-width: 900px) {
+      div.flex-row {
+        flex-direction: column !important;
+      }
+
+      main {
+        padding: 48px;
+        height: auto;
+      }
+      img {
+        margin-block-end: 48px;
+        margin-inline: auto;
+      }
     }
   `;
 }
