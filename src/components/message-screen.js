@@ -33,6 +33,7 @@ export class MessageScreen extends LitElement {
     identifier: { type: String },
     totalPages: { type: Number },
     currentPage: { type: Number },
+    bodyContent: { type: Object },
   };
   constructor() {
     super();
@@ -64,14 +65,23 @@ export class MessageScreen extends LitElement {
           <h1>${this.heading}</h1>
           <slot></slot>
         </div>
-        <div class="pagination">
-          ${repeat(
-            paginationIndicators,
-            (item) => item.id,
-            (item) =>
-              html` <span class="holder"><span class="${item}"></span></span>`
-          )}
-        </div>
+        ${when(
+          paginationIndicators.length > 0,
+          () => html`
+            <div class="pagination">
+              ${repeat(
+                paginationIndicators,
+                (item) => item.id,
+                (item) =>
+                  html` <span class="holder"
+                    ><span class="${item}"></span
+                  ></span>`
+              )}
+            </div>
+          `,
+          null
+        )}
+
         <div class="lower">
           ${when(
             this.primaryAction,
@@ -118,6 +128,10 @@ export class MessageScreen extends LitElement {
       flex-direction: column;
       align-items: center;
     }
+
+    .lower {
+      padding-bottom: 16px;
+    }
     .inner {
       width: 85%;
       justify-content: space-between;
@@ -133,6 +147,7 @@ export class MessageScreen extends LitElement {
     }
     img {
       margin-block: 16px;
+      max-height: 140px;
     }
 
     img.subscribenow-message-screen,
@@ -152,6 +167,24 @@ export class MessageScreen extends LitElement {
     img.open-mozilla-vpn-message-screen {
       block-size: 108px;
       inline-size: 111px;
+    }
+
+    img.onboarding-screen-4 {
+      margin-top: 24px;
+      max-height: 68px;
+      margin-bottom: 0px;
+    }
+    @media (prefers-color-scheme: dark) {
+      img.onboarding-screen-4 {
+        filter: invert();
+      }
+    }
+    ::slotted(.row) {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      justify-content: space-between;
+      align-items: baseline;
     }
 
     .pagination {
@@ -216,7 +249,8 @@ export class MessageScreen extends LitElement {
       background-color: transparent;
       color: var(--action-button-color);
       block-size: 40px;
-      margin-block-end: 24px;
+      font-family: "Inter Semi Bold";
+      font-size: 16px;
     }
     .primarybtn {
       background-color: var(--action-button-color);

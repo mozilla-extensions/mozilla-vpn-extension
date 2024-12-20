@@ -22,7 +22,7 @@ export class Telemetry {
     record: PropertyType.Function,
   };
   /**  @type { IBindable<Boolean>}*/
-  telemetryEnabled = property(false);
+  telemetryEnabled = property(true);
 
   /**
    * @param {VPNController} controller
@@ -34,6 +34,7 @@ export class Telemetry {
     this.telemetryEnabled = computed(controller.settings, (vpnSettings) => {
       return vpnSettings.extensionTelemetryEnabled;
     });
+
     extensionController.state.subscribe((state) => {
       if (state.enabled == this.#enabled) {
         return;
@@ -44,6 +45,7 @@ export class Telemetry {
       this.#enabled = state.enabled;
       this.#enabled ? this.startSession() : this.stopSession();
     });
+
     proxyHandler.siteContexts.subscribe((ctxMap) => {
       const counts = Telemetry.evaluateSiteContexts(ctxMap);
       this.record("count_excluded", counts.excluded);
@@ -57,6 +59,7 @@ export class Telemetry {
       },
     });
   }
+
   record(eventName = "", data) {
     if (!this.telemetryEnabled.value) {
       // Don't send telemetry, unless we're sure we're enabled.

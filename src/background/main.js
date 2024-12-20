@@ -124,12 +124,13 @@ const main = new Main();
 main.init();
 globalThis["main"] = main;
 
-// Just do this for debugging
-//chrome.browserAction.openPopup();
-
-/**
-browser.tabs.create({
-  url: "/ui/settingsPage/index.html",
-})
-
- */
+function openFirstRun(details) {
+  if (details.reason !== "install") {
+    return;
+  }
+  const url = browser.runtime.getURL("/ui/firstRun/firstRun.html");
+  browser.tabs.create({
+    url,
+  });
+}
+browser.runtime.onInstalled.addListener(openFirstRun);
