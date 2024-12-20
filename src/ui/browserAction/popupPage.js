@@ -67,6 +67,7 @@ export class BrowserActionPopup extends LitElement {
     _siteContexts: { type: Array },
     allowDisconnect: { type: Boolean },
     alerts: { type: Array },
+    telemEnabled: { type: Boolean },
   };
 
   constructor() {
@@ -93,6 +94,9 @@ export class BrowserActionPopup extends LitElement {
     this.updatePage();
     extController.allowDisconnect.subscribe((s) => {
       this.allowDisconnect = s;
+    });
+    telemetry.telemetryEnabled.subscribe((s) => {
+      this.telemEnabled = s;
     });
   }
   updatePage() {
@@ -176,6 +180,7 @@ export class BrowserActionPopup extends LitElement {
     const back = () => {
       this.stackView?.value?.pop().then(() => {
         this.requestUpdate();
+        this.updatePage();
       });
     };
 
@@ -289,8 +294,15 @@ export class BrowserActionPopup extends LitElement {
     );
   }
 
+  toggleTelemetry(status) {
+    telemetry.setTelemetryEnabled(status);
+  }
+
   async openSettingsPanel() {
-    const settingsPanelElement = BrowserActionPopup.createSettingsPanel();
+    const settingsPanelElement = BrowserActionPopup.createSettingsPanel(
+      this.telemEnabled,
+      this.toggleTelemetry
+    );
     await this.stackView.value?.push(settingsPanelElement);
     this.requestUpdate();
   }
@@ -422,7 +434,7 @@ export class BrowserActionPopup extends LitElement {
     `;
   }
 
-  static createSettingsPanel() {
+  static createSettingsPanel(telemEnabled, toggleTelemetry = () => {}) {
     const viewElement = document.createElement("section");
     viewElement.classList = ["settings-panel"];
     viewElement.dataset.title = "Settings";
@@ -460,6 +472,8 @@ export class BrowserActionPopup extends LitElement {
       },
     ];
 
+    let telemetryStatus = telemEnabled;
+
     render(
       html`
         <ul id="settingsList">
@@ -473,6 +487,26 @@ export class BrowserActionPopup extends LitElement {
             `
           )}
         </ul>
+        <div class="telemetry">
+          <div id="telemetry-checkbox" class="checkbox-wrapper">
+            <input 
+            .checked=${telemEnabled}
+            @click=${() => {
+              telemetryStatus = !telemetryStatus;
+              toggleTelemetry(telemetryStatus);
+            }} type="checkbox" />
+          </div>
+          <div class="telemetry-checkbox-label">
+            <label for="telemetry-checkbox" class="telemetry-checkbox-headline">${tr("telemetry_toggle_text")}</label>
+            <p class="telemetry-checkbox-body">${tr("telemetrySettingsCheckboxLabel")} 
+            <a href="" @click=${() => {
+              openInNewTab(
+                "https://addons.mozilla.org/firefox/addon/mozilla-vpn-extension/privacy/"
+              );
+            }} class="in-copy-link">${tr("learnMore")}</>
+            </p>
+          </div>
+        </div>
       `,
       viewElement
     );
@@ -506,6 +540,29 @@ export class BrowserActionPopup extends LitElement {
 
   static styles = css`
     ${fontStyling}${resetSizing}${ghostButtonStyles}${inUseLabel}${positioner}
+
+    .telemetry {
+      border-top: 1px solid var(--divider-color);
+      padding: 24px 8px 16px 1px;
+      margin: 20px 24px 24px 20px;
+      display: flex;
+      flex-direction: row;
+    }
+
+    .telemetry-checkbox-headline {
+      font-family: "Inter Semi Bold";
+      font-size: 14px;
+    }
+
+    .telemetry-checkbox-body {
+      font-size: 13px;
+      margin-block-start: 4px;
+      padding-inline-end: 8px;
+    }
+    .telemetry-checkbox-label {
+      margin-inline-start: 18px;
+    }
+
     section {
       background-color: var(--panel-bg-color);
     }
