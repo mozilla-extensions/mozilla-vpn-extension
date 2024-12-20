@@ -160,11 +160,15 @@ export class FirstRunPage extends LitElement {
       h1 {
         color: rgba(255, 255, 255, 1);
       }
-      p.bold, a, li, label {
-        color: rgba(255, 255, 255, .9);
+      p.bold,
+      a,
+      li,
+      label {
+        color: rgba(255, 255, 255, 0.9);
       }
-      p, li {
-        color: rgba(255, 255, 255, .7);
+      p,
+      li {
+        color: rgba(255, 255, 255, 0.7);
       }
     }
 
