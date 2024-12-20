@@ -31,7 +31,7 @@ export class Telemetry {
    */
   constructor(controller, extensionController, proxyHandler) {
     this.#controller = controller;
-    this.telemetryEnabled.value = computed(
+    this.telemetryEnabled = computed(
       controller.settings,
       (vpnSettings) => {
         return vpnSettings.extensionTelemetryEnabled;
@@ -61,7 +61,6 @@ export class Telemetry {
         extensionTelemetryEnabled: enabled,
       },
     });
-    this.telemetryEnabled.value = enabled;
   }
 
   record(eventName = "", data) {
