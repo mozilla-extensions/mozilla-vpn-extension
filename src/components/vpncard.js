@@ -179,7 +179,7 @@ export class VPNCard extends LitElement {
     `;
   }
 
-  static subline(enabled, stability, clientIsConnected, clientIsConnected) {
+  static subline(enabled, stability, connecting, clientConnected) {
     const onLinkClick = () => {
       browser.tabs.create({
         url: "https://support.mozilla.org/kb/get-started-mozilla-vpn-extension?utm_medium=mozilla-vpn&utm_source=vpn-extension",
@@ -188,7 +188,7 @@ export class VPNCard extends LitElement {
     };
 
     if (!enabled && !connecting) {
-      return clientIsConnected
+      return clientConnected
         ? html`<p class="subline ext-is-off">
             ${tr("extensionVpnIsOff")}
             <a class="in-copy-link" @click=${onLinkClick} href=""
