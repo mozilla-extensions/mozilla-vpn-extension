@@ -203,7 +203,10 @@ export class VPNCard extends LitElement {
       </svg>
     `;
 
-    switch (stability) {
+    if (!this.enabled) {
+      return;
+    }
+    switch (stability) { 
       case VPNState.NoSignal:
         return html`<p class="subline">${errorSvg} No Signal</p>`;
       case VPNState.Unstable:
