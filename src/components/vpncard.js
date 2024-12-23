@@ -147,6 +147,7 @@ export class VPNCard extends LitElement {
               ${VPNCard.subline(
                 this.enabled,
                 this.stability,
+                this.connecting,
                 this.clientConnected
               )}
               ${timeString}
@@ -203,6 +204,9 @@ export class VPNCard extends LitElement {
       </svg>
     `;
 
+    if (!enabled) {
+      return;
+    }
     switch (stability) {
       case VPNState.NoSignal:
         return html`<p class="subline">${errorSvg} No Signal</p>`;
