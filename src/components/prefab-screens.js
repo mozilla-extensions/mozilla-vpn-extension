@@ -81,14 +81,10 @@ defineMessageScreen({
   heading: "Subscribe to Mozilla VPN",
   bodyText: tr("bodySubscribeNow"),
   primaryAction: tr("btnSubscribeNow"),
-  onPrimaryAction: () => {
-    () =>
-      closeAfter(() => open("https://www.mozilla.org/products/vpn#pricing"));
-  },
+  onPrimaryAction: () =>
+    closeAfter(() => open("https://www.mozilla.org/products/vpn#pricing")),
   secondaryAction: tr("getHelp"),
-  onSecondaryAction: () => {
-    close(() => open(getHelpUrl));
-  },
+  onSecondaryAction: () => closeAfter(() => open(getHelpUrl)),
 });
 
 defineMessageScreen({
@@ -97,13 +93,10 @@ defineMessageScreen({
   heading: tr("headerNeedsUpdate"),
   bodyText: tr("bodyNeedsUpdate2"),
   primaryAction: tr("btnDownloadNow"),
-  onPrimaryAction: () => {
-    closeAfter(() => open("https://www.mozilla.org/products/vpn/download/"));
-  },
+  onPrimaryAction: () =>
+    closeAfter(() => open("https://www.mozilla.org/products/vpn/download/")),
   secondaryAction: tr("getHelp"),
-  onSecondaryAction: () => {
-    close(() => open(getHelpUrl));
-  },
+  onSecondaryAction: () => closeAfter(() => open(getHelpUrl)),
 });
 
 defineMessageScreen({
@@ -112,9 +105,7 @@ defineMessageScreen({
   heading: tr("headerSignedOut"),
   bodyText: tr("bodySignedOut"),
   secondaryAction: tr("getHelp"),
-  onSecondaryAction: () => {
-    close(() => open(getHelpUrl));
-  },
+  onSecondaryAction: () => closeAfter(() => open(getHelpUrl)),
 });
 
 defineMessageScreen({
@@ -126,13 +117,10 @@ defineMessageScreen({
     <p class="footnote">${tr("bodyInstallMsgFooter")}</p>
   `,
   primaryAction: tr("btnDownloadNow"),
-  onPrimaryAction: () => {
-    closeAfter(() => open("https://www.mozilla.org/products/vpn/download/"));
-  },
+  onPrimaryAction: () =>
+    closeAfter(() => open("https://www.mozilla.org/products/vpn/download/")),
   secondaryAction: tr("getHelp"),
-  onSecondaryAction: () => {
-    close(() => open(getHelpUrl));
-  },
+  onSecondaryAction: () => closeAfter(() => open(getHelpUrl)),
 });
 
 defineMessageScreen({
@@ -143,23 +131,24 @@ defineMessageScreen({
   onPrimaryAction: null,
   primaryAction: null,
   secondaryAction: tr("getHelp"),
-  onSecondaryAction: () => {
-    close(() => open(getHelpUrl));
-  },
+  onSecondaryAction: () => closeAfter(() => open(getHelpUrl)),
 });
 
 // Need to start loop at 1 because of how the strings were added to l10n repo.
 // We need to stop the looop at NUMBER_OF_ONBOARDING_PAGES-1 -> as we want the Telemetry page to
 // be last and it has special logic.
 for (let i = 1; i <= NUMBER_OF_ONBOARDING_PAGES; i++) {
+  const lastOnboardingPanel = i == NUMBER_OF_ONBOARDING_PAGES;
+  const primaryActionText = lastOnboardingPanel ? tr("done") : tr("next");
+
   defineMessageScreen({
     tag: `onboarding-screen-${i}`,
     img: `onboarding-${i}.svg`,
     heading: tr(`onboarding${i}_title`),
     bodyText: html` <p>${tr(`onboarding${i}_body`)}</p> `,
-    primaryAction: tr("next"),
+    primaryAction: primaryActionText,
     onPrimaryAction: () => {
-      if (i < NUMBER_OF_ONBOARDING_PAGES) {
+      if (!lastOnboardingPanel) {
         onboardingController.nextOnboardingPage();
       } else {
         onboardingController.finishOnboarding();
@@ -185,7 +174,5 @@ defineMessageScreen({
   onPrimaryAction: null,
   primaryAction: null,
   secondaryAction: tr("getHelp"),
-  onSecondaryAction: () => {
-    close(() => open(getHelpUrl));
-  },
+  onSecondaryAction: () => closeAfter(() => open(getHelpUrl)),
 });
