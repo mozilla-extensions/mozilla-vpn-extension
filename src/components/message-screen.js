@@ -100,7 +100,7 @@ export class MessageScreen extends LitElement {
             this.secondaryAction,
             () => html`
               <button
-                class="secondarybtn"
+                class="secondarybtn ${this.identifier}"
                 @click=${(e) => {
                   this.onSecondaryAction(this, e);
                 }}
@@ -115,6 +115,12 @@ export class MessageScreen extends LitElement {
   }
   static styles = css`
     ${fontStyling}
+
+    /* Hide "Skip" on the last onboarding panel */
+    .onboarding-screen-3.secondarybtn {
+      visibility: hidden;
+    }
+
     :host {
       --min-block-size: 521px;
       /* prevent the panel from shrinking vertically when there isn't as much content */
