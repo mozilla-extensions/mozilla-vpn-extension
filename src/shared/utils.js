@@ -23,6 +23,21 @@ export const Utils = {
     return ["win"].includes(os);
   },
 
+  connectingDelay: 2500,
+
+  // Hack to mitigate FXVPN-217 and FXVPN-222.
+  // When transitioning from StateFirefoxVPNConnecting to StateFirefoxVPNEnabled,
+  // the client enters StateOnPartial wherein routing table updates can cause
+  // long page reloads or even timeouts.
+  // To offset this, we introduce a delay in the UI and before reloading tabs,
+  // allowing the OS a buffer in which to update routing tables.
+  delayToStateEnabledNeeded(currentState, newState) {
+    if (!currentState) {
+      return false;
+    }
+    return currentState === "Connecting" && newState === "Enabled";
+  },
+
   isViableClientVersion: (clientVersion) => {
     // TODO we should do something better here
     // We'll likely want to update the minimumViableClient

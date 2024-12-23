@@ -44,15 +44,32 @@ export class TabReloader extends Component {
 
   currentExtState;
 
-  static async onExtensionStateChanged(extState) {
+  static async onExtensionStateChanged(newState) {
     if (
-      this.currentExtState == extState.state ||
-      !["Enabled", "Disabled"].includes(extState.state)
+      this.currentExtState == newState.state ||
+      !["Enabled", "Disabled", "Connecting"].includes(newState.state)
     ) {
       return;
     }
-    this.currentExtState = extState.state;
-    TabReloader.onOriginChanged();
+
+    const cachedCurrentState = this.currentExtState;
+    this.currentExtState = newState.state;
+
+    // We don't need to reload tabs when we move to "Connecting"
+    // so return
+    if (newState.state === "Connecting") {
+      return;
+    }
+
+    // Hack to mitigate FXVPN-217 and FXVPN-222
+    // See Utils.delayToStateEnabledNeeded() for details
+    if (Utils.delayToStateEnabledNeeded(cachedCurrentState, newState.state)) {
+      setTimeout(() => {
+        TabReloader.onOriginChanged();
+      }, Utils.connectingDelay);
+    } else {
+      TabReloader.onOriginChanged();
+    }
   }
 
   static async onOriginChanged(origin = null) {
