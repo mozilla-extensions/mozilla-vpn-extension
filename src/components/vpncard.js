@@ -251,11 +251,11 @@ export class VPNCard extends LitElement {
       box-shadow: var(--box-shadow-on);
     }
 
-    .box.connecting .pill {
+    .box.connecting mz-pill {
       pointer-events: none;
     }
 
-    .box.connecting.allowDisconnect .pill {
+    .box.connecting.allowDisconnect mz-pill {
       pointer-events: all;
       opacity: 1;
     }
