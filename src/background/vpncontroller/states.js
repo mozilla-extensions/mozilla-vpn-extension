@@ -217,7 +217,7 @@ export class vpnStatusResponse {
 }
 
 export class VPNSettings {
-  extensionTelemetryEnabled = false;
+  extensionTelemetryEnabled = true;
 }
 
 export class BridgeResponse {
