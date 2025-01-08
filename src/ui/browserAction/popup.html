@@ -10,6 +10,8 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" href="popup.css" />
     <link rel="stylesheet" href="../variables.css" />
+    <!-- Load placeholder sync so it's ready first -->
+    <script src="./popup-placeholder.js" type="module"></script>
     <script src="./popupPage.js" type="module"></script>
     <script src="./popupConditional.js" type="module"></script>
     <script src="../../components/message-screen.js" type="module"></script>
@@ -18,7 +20,8 @@
 
     <title>Mozilla VPN</title>
   </head>
-  <body>
+  <body class="stack">
+    <popup-placeholder></popup-placeholder>
     <popup-condview id="conditional-view" class="needsSlotted">
       <needs-update-message-screen
         slot="MessageUpdateClient"
