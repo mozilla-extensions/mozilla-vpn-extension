@@ -35,7 +35,7 @@ export class PageActionPopup extends LitElement {
       if (!Utils.isValidForProxySetting(tab.url)) {
         return;
       }
-      const hostname = Utils.getTopLevelDomain(tab.url);
+      const hostname = Utils.getDomainName(tab.url);
       this.pageURL = hostname;
       if (proxyHandler.siteContexts.value.has(this.pageURL)) {
         this._siteContext = proxyHandler.siteContexts.value.get(this.pageURL);

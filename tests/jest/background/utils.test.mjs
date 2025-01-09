@@ -29,20 +29,24 @@ describe("Utils", () => {
     mockSet.mockClear();
   });
 
-  describe("getTopLevelDomain", () => {
+  describe("getDomainName", () => {
     test("Returns a formatted hostname when given a url", () => {
-      const result = Utils.getTopLevelDomain("www.mozilla.org");
+      const result = Utils.getDomainName("www.mozilla.org");
       expect(result).toBe("www.mozilla.org");
     });
     test("Removes reader prefixes from the url", () => {
-      const result = Utils.getTopLevelDomain(
+      const result = Utils.getDomainName(
         "about:reader?url=https://firefox.com"
       );
       expect(result).toBe("firefox.com");
     });
     test("Returns the string if the string is not a valid url", () => {
-      const result = Utils.getTopLevelDomain("about:debugging");
+      const result = Utils.getDomainName("about:debugging");
       expect(result).toBe("about:debugging");
+    });
+    test("Correctly formats and returns the top and second-level domain when given an eTLD+1 domain", () => {
+      const result = Utils.getDomainName("https://www.lanacion.com.ar/");
+      expect(result).toBe("lanacion.com.ar");
     });
   });
 

@@ -119,7 +119,7 @@ export class BrowserActionPopup extends LitElement {
         this.hasSiteContext = false;
         return;
       }
-      const hostname = Utils.getTopLevelDomain(tab.url);
+      const hostname = Utils.getDomainName(tab.url);
       this.pageURL = hostname;
       if (this._siteContexts.has(this.pageURL)) {
         this._siteContext = proxyHandler.siteContexts.value.get(this.pageURL);

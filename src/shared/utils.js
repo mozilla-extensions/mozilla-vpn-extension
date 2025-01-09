@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import suffixes from "./suffixes.js";
+
 /**
  * Here you'll find utility functions for managing
  * site contexts and handling various tasks.
@@ -67,28 +69,37 @@ export const Utils = {
    * @param {string} url - URL from which to retrieve the domain name.
    * @returns {string} - The domain name, or the url if a valid (within the context of the extension) domain name is not derived.
    */
-  getTopLevelDomain(url) {
-    url = this.stripPrefixesFromUrl(url);
+getDomainName(url) {
+  // Remove any prefixes from the URL
+  url = this.stripPrefixesFromUrl(url);
 
-    try {
-      // Create a URL object from the input URL
-      let parsedUrl = new URL(url);
-
-      // Split the hostname to remove any subdomains or prefixes
-      let domainParts = parsedUrl.hostname.split(".");
-
-      // If the domain has more than two parts, remove subdomains (e.g., "reader.example.com" becomes "example.com")
-      if (domainParts.length > 2) {
-        return domainParts.slice(-2).join(".");
-      }
-
-      // If it's already just a domain name, return it
-      return parsedUrl.hostname ? parsedUrl.hostname : url;
-    } catch (error) {
-      // Handle invalid URLs
+  try {
+    // Parse the URL to extract the hostname
+    const parsedUrl = new URL(url);
+    const hostnameParts = parsedUrl.hostname.split(".");
+    
+    // Combine the last two parts of the hostname, drop the rest (e.g., "example.com")
+    const formattedDomain = hostnameParts.slice(-2).join(".");
+    
+    if (!formattedDomain) {
+      // (e.g., "about:debugging")
       return url;
     }
-  },
+
+    // Handle eTLD+1 domains (e.g., "https://www.lanacion.com.ar")
+    if (suffixes.includes(formattedDomain)) {
+      // We've only captured the suffix of an eTLD+1 domain, 
+      // We need to grab more of the url to capture the second-level domain
+      return hostnameParts.slice(-3).join(".");
+    }
+
+    return formattedDomain;
+  
+  } catch (error) {
+    // Return the original URL for invalid inputs
+    return url;
+  }
+},
 
   isValidForProxySetting: (url) => {
     url = Utils.stripPrefixesFromUrl(url);
