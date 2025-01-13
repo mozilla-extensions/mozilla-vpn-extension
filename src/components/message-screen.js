@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { html, LitElement, when, repeat, css } from "../vendor/lit-all.min.js";
-import { fontStyling } from "./styles.js";
+import { fontStyling, ghostButtonStyles } from "./styles.js";
 import "./titlebar.js";
 
 /**
@@ -100,7 +100,7 @@ export class MessageScreen extends LitElement {
             this.secondaryAction,
             () => html`
               <button
-                class="secondarybtn ${this.identifier}"
+                class="ghost-btn ${this.identifier}"
                 @click=${(e) => {
                   this.onSecondaryAction(this, e);
                 }}
@@ -114,10 +114,10 @@ export class MessageScreen extends LitElement {
     `;
   }
   static styles = css`
-    ${fontStyling}
+    ${fontStyling}${ghostButtonStyles}
 
     /* Hide "Skip" on the last onboarding panel */
-    .onboarding-screen-3.secondarybtn {
+    .onboarding-screen-3.ghost-btn {
       visibility: hidden;
     }
 
@@ -180,6 +180,11 @@ export class MessageScreen extends LitElement {
       max-height: 68px;
       margin-bottom: 0px;
     }
+
+    .ghost-btn {
+      color: var(--action-button-color);
+    }
+
     @media (prefers-color-scheme: dark) {
       img.onboarding-screen-4 {
         filter: invert();
@@ -233,7 +238,7 @@ export class MessageScreen extends LitElement {
       flex-grow: 1;
     }
     ::slotted(p) {
-      margin-block: 0 24px;
+      margin-block: 0 16px;
       text-align: center;
       font-family: var(--font-family);
       font-size: 14px;
@@ -243,27 +248,35 @@ export class MessageScreen extends LitElement {
     }
 
     ::slotted(.footnote) {
-      margin-bottom: 16px;
       inline-size: 90%;
+      margin-block-end: 20px;
     }
+
     button {
       border: none;
       height: 32px;
       margin-bottom: 8px;
+      font-size: 16px !important;
+      font-family: "Inter Regular";
+      border-radius: var(--button-border-radius);
+      transition: var(--button-transition);
     }
-    .secondarybtn {
-      background-color: transparent;
-      color: var(--action-button-color);
-      block-size: 40px;
-      font-family: "Inter Semi Bold";
-      font-size: 16px;
-    }
+
     .primarybtn {
       background-color: var(--action-button-color);
       color: white;
       border-radius: 4px;
       block-size: 40px;
     }
+
+    .primarybtn:hover {
+      background-color: var(--blue60);
+    }
+
+    .primarybtn:active {
+      background-color: var(--blue70);
+    }
+
     p {
       color: #6d6d6e;
     }
@@ -275,6 +288,10 @@ export class MessageScreen extends LitElement {
 
       ::slotted(p) {
         color: rgba(255, 255, 255, 0.6);
+      }
+
+      .ghost-btn {
+        color: rgba(255, 255, 255, 1);
       }
     }
   `;
