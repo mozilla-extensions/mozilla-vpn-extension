@@ -21,6 +21,7 @@ export const REQUEST_TYPES = [
   "session_stop",
   "interventions",
   "settings",
+  "start",
 ];
 
 export class VPNState {
