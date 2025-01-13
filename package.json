@@ -13,6 +13,7 @@
     "prettier": "prettier . --check",
     "addonslinter": "addons-linter src/",
     "typecheck": "tsc --noEmit",
+    "update-suffixes": "node scripts/updateSuffixRules.js",
     "build": "web-ext build --source-dir src --filename mozilla-vpn-extension.xpi",
     "start-dev": "npm run remove-locales-github  && npm run web-ext-run --pref=ui.popup.disable_autohide=true",
     "start": "npm run remove-locales-github && npm run web-ext-run",

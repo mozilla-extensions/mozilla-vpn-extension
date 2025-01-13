@@ -3,6 +3,7 @@ build
 coverage
 src/vendor/*
 src/_locales/*
+src/shared/suffixes.js
 **/*.yml
 **/*.md
 *.md
