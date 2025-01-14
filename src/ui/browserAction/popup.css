@@ -24,6 +24,10 @@ body {
   overflow-y: scroll;
 }
 
+html {
+  overflow: hidden;
+}
+
 .needsSlotted > * {
   display: none;
 }

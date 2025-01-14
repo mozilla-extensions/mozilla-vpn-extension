@@ -580,7 +580,8 @@ export class BrowserActionPopup extends LitElement {
     }
 
     section.limit-panel-height {
-      overflow-y: scroll;
+      overflow-y: auto;
+      max-height: var(--window-max-height);
     }
 
     main {
