@@ -189,6 +189,29 @@ export const ghostButtonStyles = css`
   }
 `;
 
+export const primaryBtn = css`
+  .primarybtn {
+    background-color: var(--action-button-color);
+    color: rgba(255, 255, 255, 1);
+    border-radius: var(--button-border-radius);
+    block-size: 40px;
+    border: none;
+    margin-bottom: 8px;
+    font-size: 16px !important;
+    font-family: "Inter Regular";
+    transition: var(--button-transition);
+    inline-size: 100%;
+  }
+
+  .primarybtn:hover {
+    background-color: var(--blue60);
+  }
+
+  .primarybtn:active {
+    background-color: var(--blue70);
+  }
+`;
+
 export const positioner = css`
   .positioner {
     inline-size: 24px;
