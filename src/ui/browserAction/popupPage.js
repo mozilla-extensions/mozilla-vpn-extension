@@ -780,15 +780,15 @@ export class BrowserActionPopup extends LitElement {
       }
 
       #resetPageSettings {
-        box-shadow: 0 0 0 2px rgba(255, 255, 255, .7);
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.7);
       }
 
       #resetPageSettings:hover {
-        background: rgba(255, 255, 255, .1);
+        background: rgba(255, 255, 255, 0.1);
       }
 
       #resetPageSettings:active {
-        background: rgba(255, 255, 255, .15);
+        background: rgba(255, 255, 255, 0.15);
       }
     }
   `;
