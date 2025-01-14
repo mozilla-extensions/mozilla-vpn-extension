@@ -73,15 +73,16 @@ export class FirstRunPage extends LitElement {
               />
               <label class="pill-copy">${tr("telemetryCheckboxLabel")}</label>
             </div>
-            <p class="footer bold">${tr("toContinueToTheExtension")}</p>
-            <button
-              class="primarybtn"
-              @click=${(e) => {
-                browser.browserAction.openPopup();
-              }}
-            >
-              ${tr("next")}
-            </button>
+            <div class="footer bold">
+              <button
+                class="primarybtn"
+                @click=${(e) => {
+                  browser.browserAction.openPopup();
+                }}
+              >
+                ${tr("next")}
+              </button>
+            </div>
           </div>
         </div>
       </main>
@@ -170,7 +171,6 @@ export class FirstRunPage extends LitElement {
     .primarybtn {
       inline-size: auto;
       padding: 0 32px;
-      margin-block-start: 24px;
     }
 
     .footer {
