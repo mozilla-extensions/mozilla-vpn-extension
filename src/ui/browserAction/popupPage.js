@@ -415,7 +415,7 @@ export class BrowserActionPopup extends LitElement {
       </div>
       ${pageLocationPicker}
       <button
-        id="selectLocation"
+        id="resetPageSettings"
         class=${hasSiteContext ? "" : "disabled"}
         @click=${removeSiteContext}
       >
@@ -677,7 +677,7 @@ export class BrowserActionPopup extends LitElement {
       border-radius: 4px;
       padding: 8px, 16px, 8px, 16px;
       font-size: 16px;
-      border: 2px solid var(--action-button-color);
+      border: none;
       color: var(--action-button-color);
       background-color: transparent;
       padding: 10px;
@@ -687,19 +687,19 @@ export class BrowserActionPopup extends LitElement {
     }
 
     #selectPageLocation:disabled,
-    #selectLocation.disabled {
+    #resetPageSettings.disabled {
       opacity: 0.5;
       pointer-events: none;
     }
 
-    #selectLocation {
+    #resetPageSettings {
       margin-block-end: 0px;
+      box-shadow: 0 0 0 2px var(--action-button-color);
     }
 
     #give-feedback {
       margin-block: 8px 16px;
       border: none;
-      font-family:;
       font-size: 15px;
     }
 
@@ -774,6 +774,22 @@ export class BrowserActionPopup extends LitElement {
 
       #settingsList button::after {
         filter: grayscale(1) brightness(2);
+      }
+
+      button {
+        color: rgba(255, 255, 255, 1);
+      }
+
+      #resetPageSettings {
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.7);
+      }
+
+      #resetPageSettings:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      #resetPageSettings:active {
+        background: rgba(255, 255, 255, 0.15);
       }
     }
   `;
