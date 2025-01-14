@@ -257,7 +257,8 @@ describe("IPC::Settings", () => {
     const message = {
       t: "settings",
       settings: {
-        extensionTelemetryEnabled: true,
+        // Send the inverse
+        extensionTelemetryEnabled: !new VPNSettings().extensionTelemetryEnabled,
       },
     };
     await target.handleResponse(message);

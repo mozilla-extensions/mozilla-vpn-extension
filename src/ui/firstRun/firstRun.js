@@ -31,6 +31,9 @@ export class FirstRunPage extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
+
+    // Once on the first run enable telemetry by default.
+    telemetry.setTelemetryEnabled(true);
   }
 
   render() {

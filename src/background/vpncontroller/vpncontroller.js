@@ -203,8 +203,9 @@ export class VPNController extends Component {
       case "settings":
         const settings = new VPNSettings();
         // Copy over all values that we expect to be in VPNSettings
-        Object.keys(settings).forEach((k) => {
-          if (response.settings[k]) {
+        let keys = Object.keys(settings);
+        keys.forEach((k) => {
+          if (response.settings[k] != undefined) {
             settings[k] = response.settings[k];
           }
         });
