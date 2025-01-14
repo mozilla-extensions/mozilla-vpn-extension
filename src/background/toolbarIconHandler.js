@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { Component } from "./component.js";
+import { Utils } from "../shared/utils.js";
 import {
   ExtensionController,
   FirefoxVPNState,
@@ -23,6 +24,11 @@ export class ToolbarIconHandler extends Component {
     super(receiver);
     this.extController = extController;
     this.vpnController = vpnController;
+    this.isSupportedPlatform = true;
+    browser.runtime.getPlatformInfo().then((deviceOs) => {
+      this.isSupportedPlatform = Utils.isSupportedOs(deviceOs.os);
+      this.maybeUpdateBrowserActionIcon();
+    });
   }
 
   /** @type {FirefoxVPNState | undefined} */
@@ -81,6 +87,10 @@ export class ToolbarIconHandler extends Component {
       window.matchMedia("(prefers-color-scheme: dark)").matches;
 
     const scheme = darkMode || windowInfo.incognito ? "light" : "dark";
+
+    if (!this.isSupportedPlatform) {
+      return this.setIcon(scheme, "disabled", windowInfo.id);
+    }
 
     let status = ["Connecting", "Enabled"].includes(this.extState.state)
       ? "enabled"
