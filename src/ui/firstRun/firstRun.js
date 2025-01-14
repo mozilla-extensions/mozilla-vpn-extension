@@ -7,6 +7,7 @@ import {
   fontStyling,
   inCopyLink,
   resetSizing,
+  primaryBtn,
 } from "../../components/styles.js";
 import { tr } from "../../shared/i18n.js";
 import "../../components/mz-pill.js";
@@ -75,7 +76,16 @@ export class FirstRunPage extends LitElement {
               />
               <label class="pill-copy">${tr("telemetryCheckboxLabel")}</label>
             </div>
-            <p class="bold">${tr("toContinueToTheExtension")}</p>
+            <div class="footer bold">
+              <button
+                class="primarybtn"
+                @click=${(e) => {
+                  browser.browserAction.openPopup();
+                }}
+              >
+                ${tr("next")}
+              </button>
+            </div>
           </div>
         </div>
       </main>
@@ -86,11 +96,12 @@ export class FirstRunPage extends LitElement {
     ${fontStyling}
     ${resetSizing}
     ${inCopyLink}
+    ${primaryBtn}
     
     main {
       width: 100vw;
-      height: 100vh;
-      padding: 0 24px 80px 24px;
+      min-height: 100vh;
+      padding: 80px 24px 80px 24px;
       display: flex;
       flex-align: center;
       justify-content: center;
@@ -124,6 +135,7 @@ export class FirstRunPage extends LitElement {
 
     img {
       margin-inline-end: 32px;
+      margin-block-start: 32px;
       max-inline-size: 300px;
     }
 
@@ -134,7 +146,7 @@ export class FirstRunPage extends LitElement {
     }
 
     h1 {
-      margin-block-end: 72px;
+      margin-block-end: 32px;
       font-size: 40px;
       line-height: 50px;
       text-align: center;
@@ -159,6 +171,16 @@ export class FirstRunPage extends LitElement {
       line-height: 27px;
     }
 
+    .primarybtn {
+      inline-size: auto;
+      padding: 0 32px;
+    }
+
+    .footer {
+      padding-block-start: 32px;
+      border-top: 1px solid black;
+    }
+
     @media (prefers-color-scheme: dark) {
       h1 {
         color: rgba(255, 255, 255, 1);
@@ -172,6 +194,9 @@ export class FirstRunPage extends LitElement {
       p,
       li {
         color: rgba(255, 255, 255, 0.7);
+      }
+      .footer {
+        border-color: rgba(255, 255, 255, 0.6);
       }
     }
 

@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { html, LitElement, when, repeat, css } from "../vendor/lit-all.min.js";
-import { fontStyling, ghostButtonStyles } from "./styles.js";
+import { fontStyling, ghostButtonStyles, primaryBtn } from "./styles.js";
 import "./titlebar.js";
 
 /**
@@ -114,7 +114,7 @@ export class MessageScreen extends LitElement {
     `;
   }
   static styles = css`
-    ${fontStyling}${ghostButtonStyles}
+    ${fontStyling}${ghostButtonStyles}${primaryBtn}
 
     /* Hide "Skip" on the last onboarding panel */
     .onboarding-screen-3.ghost-btn {
@@ -254,27 +254,11 @@ export class MessageScreen extends LitElement {
 
     button {
       border: none;
-      height: 32px;
       margin-bottom: 8px;
       font-size: 16px !important;
       font-family: "Inter Regular";
       border-radius: var(--button-border-radius);
       transition: var(--button-transition);
-    }
-
-    .primarybtn {
-      background-color: var(--action-button-color);
-      color: white;
-      border-radius: 4px;
-      block-size: 40px;
-    }
-
-    .primarybtn:hover {
-      background-color: var(--blue60);
-    }
-
-    .primarybtn:active {
-      background-color: var(--blue70);
     }
 
     p {
