@@ -75,21 +75,51 @@
 
 import { IBindable, property, ReadOnlyProperty } from "./property.js";
 
-export const getExposedObject = async (name = "ohno") => {
+export const getExposedObject = async (name = "ohno", maxRetrys = 20) => {
   // TODO: Lesley noted this port might disconnect
   // So we should handle this here and auto hook up a new
   // port with the message port JUST IN CASE.
   /** @type {browser.runtime.Port} */
-  const port = globalThis.chrome.runtime.connect({ name });
 
-  const messagePort = toMessagePort(port);
+  /** @type {IPC_INFO_MESSAGE?} */
+  let info = null;
+  let port;
+  /** @type {MessagePort?} */
+  let messagePort = null;
+  for (let retryCount = 0; retryCount <= maxRetrys && !info; retryCount++) {
+    if (!port) {
+      port = globalThis.chrome.runtime.connect({ name });
+    }
+    messagePort = toMessagePort(port);
+    try {
+      // @ts-ignore
+      info = await requestFromPort(
+        messagePort,
+        {
+          ...new IPC_INFO_MESSAGE(),
+          id: makeID(),
+        },
+        100 + Math.pow(2, Math.min(retryCount, 10)) // Scale from 1ß2ms -> 1124ms Delay between attempts
+      );
+    } catch (error) {
+      if (port) {
+        port.disconnect();
+        port = null;
+      }
+      console.log(
+        `Attempt ${retryCount}/${maxRetrys} to fetch ${name}-Info failed.`
+      );
+    }
+  }
+  if (info == null) {
+    throw new Error(`Background script did not Provide info for ${name}`);
+    return;
+  }
+  if (!messagePort) {
+    throw new Error(`Failed to establish a message port`);
+    return;
+  }
 
-  /** @type {IPC_INFO_MESSAGE} */
-  // @ts-ignore
-  const info = await requestFromPort(messagePort, {
-    ...new IPC_INFO_MESSAGE(),
-    id: makeID(),
-  });
   return await createReplica(info.data, messagePort);
 };
 

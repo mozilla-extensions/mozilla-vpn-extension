@@ -1,4 +1,5 @@
 import { getExposedObject } from "../../shared/ipc.js";
+const t0 = performance.now();
 
 /**
  * Import Types
@@ -45,3 +46,6 @@ export const butterBarService = await getExposedObject("ButterBarService");
 export const telemetry = await getExposedObject("Telemetry");
 
 export const ready = Promise.all([vpnController, proxyHandler]);
+
+var t1 = performance.now();
+console.log("Inizializing ipc took " + (t1 - t0) + " milliseconds.");
