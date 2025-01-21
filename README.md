@@ -9,6 +9,30 @@
 
 ___
 
+## Building the Extension 
+1. Clone the source code
+
+```
+        git clone https://github.com/mozilla-extensions/mozilla-vpn-extension
+        cd mozilla-vpn-extension
+```
+2. Initialize the submodules
+```
+        git submodule update --init --recursive
+```
+
+3. Install node modules
+```
+        npm install
+```
+4. Build
+```
+        npm run build
+        # Extension is now ready:
+        sha256sum dist/mozilla-vpn-extension.xpi
+```
+
+
 ## Development
 1. Clone the source code
 
