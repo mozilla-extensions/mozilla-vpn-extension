@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
-  "version": "1.1.1",
+  "version": "1.1.2",
   "author": "Mozilla",
-  "name": "__MSG_extensionName__",
+  "name": "__MSG_extensionName2__",
   "description": "__MSG_extensionDescription__",
 
   "browser_specific_settings": {
