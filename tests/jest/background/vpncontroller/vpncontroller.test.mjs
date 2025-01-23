@@ -18,46 +18,36 @@ import Constants from "../../../../src/shared/constants";
 
 describe("isSplitTunneled", () => {
   const cases = [
-    { res: true, path: "/soo/bar/Firefox Nightly/firefox.exe" },
-    { res: true, path: "/soo/bar/Firefox Developer Edition/firefox.exe" },
-    { res: true, path: "/soo/bar/Firefox/firefox.exe" },
-    { res: true, path: "/soo/bar/Firefox Nightly/firefox" },
-    { res: true, path: "/soo/bar/Firefox Developer Edition/firefox" },
-    { res: true, path: "/soo/bar/Firefox/firefox" },
-    { res: false, path: "/soo/bar/Waterfox/Waterfox" },
+    { res: true, 
+      path: "/foo/bar/firefox.exe",
+      parent: "/foo/bar/firefox.exe"
+    },
+    { res: true, 
+      path: "/foo/bar/firefox.exe",
+      parent: "\\foo\\bar\\firefox.exe"
+    },
+    { res: false, 
+      path: "/foo/bar/fox.exe",
+      parent: "\\foo\\bar\\firefox.exe"
+    },
   ];
   cases.forEach((c) => {
     it(`Should handle ${c.path}`, () => {
       expect(
-        isSplitTunnled({
-          t: "disabled_apps",
-          disabled_apps: [c.path],
-        })
+        isSplitTunnled(
+          c.parent,
+          [c.path],
+        )
       ).toBe(c.res);
     });
   });
   it(`No apps split tunneled`, () => {
     expect(
-      isSplitTunnled({
-        t: "disabled_apps",
-        disabled_apps: [],
-      })
+      isSplitTunnled("",[])
     ).toBe(false);
   });
   it(`Has default args`, () => {
     expect(isSplitTunnled()).toBe(false);
-  });
-  it(`Throws with wrong args`, () => {
-    try {
-      isSplitTunnled({
-        t: "malformed_apps",
-        disabled_apps: [],
-      });
-      // Unreachable Hopefully
-      expect(null).toBe(true);
-    } catch (error) {
-      expect(error.toString()).toContain("passed an invalid response");
-    }
   });
 });
 

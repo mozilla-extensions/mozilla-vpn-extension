@@ -190,3 +190,11 @@ defineMessageScreen({
   secondaryAction: tr("getHelp"),
   onSecondaryAction: () => closeAfter(() => open(getHelpUrl)),
 });
+
+defineMessageScreen({
+  tag: "split-tunnel-message-screen",
+  img: "message-split-tunnel.svg",
+  heading: tr("messageSplitTunnelHeader"),
+  bodyText: tr("messageSplitTunnelBody")
+})
+

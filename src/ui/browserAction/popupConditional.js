@@ -32,18 +32,20 @@ export class PopUpConditionalView extends LitElement {
     const supportedPlatform = Utils.isSupportedOs(deviceOs.os);
 
     propertySum(
-      (state, features, currentPage) => {
+      (state, features, currentPage,isExcluded) => {
         this.targetElement = PopUpConditionalView.toSlotname(
           state,
           features,
           supportedPlatform,
           currentPage,
-          this.onBoadingScreens
+          this.onBoadingScreens,
+          isExcluded
         );
       },
       vpnController.state,
       vpnController.featureList,
-      onboardingController.currentOnboardingPage
+      onboardingController.currentOnboardingPage,
+      vpnController.isExcluded
     );
 
     // Messages may dispatch an event requesting to send a Command to the VPN
@@ -66,15 +68,10 @@ export class PopUpConditionalView extends LitElement {
    * @param {FeatureFlags} features
    * @param {Boolean} supportedPlatform
    * @param {Number} currentOnboardingPage
+   * @param {Boolean} isExcluded
    * @returns {String}
    */
-  static toSlotname(
-    state,
-    features,
-    supportedPlatform,
-    currentOnboardingPage,
-    onBoardingScreens
-  ) {
+  static toSlotname(state, features, supportedPlatform, currentOnboardingPage,onBoardingScreens, isExcluded) {
     if (!supportedPlatform && !features.webExtension) {
       return html`<unsupported-os-message-screen></unsupported-os-message-screen>`;
     }
@@ -98,6 +95,9 @@ export class PopUpConditionalView extends LitElement {
       currentOnboardingPage <= NUMBER_OF_ONBOARDING_PAGES
     ) {
       return onBoardingScreens[currentOnboardingPage];
+    }
+    if(isExcluded){
+      return html`<split-tunnel-message-screen></split-tunnel-message-screen>`
     }
 
     return html`<popup-browseraction></popup-browseraction>`;

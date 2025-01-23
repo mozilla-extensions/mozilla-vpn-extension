@@ -10,6 +10,7 @@ import { Utils } from "../../shared/utils.js";
 import {
   IBindable,
   WritableProperty,
+  propertySum,
   property,
 } from "../../shared/property.js";
 import { PropertyType } from "../../shared/ipc.js";
@@ -57,9 +58,6 @@ export class VPNController extends Component {
   }
   get servers() {
     return this.#mServers;
-  }
-  get isExcluded() {
-    return this.#isExcluded;
   }
   /** @type {IBindable<FeatureFlags>} */
   get featureList() {
@@ -134,6 +132,11 @@ export class VPNController extends Component {
     });
 
     this.initNativeMessaging();
+
+    // Whenever the applist changes, make sure we check if that is us. 
+    this.#mSplitTunnledApps.subscribe(()=>{
+      this.postToApp("proc_info")
+    })
   }
   /**
    * Sends a message to the client
@@ -178,7 +181,7 @@ export class VPNController extends Component {
         this.#mServers.set(response.servers.countries);
         break;
       case "disabled_apps":
-        this.#isExcluded.set(isSplitTunnled(response));
+        this.#mSplitTunnledApps.set(response["disabled_apps"]);
         break;
       case "status":
         const newStatus = fromVPNStatusResponse(response, this.#mServers.value);
@@ -225,6 +228,11 @@ export class VPNController extends Component {
   async handleBridgeResponse(response, state) {
     const currentState = state.value;
     // We can only get 2 types of messages right now: client-down/up
+    if(response.exe){
+      this.#mParentProcess.set(response.exe)
+    }
+
+
     if (
       (response.status && response.status === "vpn-client-down") ||
       (response.error && response.error === "vpn-client-down")
@@ -281,31 +289,23 @@ export class VPNController extends Component {
 
   #mFeaturelist = property(new FeatureFlags());
 
-  #isExcluded = property(false);
-
+  #mSplitTunnledApps = property([]);
+  #mParentProcess = property("");
   #mInterventions = property([]);
   #settings = property(new VPNSettings());
+
+  isExcluded = propertySum(isSplitTunnled,this.#mParentProcess, this.#mSplitTunnledApps)
+
 }
 
-export function isSplitTunnled(
-  response = {
-    t: "disabled_apps",
-    disabled_apps: [""],
+export function isSplitTunnled(parent ="",apps=[""]) {
+  if(parent == ""){
+    return false;
   }
-) {
-  if (response.t != "disabled_apps") {
-    throw new Error("passed an invalid response");
+  if(apps.length == 0){
+    return false;
   }
-  // Todo: THIS IS STILL HACKY
-  const search_terms = ["firefox.exe", "firefox"];
-  let apps = response.disabled_apps;
-  apps ??= [];
-  const isFirefoxExcluded = apps.some((path) => {
-    return search_terms.some((searchPath) => {
-      return path.endsWith(searchPath);
-    });
-  });
-  return isFirefoxExcluded;
+  return apps.some((app) => app === parent.replaceAll("\\","/"));
 }
 
 const MOZILLA_VPN_SERVERS_KEY = "mozillaVpnServers";
