@@ -34,6 +34,15 @@ const sendToApp = (customElement, command = "") => {
   );
 };
 
+const openVPN = (elm) => {
+  sendToApp(elm, "start");
+};
+
+const openAuth = (elm) => {
+  sendToApp(elm, "focus");
+  sendToApp(elm, "openAuth");
+};
+
 const defineMessageScreen = (
   args = {
     tag,
@@ -104,6 +113,8 @@ defineMessageScreen({
   img: "message-signin.svg",
   heading: tr("headerSignedOut"),
   bodyText: tr("bodySignedOut"),
+  primaryAction: tr("btnOpenVpn"),
+  onPrimaryAction: openAuth,
   secondaryAction: tr("getHelp"),
   onSecondaryAction: () => closeAfter(() => open(getHelpUrl)),
 });
@@ -128,8 +139,8 @@ defineMessageScreen({
   img: "message-open.svg",
   heading: tr("headerOpenMozillaVPN"),
   bodyText: html` <p>${tr("bodyOpenMsg")}</p> `,
-  onPrimaryAction: null,
-  primaryAction: null,
+  onPrimaryAction: openVPN,
+  primaryAction: tr("btnOpenVpn"),
   secondaryAction: tr("getHelp"),
   onSecondaryAction: () => closeAfter(() => open(getHelpUrl)),
 });
