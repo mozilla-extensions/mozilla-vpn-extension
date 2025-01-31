@@ -28,10 +28,6 @@ html {
   overflow: hidden;
 }
 
-.needsSlotted > * {
-  display: none;
-}
-
 .stack {
   display: grid;
   grid-template-rows: 1fr;
