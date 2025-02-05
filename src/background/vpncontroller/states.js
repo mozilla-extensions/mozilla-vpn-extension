@@ -212,7 +212,7 @@ export class vpnStatusResponse {
       available: false,
       url: "https://localhost:8080",
     },
-    version: "2.25.0",
+    version: "2.99.0",
   };
 }
 

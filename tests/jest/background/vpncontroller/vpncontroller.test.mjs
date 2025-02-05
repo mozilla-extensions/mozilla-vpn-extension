@@ -14,6 +14,8 @@ import {
 } from "../../../../src/background/vpncontroller";
 import { property } from "../../../../src/shared/property";
 
+import Constants from "../../../../src/shared/constants";
+
 describe("isSplitTunneled", () => {
   const cases = [
     { res: true, path: "/soo/bar/Firefox Nightly/firefox.exe" },
@@ -98,7 +100,7 @@ describe("fromVPNStatusResponse", () => {
     msg.status.location.exit_country_code = "mor";
     msg.status.location.exit_city_name =
       "Actually no idea what the name would be";
-    msg.status.version = "2.25.1";
+    msg.status.version = Constants.MINIMUM_VPN_VERSION;
 
     const result = fromVPNStatusResponse(msg, list);
     expect(result.exitServerCity).toBe(list[1][0]);
@@ -116,7 +118,7 @@ describe("fromVPNStatusResponse", () => {
     msg.status.location.exit_country_code = "mor";
     msg.status.location.exit_city_name =
       "Actually no idea what the name would be";
-    msg.status.version = "2.25.1";
+    msg.status.version = Constants.MINIMUM_VPN_VERSION;
 
     const result = fromVPNStatusResponse(msg, list);
     expect(result.exitServerCity).toBe(list[1][0]);
@@ -134,7 +136,7 @@ describe("fromVPNStatusResponse", () => {
     msg.status.location.exit_country_code = "mor";
     msg.status.location.exit_city_name =
       "Actually no idea what the name would be";
-    msg.status.version = "2.25.1";
+    msg.status.version = Constants.MINIMUM_VPN_VERSION;
 
     const result = fromVPNStatusResponse(msg, list);
     expect(result.exitServerCity).toBe(list[1][0]);
@@ -155,7 +157,7 @@ describe("fromVPNStatusResponse", () => {
           exit_country_code: "",
         },
         vpn: "StateInitializing",
-        version: "2.25.2",
+        version: Constants.MINIMUM_VPN_VERSION,
       },
       t: "status",
     };
