@@ -104,6 +104,27 @@ export class ToolbarIconHandler extends Component {
     const base64 = btoa(logo);
     return `data:image/svg+xml;base64,${base64}`;
   }
+  static getFillColor(themeColors) {
+    const darkMode =
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const defaultColor = darkMode ? "white" : "black";
+
+    // If there is no theme selected in firefox, just use defaults
+    if (!themeColors) {
+      return defaultColor;
+    }
+    if (themeColors.icons) {
+      // If the Theme specifically tells us the icon color to use
+      // respect that.
+      return themeColors.icons;
+    }
+    if (themeColors.toolbar_text) {
+      return themeColors.toolbar_text;
+    }
+    // We failed to find a good color >:(
+    return defaultColor;
+  }
 
   async maybeUpdateBrowserActionIcon() {
     const windowInfo = await browser.windows.getCurrent();
@@ -113,7 +134,7 @@ export class ToolbarIconHandler extends Component {
     const theme = await browser.theme.getCurrent();
     // tab_background_text seems to be the same as --toolbarbutton-icon-fill
     // which is sadly not exported int the theme >:/
-    const iconFill = theme.colors.tab_background_text;
+    const iconFill = ToolbarIconHandler.getFillColor(theme.colors);
 
     if (!this.isSupportedPlatform) {
       return this.setIcon(iconFill, disabledColor, windowInfo.id);
