@@ -140,7 +140,7 @@ defineMessageScreen({
   heading: tr("headerOpenMozillaVPN"),
   bodyText: html` <p>${tr("bodyOpenMsg")}</p> `,
   onPrimaryAction: openVPN,
-  primaryAction: tr("btnOpenVpn"),
+  primaryAction: tr("headerOpenMozillaVPN"),
   secondaryAction: tr("getHelp"),
   onSecondaryAction: () => closeAfter(() => open(getHelpUrl)),
 });
