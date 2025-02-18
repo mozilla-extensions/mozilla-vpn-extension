@@ -19,7 +19,7 @@ export class PopUpConditionalView extends ConditionalView {
     const supportedPlatform = Utils.isSupportedOs(deviceOs.os);
 
     propertySum(
-      (state, features, currentPage,isExcluded) => {
+      (state, features, currentPage, isExcluded) => {
         this.slotName = PopUpConditionalView.toSlotname(
           state,
           features,
@@ -62,7 +62,13 @@ export class PopUpConditionalView extends ConditionalView {
    * @param {Boolean} isExcluded
    * @returns {String}
    */
-  static toSlotname(state, features, supportedPlatform, currentOnboardingPage, isExcluded) {
+  static toSlotname(
+    state,
+    features,
+    supportedPlatform,
+    currentOnboardingPage,
+    isExcluded
+  ) {
     if (!supportedPlatform && !features.webExtension) {
       return "MessageOSNotSupported";
     }
@@ -90,8 +96,8 @@ export class PopUpConditionalView extends ConditionalView {
     ) {
       return `onboarding-${currentOnboardingPage}`;
     }
-    if(isExcluded){
-      return "MessageSplitTunnel"
+    if (isExcluded) {
+      return "MessageSplitTunnel";
     }
 
     return "default";
