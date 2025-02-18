@@ -18,33 +18,21 @@ import Constants from "../../../../src/shared/constants";
 
 describe("isSplitTunneled", () => {
   const cases = [
-    { res: true, 
+    { res: true, path: "/foo/bar/firefox.exe", parent: "/foo/bar/firefox.exe" },
+    {
+      res: true,
       path: "/foo/bar/firefox.exe",
-      parent: "/foo/bar/firefox.exe"
+      parent: "\\foo\\bar\\firefox.exe",
     },
-    { res: true, 
-      path: "/foo/bar/firefox.exe",
-      parent: "\\foo\\bar\\firefox.exe"
-    },
-    { res: false, 
-      path: "/foo/bar/fox.exe",
-      parent: "\\foo\\bar\\firefox.exe"
-    },
+    { res: false, path: "/foo/bar/fox.exe", parent: "\\foo\\bar\\firefox.exe" },
   ];
   cases.forEach((c) => {
     it(`Should handle ${c.path}`, () => {
-      expect(
-        isSplitTunnled(
-          c.parent,
-          [c.path],
-        )
-      ).toBe(c.res);
+      expect(isSplitTunnled(c.parent, [c.path])).toBe(c.res);
     });
   });
   it(`No apps split tunneled`, () => {
-    expect(
-      isSplitTunnled("",[])
-    ).toBe(false);
+    expect(isSplitTunnled("", [])).toBe(false);
   });
   it(`Has default args`, () => {
     expect(isSplitTunnled()).toBe(false);

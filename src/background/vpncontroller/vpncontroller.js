@@ -133,10 +133,10 @@ export class VPNController extends Component {
 
     this.initNativeMessaging();
 
-    // Whenever the applist changes, make sure we check if that is us. 
-    this.#mSplitTunnledApps.subscribe(()=>{
-      this.postToApp("proc_info")
-    })
+    // Whenever the applist changes, make sure we check if that is us.
+    this.#mSplitTunnledApps.subscribe(() => {
+      this.postToApp("proc_info");
+    });
   }
   /**
    * Sends a message to the client
@@ -228,10 +228,9 @@ export class VPNController extends Component {
   async handleBridgeResponse(response, state) {
     const currentState = state.value;
     // We can only get 2 types of messages right now: client-down/up
-    if(response.exe){
-      this.#mParentProcess.set(response.exe)
+    if (response.exe) {
+      this.#mParentProcess.set(response.exe);
     }
-
 
     if (
       (response.status && response.status === "vpn-client-down") ||
@@ -294,18 +293,21 @@ export class VPNController extends Component {
   #mInterventions = property([]);
   #settings = property(new VPNSettings());
 
-  isExcluded = propertySum(isSplitTunnled,this.#mParentProcess, this.#mSplitTunnledApps)
-
+  isExcluded = propertySum(
+    isSplitTunnled,
+    this.#mParentProcess,
+    this.#mSplitTunnledApps
+  );
 }
 
-export function isSplitTunnled(parent ="",apps=[""]) {
-  if(parent == ""){
+export function isSplitTunnled(parent = "", apps = [""]) {
+  if (parent == "") {
     return false;
   }
-  if(apps.length == 0){
+  if (apps.length == 0) {
     return false;
   }
-  return apps.some((app) => app === parent.replaceAll("\\","/"));
+  return apps.some((app) => app === parent.replaceAll("\\", "/"));
 }
 
 const MOZILLA_VPN_SERVERS_KEY = "mozillaVpnServers";
