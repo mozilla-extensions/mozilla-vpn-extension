@@ -132,8 +132,6 @@ export class ToolbarIconHandler extends Component {
       return;
     }
     const theme = await browser.theme.getCurrent();
-    // tab_background_text seems to be the same as --toolbarbutton-icon-fill
-    // which is sadly not exported int the theme >:/
     const iconFill = ToolbarIconHandler.getFillColor(theme.colors);
 
     if (!this.isSupportedPlatform) {
