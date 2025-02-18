@@ -46,6 +46,7 @@ export class ProxyHandler extends Component {
             type: "socks",
             host: "file:/var/run/mozillavpn.proxy",
             port: 1234,
+            proxyDNS: true,
           },
         ];
       } else if (info.os === "win") {
@@ -55,6 +56,7 @@ export class ProxyHandler extends Component {
             type: "socks",
             host: "localhost",
             port: 8123,
+            proxyDNS: true,
           },
         ];
       } else {
@@ -103,7 +105,7 @@ export class ProxyHandler extends Component {
    * Returns the array of proxyInfo objects,
    * in the VPN client's current server
    * location.
-   * @type {IBindable<Map<String, Array>>}
+   * @type {IBindable<Array<any>>}
    * */
   get currentExitRelays() {
     return this.#mCurrentExitRelays.readOnly;
@@ -178,7 +180,6 @@ export class ProxyHandler extends Component {
       }
     });
     this.#mProxyMap.value = result;
-    console.log(`Updated #mCurrentExitRelays to ${this.#mCurrentExitRelays}`);
     return result;
   }
 
