@@ -94,7 +94,7 @@ export class PopUpConditionalView extends LitElement {
       return html`<subscribenow-message-screen></subscribenow-message-screen>`;
     }
     if (
-      currentOnboardingPage >= 1 &&
+      currentOnboardingPage >= 0 &&
       currentOnboardingPage <= NUMBER_OF_ONBOARDING_PAGES
     ) {
       return onBoardingScreens[currentOnboardingPage];
