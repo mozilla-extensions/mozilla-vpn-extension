@@ -46,6 +46,7 @@ export class ProxyHandler extends Component {
             type: "socks",
             host: "file:/var/run/mozillavpn.proxy",
             port: 1234,
+            proxyDNS: true,
           },
         ];
       } else if (info.os === "win") {
@@ -55,6 +56,7 @@ export class ProxyHandler extends Component {
             type: "socks",
             host: "localhost",
             port: 8123,
+            proxyDNS: true,
           },
         ];
       } else {
