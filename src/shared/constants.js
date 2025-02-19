@@ -3,5 +3,5 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 export default {
-  MINIMUM_VPN_VERSION: "2.26.0",
+  MINIMUM_VPN_VERSION: "2.25.1",
 };
