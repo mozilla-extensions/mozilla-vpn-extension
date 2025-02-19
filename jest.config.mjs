@@ -5,4 +5,11 @@ export default {
     "js",
   ],
   testRegex: `test\.mjs$`,
+
+  collectCoverageFrom: [
+    "src/**/*.{js,jsx}",
+    "!**/node_modules/**",
+    "!**/vendor/**",
+  ],
+  collectCoverage: true,
 };

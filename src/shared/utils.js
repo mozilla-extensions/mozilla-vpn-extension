@@ -4,6 +4,8 @@
 
 import suffixes from "./suffixes.js";
 
+import Constants from "./constants.js";
+
 /**
  * Here you'll find utility functions for managing
  * site contexts and handling various tasks.
@@ -40,12 +42,29 @@ export const Utils = {
     return currentState === "Connecting" && newState === "Enabled";
   },
 
-  isViableClientVersion: (clientVersion) => {
-    // TODO we should do something better here
-    // We'll likely want to update the minimumViableClient
-    // out of band at some point.
-    const minimumViableClient = "2.25.0";
-    return parseInt(clientVersion) < parseInt(minimumViableClient);
+  isViableClientVersion: (
+    clientVersion = "0.0.0",
+    minimumViableClient = Constants.MINIMUM_VPN_VERSION
+  ) => {
+    let client = clientVersion.split(".").map((a) => parseInt(a, 10));
+    let minimum = minimumViableClient.split(".").map((a) => parseInt(a, 10));
+
+    if (client.length != 3) {
+      throw new Error(
+        `Client version does not match format A.B.C -> ${clientVersion}`
+      );
+    }
+    if (minimum.length != 3) {
+      throw new Error(
+        `minimumViableClient version does not match format A.B.C -> ${minimumViableClient}`
+      );
+    }
+    for (let i = 0; i < 3; ++i) {
+      if (client[i] != minimum[i]) {
+        return client[i] > minimum[i];
+      }
+    }
+    return true;
   },
 
   /**
