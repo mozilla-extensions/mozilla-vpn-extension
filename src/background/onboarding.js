@@ -11,7 +11,7 @@ import { PropertyType } from "./../shared/ipc.js";
 import { fromStorage, putIntoStorage } from "./vpncontroller/vpncontroller.js";
 
 const ONBOARDING_KEY = "mozillaVpnOnboarding";
-const FIRST_PAGE = 1;
+const FIRST_PAGE = 0;
 export const NUMBER_OF_ONBOARDING_PAGES = 3;
 const FIRST_UNUSED_PAGE = NUMBER_OF_ONBOARDING_PAGES + 1;
 

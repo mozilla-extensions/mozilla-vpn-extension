@@ -2,16 +2,29 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { ConditionalView } from "../../components/conditional-view.js";
 import { propertySum } from "../../shared/property.js";
 import { Utils } from "../../shared/utils.js";
 import { vpnController, onboardingController, telemetry } from "./backend.js";
 import { NUMBER_OF_ONBOARDING_PAGES } from "../../background/onboarding.js";
+import { LitElement, html } from "../../vendor/lit-all.min.js";
 
-export class PopUpConditionalView extends ConditionalView {
-  constructor() {
-    super();
+export class PopUpConditionalView extends LitElement {
+  static properties = {
+    targetElement: { type: Object },
+  };
+  createRenderRoot() {
+    return this;
   }
+
+  render() {
+    return this.targetElement;
+  }
+
+  onBoadingScreens = [
+    html`<onboarding-screen-1></onboarding-screen-1>`,
+    html`<onboarding-screen-2></onboarding-screen-2>`,
+    html`<onboarding-screen-3></onboarding-screen-3>`,
+  ];
 
   async connectedCallback() {
     super.connectedCallback();
@@ -20,17 +33,13 @@ export class PopUpConditionalView extends ConditionalView {
 
     propertySum(
       (state, features, currentPage) => {
-        this.slotName = PopUpConditionalView.toSlotname(
+        this.targetElement = PopUpConditionalView.toSlotname(
           state,
           features,
           supportedPlatform,
-          currentPage
+          currentPage,
+          this.onBoadingScreens
         );
-        if (this.slotName == !"default") {
-          requestIdleCallback(() => {
-            telemetry.record("error_screen", { error: this.slotName });
-          });
-        }
       },
       vpnController.state,
       vpnController.featureList,
@@ -59,36 +68,39 @@ export class PopUpConditionalView extends ConditionalView {
    * @param {Number} currentOnboardingPage
    * @returns {String}
    */
-  static toSlotname(state, features, supportedPlatform, currentOnboardingPage) {
+  static toSlotname(
+    state,
+    features,
+    supportedPlatform,
+    currentOnboardingPage,
+    onBoardingScreens
+  ) {
     if (!supportedPlatform && !features.webExtension) {
-      return "MessageOSNotSupported";
+      return html`<unsupported-os-message-screen></unsupported-os-message-screen>`;
     }
     if (!state.installed) {
-      return "MessageInstallVPN";
+      return html`<install-message-screen></install-message-screen>`;
     }
     if (state.needsUpdate) {
-      return "MessageUpdateClient";
+      return html`<needs-update-message-screen></needs-update-message-screen>`;
     }
     if (!state.alive) {
-      return "MessageOpenMozillaVPN";
-    }
-    if (!features.webExtension) {
-      return "MessageOSNotSupported";
+      return html`<open-mozilla-vpn-message-screen></open-mozilla-vpn-message-screen>`;
     }
     if (!state.authenticated) {
-      return "MessageSignIn";
+      return html`<signin-message-screen></signin-message-screen>`;
     }
     if (!state.subscribed) {
-      return "MessageSubscription";
+      return html`<subscribenow-message-screen></subscribenow-message-screen>`;
     }
     if (
-      currentOnboardingPage >= 1 &&
+      currentOnboardingPage >= 0 &&
       currentOnboardingPage <= NUMBER_OF_ONBOARDING_PAGES
     ) {
-      return `onboarding-${currentOnboardingPage}`;
+      return onBoardingScreens[currentOnboardingPage];
     }
 
-    return "default";
+    return html`<popup-browseraction></popup-browseraction>`;
   }
 }
 customElements.define("popup-condview", PopUpConditionalView);
