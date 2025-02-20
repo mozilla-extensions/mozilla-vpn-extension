@@ -175,7 +175,7 @@ export class RequestHandler extends Component {
   static toDefaultProxyInfo(browserProxySettings, extState, relays) {
     if (
       extState?.useExitRelays ||
-      browserProxySettings?.value?.proxyType != "none"
+      ( browserProxySettings?.value?.proxyType != "none" && browserProxySettings?.value?.proxyType != "system" )
     ) {
       return relays;
     } else {
