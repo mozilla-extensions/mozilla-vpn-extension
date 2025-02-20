@@ -19,12 +19,13 @@ export class PopUpConditionalView extends ConditionalView {
     const supportedPlatform = Utils.isSupportedOs(deviceOs.os);
 
     propertySum(
-      (state, features, currentPage) => {
+      (state, features, currentPage, isExcluded) => {
         this.slotName = PopUpConditionalView.toSlotname(
           state,
           features,
           supportedPlatform,
-          currentPage
+          currentPage,
+          isExcluded
         );
         if (this.slotName == !"default") {
           requestIdleCallback(() => {
@@ -34,7 +35,8 @@ export class PopUpConditionalView extends ConditionalView {
       },
       vpnController.state,
       vpnController.featureList,
-      onboardingController.currentOnboardingPage
+      onboardingController.currentOnboardingPage,
+      vpnController.isExcluded
     );
 
     // Messages may dispatch an event requesting to send a Command to the VPN
@@ -57,9 +59,16 @@ export class PopUpConditionalView extends ConditionalView {
    * @param {FeatureFlags} features
    * @param {Boolean} supportedPlatform
    * @param {Number} currentOnboardingPage
+   * @param {Boolean} isExcluded
    * @returns {String}
    */
-  static toSlotname(state, features, supportedPlatform, currentOnboardingPage) {
+  static toSlotname(
+    state,
+    features,
+    supportedPlatform,
+    currentOnboardingPage,
+    isExcluded
+  ) {
     if (!supportedPlatform && !features.webExtension) {
       return "MessageOSNotSupported";
     }
@@ -86,6 +95,9 @@ export class PopUpConditionalView extends ConditionalView {
       currentOnboardingPage <= NUMBER_OF_ONBOARDING_PAGES
     ) {
       return `onboarding-${currentOnboardingPage}`;
+    }
+    if (isExcluded) {
+      return "MessageSplitTunnel";
     }
 
     return "default";
