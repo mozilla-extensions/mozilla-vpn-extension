@@ -10,7 +10,7 @@ import {
   FirefoxVPNState,
 } from "./extensionController/index.js";
 import { ProxyHandler, ProxyUtils } from "./proxyHandler/index.js";
-import { propertySum } from "../shared/property.js";
+import { propertySum, property } from "../shared/property.js";
 
 const log = Logger.logger("RequestHandler");
 let self;
@@ -30,8 +30,31 @@ export class RequestHandler extends Component {
     this.active = false;
     this.localProxyInfo = [];
     this.currentExitRelays = [];
-    this.defaultProxyInfo = ProxyUtils.getDirectProxyInfoObject();
+    this.browserProxySettings = property();
+    this.defaultProxyInfo = propertySum(
+      RequestHandler.toDefaultProxyInfo,
+      this.browserProxySettings,
+      extController.state,
+      proxyHandler.currentExitRelays
+    );
     self = this;
+
+    browser.proxy.settings.get({}).then((v) => {
+      this.browserProxySettings.set(v);
+    });
+    browser.proxy.settings.onChange.addListener((v) => {
+      debugger;
+      this.browserProxySettings.set(v);
+    });
+    // Every 10 Minutes Check poll the proxy settings
+    // As browser.proxy.settings.onChange does not seem
+    // to notify us if the user Changes the setting,
+    // just another extension would...
+    setInterval(() => {
+      browser.proxy.settings.get({}).then((v) => {
+        this.browserProxySettings.set(v);
+      });
+    }, 600000);
 
     /** @type {FirefoxVPNState | undefined} */
     this.extState = {};
@@ -58,12 +81,6 @@ export class RequestHandler extends Component {
   updateProxyInfoFromClient(localProxy, exitRelays) {
     this.localProxyInfo = localProxy;
     this.currentExitRelay = exitRelays;
-
-    if (this.extState.useExitRelays) {
-      this.defaultProxyInfo = exitRelays;
-    } else {
-      this.defaultProxyInfo = ProxyUtils.getDirectProxyInfoObject();
-    }
   }
 
   /**
@@ -71,12 +88,6 @@ export class RequestHandler extends Component {
    * @param {FirefoxVPNState} extState
    */
   handleExtensionStateChanges(extState) {
-    if (extState.useExitRelays) {
-      this.defaultProxyInfo = this.currentExitRelays;
-    } else {
-      this.defaultProxyInfo = ProxyUtils.getDirectProxyInfoObject();
-    }
-
     return this.addOrRemoveRequestListener();
   }
 
@@ -118,7 +129,11 @@ export class RequestHandler extends Component {
   }
 
   proxyAllReqsByDefault() {
-    return this.extState.bypassTunnel || this.extState.useExitRelays;
+    return (
+      this.extState.bypassTunnel ||
+      this.extState.useExitRelays ||
+      this.browserProxySettings.value?.value?.proxyType != "none"
+    );
   }
 
   /**
@@ -154,7 +169,18 @@ export class RequestHandler extends Component {
     }
 
     // No custom proxy for the site, return default connection
-    return self.defaultProxyInfo;
+    return self.defaultProxyInfo.value;
+  }
+
+  static toDefaultProxyInfo(browserProxySettings, extState, relays) {
+    if (
+      extState?.useExitRelays ||
+      browserProxySettings?.value?.proxyType != "none"
+    ) {
+      return relays;
+    } else {
+      return ProxyUtils.getDirectProxyInfoObject();
+    }
   }
 }
 
