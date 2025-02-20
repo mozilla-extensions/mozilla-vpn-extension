@@ -132,7 +132,7 @@ export class RequestHandler extends Component {
     return (
       this.extState.bypassTunnel ||
       this.extState.useExitRelays ||
-      this.browserProxySettings.value?.value?.proxyType != "manual"
+      this.browserProxySettings.value?.value?.proxyType != "none"
     );
   }
 
