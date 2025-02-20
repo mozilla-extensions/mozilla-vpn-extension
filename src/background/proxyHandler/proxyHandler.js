@@ -105,7 +105,7 @@ export class ProxyHandler extends Component {
    * Returns the array of proxyInfo objects,
    * in the VPN client's current server
    * location.
-   * @type {IBindable<Map<String, Array>>}
+   * @type {IBindable<Array<any>>}
    * */
   get currentExitRelays() {
     return this.#mCurrentExitRelays.readOnly;
@@ -180,7 +180,6 @@ export class ProxyHandler extends Component {
       }
     });
     this.#mProxyMap.value = result;
-    console.log(`Updated #mCurrentExitRelays to ${this.#mCurrentExitRelays}`);
     return result;
   }
 
