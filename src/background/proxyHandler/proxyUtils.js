@@ -16,17 +16,18 @@ export const ProxyUtils = {
     return { type: "direct" };
   },
 
-
   browserProxySettingIsValid(settingValue) {
     if (!settingValue) {
       return false;
     }
-    return ( settingValue?.proxyType != "none" && !(
-      settingValue?.autoConfigUrl == "" && 
-      settingValue?.http == "" && 
-      settingValue?.socks == ""
+    return (
+      settingValue?.proxyType != "none" &&
+      !(
+        settingValue?.autoConfigUrl == "" &&
+        settingValue?.http == "" &&
+        settingValue?.socks == ""
       )
-    )
+    );
   },
 
   /**
