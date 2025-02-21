@@ -132,7 +132,7 @@ export class RequestHandler extends Component {
     return (
       this.extState.bypassTunnel ||
       this.extState.useExitRelays ||
-      this.browserProxySettings.value?.value?.proxyType != "none"
+      ProxyUtils.browserProxyUrlIsSet(this.browserProxySettings?.value)
     );
   }
 
@@ -175,7 +175,7 @@ export class RequestHandler extends Component {
   static toDefaultProxyInfo(browserProxySettings, extState, relays) {
     if (
       extState?.useExitRelays ||
-      ( browserProxySettings?.value?.proxyType != "none" && browserProxySettings?.value?.proxyType != "system" )
+      ProxyUtils.browserProxyUrlIsSet(browserProxySettings?.value)
     ) {
       return relays;
     } else {
