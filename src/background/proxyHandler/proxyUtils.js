@@ -16,6 +16,20 @@ export const ProxyUtils = {
     return { type: "direct" };
   },
 
+  browserProxySettingIsValid(settingValue) {
+    if (!settingValue) {
+      return false;
+    }
+    return (
+      settingValue?.proxyType != "none" &&
+      !(
+        settingValue?.autoConfigUrl == "" &&
+        settingValue?.http == "" &&
+        settingValue?.socks == ""
+      )
+    );
+  },
+
   /**
    * Finds the servers available for provided location, orders them by weight,
    * and returns an array of proxyInfo objects.
