@@ -92,10 +92,9 @@ export class ToolbarIconHandler extends Component {
       return this.setIcon(scheme, "disabled", windowInfo.id);
     }
 
-    let status = ["Connecting", "Enabled"].includes(this.extState.state)
+    let status = ["Connecting", "Enabled"].includes(this.extState?.state)
       ? "enabled"
       : "disabled";
-
     const stability = this.vpnState?.connectionHealth;
 
     if (!stability || stability == "Stable") {
