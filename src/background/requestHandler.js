@@ -61,7 +61,7 @@ export class RequestHandler extends Component {
 
     extController.state.subscribe((s) => {
       this.extState = s;
-      this.handleExtensionStateChanges(s);
+      return this.addOrRemoveRequestListener();
     });
 
     propertySum(
@@ -81,14 +81,6 @@ export class RequestHandler extends Component {
   updateProxyInfoFromClient(localProxy, exitRelays) {
     this.localProxyInfo = localProxy;
     this.currentExitRelay = exitRelays;
-  }
-
-  /**
-   * Handles changes in extension state and updates request listener.
-   * @param {FirefoxVPNState} extState
-   */
-  handleExtensionStateChanges(extState) {
-    return this.addOrRemoveRequestListener();
   }
 
   async init() {
@@ -132,7 +124,7 @@ export class RequestHandler extends Component {
     return (
       this.extState.bypassTunnel ||
       this.extState.useExitRelays ||
-      ProxyUtils.browserProxySettingIsValid(this.browserProxySettings?.value)
+      (this.extState.enabled && !this.extState.useExitRelays && ProxyUtils.browserProxySettingIsValid(this.browserProxySettings?.value))
     );
   }
 

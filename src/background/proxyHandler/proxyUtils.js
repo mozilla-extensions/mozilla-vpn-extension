@@ -23,9 +23,9 @@ export const ProxyUtils = {
     return (
       settingValue?.proxyType != "none" &&
       !(
-        settingValue?.autoConfigUrl == "" &&
-        settingValue?.http == "" &&
-        settingValue?.socks == ""
+        settingValue?.autoConfigUrl == undefined &&
+        settingValue?.http == undefined &&
+        settingValue?.socks == undefined
       )
     );
   },
