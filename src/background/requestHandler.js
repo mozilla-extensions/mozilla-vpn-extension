@@ -124,7 +124,9 @@ export class RequestHandler extends Component {
     return (
       this.extState.bypassTunnel ||
       this.extState.useExitRelays ||
-      (this.extState.enabled && !this.extState.useExitRelays && ProxyUtils.browserProxySettingIsValid(this.browserProxySettings?.value))
+      (this.extState.enabled &&
+        !this.extState.useExitRelays &&
+        ProxyUtils.browserProxySettingIsValid(this.browserProxySettings?.value))
     );
   }
 
