@@ -560,6 +560,9 @@ export class BrowserActionPopup extends LitElement {
       display: flex;
       flex-direction: row;
     }
+    #telemetry-checkbox input {
+      accent-color: var(--action-button-color);
+    }
 
     .telemetry-checkbox-headline {
       font-family: "Inter Semi Bold";
@@ -769,11 +772,11 @@ export class BrowserActionPopup extends LitElement {
       #settingsList button {
         color: var(--text-color-headline);
       }
-      .arrow{
+      .arrow {
         filter: invert();
         mix-blend-mode: color-dodge;
       }
-      
+
       button {
         color: rgba(255, 255, 255, 1);
       }
