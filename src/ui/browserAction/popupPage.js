@@ -742,40 +742,38 @@ export class BrowserActionPopup extends LitElement {
     }
 
     #settingsList button::before {
+      background: var(--firefox-popup_text);
       left: 8px;
     }
 
     #settingsList button::after {
       position: absolute;
       right: 16px;
-      background-image: url("../../assets/img/open-in-web.svg");
+      mask-image: url("../../assets/img/open-in-web.svg");
+      background-color: var(--action-button-color);
     }
 
     .contactSupport::before {
-      background-image: url("../../assets/img/mail.svg");
+      mask-image: url("../../assets/img/mail.svg");
     }
 
     .websitePreferences::before {
-      background-image: url("../../assets/img/developer.svg");
+      mask-image: url("../../assets/img/developer.svg");
     }
 
     .helpCenter::before {
-      background-image: url("../../assets/img/question.svg");
+      mask-image: url("../../assets/img/question.svg");
     }
 
     @media (prefers-color-scheme: dark) {
       #settingsList button {
         color: var(--text-color-headline);
       }
-      .arrow,
-      #settingsList button::before {
+      .arrow{
         filter: invert();
+        mix-blend-mode: color-dodge;
       }
-
-      #settingsList button::after {
-        filter: grayscale(1) brightness(2);
-      }
-
+      
       button {
         color: rgba(255, 255, 255, 1);
       }

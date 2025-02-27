@@ -245,6 +245,7 @@ export class VPNCard extends LitElement {
       background: lch(from var(--panel-bg-color) calc(l + 5) c h);
       box-shadow: var(--box-shadow-off);
     }
+
     .box.on,
     .box.connecting {
       background: var(--main-card-background);
@@ -373,6 +374,14 @@ export class VPNCard extends LitElement {
       opacity: 0.5;
       transition: opacity 0.3s ease;
     }
+    @media(prefers-color-scheme: dark){
+      .box {
+        background: lch(from var(--panel-bg-color) calc(l - 10) c h);
+        --shield-color: var(--color-warning);
+      }
+    }
+
+
   `;
 }
 customElements.define("vpn-card", VPNCard);

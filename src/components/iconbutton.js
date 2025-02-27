@@ -4,7 +4,7 @@
 
 import { html, LitElement, css } from "../vendor/lit-all.min.js";
 import { ghostButtonStyles } from "../components/styles.js";
-
+ 
 /**
  * `IconLinkButton`
  *
@@ -34,7 +34,7 @@ export class IconLinkButton extends LitElement {
   render() {
     return html`
       <button title="${this.alt}" class="ghost-btn ghost-icon-btn">
-        <img aria-hidden="true" src="../../assets/img/${this.icon}.svg" />
+        <img aria-hidden="true" class="masked"  style="mask-image:url('../../assets/img/${this.icon}.svg'" />
       </button>
     `;
   }
@@ -42,6 +42,14 @@ export class IconLinkButton extends LitElement {
   static styles = css`
     ${ghostButtonStyles}
 
+    .masked {
+      width: 40px;
+      height: 40px;
+      background: var(--firefox-popup_text);
+      mask-repeat: no-repeat;
+      mask-position: center;
+      mask-size: 16px;
+    }
     img {
       pointer-events: none;
     }

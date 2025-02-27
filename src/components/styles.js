@@ -125,6 +125,11 @@ export const fontStyling = css`
 `;
 
 export const inCopyLink = css`
+  .in-copy-link{
+    --in-copy-link-text-color-hover: lch(from var(--in-copy-link-text-color) l c h / 0.8);
+    --in-copy-link-text-color-active: lch(from var(--in-copy-link-text-color) l c h / 0.6);
+  }
+
   a.in-copy-link {
     margin-inline-start: 2px;
     color: var(--in-copy-link-text-color);
@@ -182,11 +187,6 @@ export const ghostButtonStyles = css`
     background: lch(from var(--button-ghost-bg-color) l c h / 0.15);
   }
 
-  @media (prefers-color-scheme: dark) {
-    .ghost-icon-btn img {
-      filter: invert(1);
-    }
-  }
 `;
 
 export const primaryBtn = css`
@@ -201,14 +201,23 @@ export const primaryBtn = css`
     font-family: "Inter Regular";
     transition: var(--button-transition);
     inline-size: 100%;
+
+    --color-enabled-hover: lch(from var(--action-button-color) l c h / 0.8);
+    --color-enabled-active: lch(from var(--action-button-color) l c h / 0.6);
   }
 
   .primarybtn:hover {
-    background-color: var(--blue60);
+    background-color: var(--color-enabled-hover);
   }
 
   .primarybtn:active {
-    background-color: var(--blue70);
+    background-color: var(--color-enabled-active);
+  }
+  @media (prefers-color-scheme: dark) {
+    .primarybtn {
+      background: var(--action-button-color);
+      color: black;
+    }
   }
 `;
 
@@ -242,7 +251,8 @@ export const inUseLabel = css`
 
   @media (prefers-color-scheme: dark) {
     .in-use {
-      background: rgba(255, 255, 255, 0.15);
+      background: var(--action-button-color);
+      color: var(--text-color-invert);
     }
   }
 `;
