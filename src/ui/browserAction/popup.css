@@ -19,11 +19,9 @@ body {
 }
 @media (prefers-color-scheme: dark) {
   body {
-    background-color: lch(from var(--firefox-popup) calc(l - 5) c h );
+    background-color: lch(from var(--firefox-popup) calc(l - 20) c h);
   }
 }
-
-
 
 .limit-panel-height {
   max-height: calc(var(--window-max-height) - var(--nav-height));

@@ -777,15 +777,22 @@ export class BrowserActionPopup extends LitElement {
       }
 
       #resetPageSettings {
-        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.7);
+        box-shadow: none;
+        border: none;
+        background: var(--action-button-color);
+        color: black;
       }
 
       #resetPageSettings:hover {
-        background: rgba(255, 255, 255, 0.1);
+        background: lch(from var(--action-button-color) calc(l - 20) c h);
       }
 
       #resetPageSettings:active {
-        background: rgba(255, 255, 255, 0.15);
+        background: lch(from var(--action-button-color) calc(l - 20) c h);
+      }
+
+      #give-feedback {
+        color: var(--action-button-color);
       }
     }
   `;

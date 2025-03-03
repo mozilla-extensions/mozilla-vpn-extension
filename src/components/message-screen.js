@@ -277,6 +277,9 @@ export class MessageScreen extends LitElement {
       .ghost-btn {
         color: rgba(255, 255, 255, 1);
       }
+      vpn-titlebar {
+        background-color: lch(from var(--firefox-popup) calc(l - 20) c h);
+      }
     }
   `;
 }
