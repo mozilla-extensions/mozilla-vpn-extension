@@ -391,12 +391,7 @@ export class BrowserActionPopup extends LitElement {
           ${hasSiteContext && !siteContext.excluded
             ? html`<span class="in-use in-use-light"> In Use </span>`
             : null}
-          <img
-            src="../../assets/img/arrow-icon-right.svg"
-            height="12"
-            width="12"
-            class="arrow"
-          />
+          <img aria-disabled="true" height="12" width="12" class="arrow" />
         </button>
       `;
     })();
@@ -612,7 +607,12 @@ export class BrowserActionPopup extends LitElement {
     }
 
     .arrow {
-      margin: auto 0 auto auto;
+      margin: auto 0px auto auto;
+      mask-size: 8px;
+      mask-image: url("../../assets/img/arrow-icon-right.svg");
+      background: var(--firefox-popup_text);
+      mask-position: center;
+      mask-repeat: no-repeat;
     }
 
     .flag {
@@ -772,11 +772,6 @@ export class BrowserActionPopup extends LitElement {
       #settingsList button {
         color: var(--text-color-headline);
       }
-      .arrow {
-        filter: invert();
-        mix-blend-mode: color-dodge;
-      }
-
       button {
         color: rgba(255, 255, 255, 1);
       }

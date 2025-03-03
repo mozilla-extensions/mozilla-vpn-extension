@@ -170,6 +170,10 @@ export class ServerList extends LitElement {
     .default-location-btn {
       margin-block: 4px auto;
     }
+    .default-location-btn,
+    .server-radio-btn {
+      accent-color: var(--action-button-color);
+    }
 
     .defaultCitySection {
       display: flex;
@@ -249,9 +253,10 @@ export class ServerList extends LitElement {
     }
 
     .toggle {
-      background-image: url("../../assets/img/arrow-toggle.svg");
-      background-position: center center;
-      background-repeat: no-repeat;
+      background-color: var(--firefox-popup_text);
+      mask-image: url("../../assets/img/arrow-toggle.svg");
+      mask-position: center center;
+      mask-repeat: no-repeat;
       margin-inline-start: 8px;
       pointer-events: none;
       transform: rotate(-90deg);
@@ -259,12 +264,6 @@ export class ServerList extends LitElement {
       inline-size: 24px;
       height: 24px;
     }
-    @media (prefers-color-scheme: dark) {
-      .toggle {
-        filter: invert(1);
-      }
-    }
-
     .opened .toggle {
       transform: rotate(0deg);
     }
