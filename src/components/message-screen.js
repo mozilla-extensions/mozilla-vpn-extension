@@ -125,6 +125,7 @@ export class MessageScreen extends LitElement {
       --min-block-size: 521px;
       /* prevent the panel from shrinking vertically when there isn't as much content */
       min-block-size: var(--min-block-size);
+      background-color: var(--panel-bg-color);
     }
     :host,
     .inner,
