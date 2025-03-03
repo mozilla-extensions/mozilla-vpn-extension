@@ -31,7 +31,7 @@
 }
 
 /** STATIC COLORS */
-:root{
+:root {
   --color-warning: #ffa436;
   --color-fatal-error: #ff6a75;
   --color-divider: #e7e7e7;
@@ -52,7 +52,7 @@
   --settings-border-color: #e7e7e7;
 }
 /* Globals */
-:root{
+:root {
   --window-width: 352px;
   --window-max-height: 536px;
   --nav-height: 48px;
@@ -71,9 +71,9 @@
   --main-card--pill-background: lch(
     from var(--main-card-background) calc(l + 15) c h
   );
-  --settings-link-color:var(--action-button-color);
+  --settings-link-color: var(--action-button-color);
 
-    /**
+  /**
         Note this color is not from our figma but the 
         firefox "light" theme, otherwise it looks wierd
         **/
@@ -97,7 +97,6 @@
     --action-button-color: var(--cyan-50);
     --color-enabled: var(--cyan-50);
     --in-copy-link-text-color: var(--cyan-50);
-
   }
 }
 

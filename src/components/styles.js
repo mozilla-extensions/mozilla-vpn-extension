@@ -125,9 +125,13 @@ export const fontStyling = css`
 `;
 
 export const inCopyLink = css`
-  .in-copy-link{
-    --in-copy-link-text-color-hover: lch(from var(--in-copy-link-text-color) l c h / 0.8);
-    --in-copy-link-text-color-active: lch(from var(--in-copy-link-text-color) l c h / 0.6);
+  .in-copy-link {
+    --in-copy-link-text-color-hover: lch(
+      from var(--in-copy-link-text-color) l c h / 0.8
+    );
+    --in-copy-link-text-color-active: lch(
+      from var(--in-copy-link-text-color) l c h / 0.6
+    );
   }
 
   a.in-copy-link {
@@ -186,7 +190,6 @@ export const ghostButtonStyles = css`
   #settingsList button:active {
     background: lch(from var(--button-ghost-bg-color) l c h / 0.15);
   }
-
 `;
 
 export const primaryBtn = css`
