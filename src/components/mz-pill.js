@@ -43,6 +43,8 @@ export class MZPillButton extends LitElement {
       background-color: var(--color-disabled);
       position: relative;
       transition: background-color 0.2s ease;
+      --color-enabled-hover: lch(from var(--color-enabled) l c h / 0.8);
+      --color-enabled-active: lch(from var(--color-enabled) l c h / 0.6);
     }
 
     .pill:hover {
@@ -57,7 +59,7 @@ export class MZPillButton extends LitElement {
       background-color: var(--color-enabled);
     }
 
-    .on .pill:hover {
+    .on.pill:hover {
       background-color: var(--color-enabled-hover);
     }
 

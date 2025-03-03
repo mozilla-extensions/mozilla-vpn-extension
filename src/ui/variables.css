@@ -30,25 +30,12 @@
     url("./../assets/fonts/Inter-Bold.woff") format("woff");
 }
 
+/** STATIC COLORS */
 :root {
-  --window-width: 352px;
-  --window-max-height: 536px;
-  --nav-height: 48px;
-  --font-family: "Inter Regular";
-  --font-family-semi-bold: "Inter Semi Bold";
-  --font-family-bold: "Inter Bold";
-  --color-enabled: var(--green50);
-  --color-enabled-hover: var(--green60);
-  --color-enabled-active: var(--green70);
-  --color-disabled: var(--grey30);
-  --color-disabled-hover: var(--grey40);
-  --color-disabled-active: var(--grey50);
   --color-warning: #ffa436;
   --color-fatal-error: #ff6a75;
   --color-divider: #e7e7e7;
-  --green50: #3fe1b0;
-  --green60: #3ad4b3;
-  --green70: #1cc4a0;
+  --green50: hsl(162, 73%, 56%);
   --grey10: #e7e7e7;
   --grey30: #9e9e9e;
   --grey40: #6d6d6e;
@@ -58,58 +45,67 @@
   --blue60: #0250bb;
   --blue70: #054096;
   --blue90: #09204d;
+  --cyan-50: #00ddff;
   --main-card-background: #321c64;
   --main-card-text-color: #ffffff;
+  --settings-secondary-text-color: #5b5b66;
+  --settings-border-color: #e7e7e7;
+}
+/* Globals */
+:root {
+  --window-width: 352px;
+  --window-max-height: 536px;
+  --nav-height: 48px;
+  --font-family: "Inter Regular";
+  --font-family-semi-bold: "Inter Semi Bold";
+  --font-family-bold: "Inter Bold";
+  --padding-default: 16px;
+  --button-border-radius: 5px;
+
+  --box-shadow-on: rgba(0, 0, 0, 0.28) 2px 2px 4px;
+  --box-shadow-off: rgba(0, 0, 0, 0.06) 2px 2px 7px;
+  --button-transition: background-color 0.2s ease;
+  --color-disabled: var(--grey30);
+  --color-disabled-hover: var(--grey40);
+  --color-disabled-active: var(--grey50);
   --main-card--pill-background: lch(
     from var(--main-card-background) calc(l + 15) c h
   );
-
-  --action-button-color: #0060df;
-
-  --padding-default: 16px;
-  --button-transition: background-color 0.2s ease;
-  --button-border-radius: 5px;
-  --box-shadow-on: rgba(0, 0, 0, 0.28) 2px 2px 4px;
-  --box-shadow-off: rgba(0, 0, 0, 0.06) 2px 2px 7px;
-  --divider-color: var(--color-divider);
-  --text-secondary-color: var(--grey40);
-
-  --settings-secondary-text-color: #5b5b66;
-  --settings-border-color: #e7e7e7;
   --settings-link-color: var(--action-button-color);
-  --in-copy-link-text-color: var(--blue50);
-  --in-copy-link-text-color-hover: var(--blue70);
-  --in-copy-link-text-color-active: var(--blue90);
+
+  /**
+        Note this color is not from our figma but the 
+        firefox "light" theme, otherwise it looks wierd
+        **/
+  --panel-bg-color: var(--firefox-popup);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --panel-bg-color: #1e1e1e;
     --border-color: lch(from var(--panel-bg-color) calc(l + 15) c h);
     --text-secondary-color: rbga(255, 255, 255, 0.6);
     --text-color-primary: #ffffff;
     --text-color-headline: #ffffff;
     --text-color-invert: var(--grey50);
+    --text-secondary-color: var(#ffffff);
     --button-ghost-bg-color: #ffffff;
     --divider-color: lch(from var(--color-divider) l c h / 0.2);
     --secondary-btn-color: #ffffff;
     --settings-secondary-text-color: rgba(255, 255, 255, 0.8);
     --settings-border-color: #e7e7e74d;
-    --settings-link-color: rgba(255, 255, 255, 1);
 
-    --in-copy-link-text-color: rgba(255, 255, 255, 1);
-    --in-copy-link-text-color-hover: rgba(255, 255, 255, 0.7);
-    --in-copy-link-text-color-active: rgba(255, 255, 255, 0.4);
+    --action-button-color: var(--cyan-50);
+    --color-enabled: var(--cyan-50);
+    --in-copy-link-text-color: var(--cyan-50);
   }
 }
 
 @media (prefers-color-scheme: light) {
   :root {
-    /**
-        Note this color is not from our figma but the 
-        firefox "light" theme, otherwise it looks wierd
-        **/
-    --panel-bg-color: #f9f9fb;
+    --in-copy-link-text-color: var(--blue50);
+    --color-enabled: var(--green50);
+    --divider-color: var(--color-divider);
+    --action-button-color: var(--blue50);
     --text-color-primary: var(--grey50);
     --text-color-headline: var(--grey60);
     --text-color-invert: #ffffff;
@@ -117,5 +113,6 @@
     --button-ghost-bg-color: var(--grey50);
     --input-border: #8f8f9d;
     --secondary-btn-color: var(--action-button-color);
+    --text-secondary-color: var(--grey40);
   }
 }

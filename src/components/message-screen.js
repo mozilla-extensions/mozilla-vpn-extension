@@ -125,6 +125,7 @@ export class MessageScreen extends LitElement {
       --min-block-size: 521px;
       /* prevent the panel from shrinking vertically when there isn't as much content */
       min-block-size: var(--min-block-size);
+      background-color: var(--panel-bg-color);
     }
     :host,
     .inner,
@@ -276,6 +277,9 @@ export class MessageScreen extends LitElement {
 
       .ghost-btn {
         color: rgba(255, 255, 255, 1);
+      }
+      vpn-titlebar {
+        background-color: lch(from var(--firefox-popup) calc(l - 20) c h);
       }
     }
   `;
