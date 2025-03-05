@@ -1,0 +1,74 @@
+name: Release Draft Workflow
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    name: Build XPI for Release Draft
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npm run build
+      - name: Rename XPI file
+        run: mv dist/mozilla-vpn-extension.xpi dist/mozilla-vpn-extension-unsigned.xpi
+      - name: Upload XPI as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mozilla-vpn-extension-unsigned.xpi
+          path: dist/mozilla-vpn-extension-unsigned.xpi
+
+  upload:
+    name: Upload XPI to Release
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download XPI
+        uses: actions/download-artifact@v4
+        with:
+          name: mozilla-vpn-extension-unsigned.xpi
+          path: .
+      - name: Upload to Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RELEASE_ID=$(jq --raw-output '.release.id' $GITHUB_EVENT_PATH)
+          echo "Uploading mozilla-vpn-extension-unsigned.xpi to release $RELEASE_ID"
+          gh release upload "$RELEASE_ID" "mozilla-vpn-extension-unsigned.xpi"
+
+  notify:
+    name: Notify Slack
+    runs-on: ubuntu-latest
+    needs: upload
+    steps:
+      - name: Get Release Info
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RELEASE_INFO=$(gh release view --json tagName,url -q '{tagName: .tagName, url: .url}')
+          echo "RELEASE_INFO=$RELEASE_INFO" >> $GITHUB_ENV
+      - name: Extract Details
+        run: |
+          VERSION=$(echo '${{ env.RELEASE_INFO }}' | jq -r '.tagName')
+          RELEASE_URL=$(echo '${{ env.RELEASE_INFO }}' | jq -r '.url')
+          DOWNLOAD_URL="${RELEASE_URL}/download/${VERSION}/mozilla-vpn-extension-unsigned.xpi"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "RELEASE_URL=$RELEASE_URL" >> $GITHUB_ENV
+          echo "DOWNLOAD_URL=$DOWNLOAD_URL" >> $GITHUB_ENV
+      - name: Send Slack Notification
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{
+            "version": "${{ env.VERSION }}",
+            "release": "${{ env.RELEASE_URL }}",
+            "download": "${{ env.DOWNLOAD_URL }}"
+          }' $SLACK_WEBHOOK_URL
