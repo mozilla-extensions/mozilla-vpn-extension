@@ -54,30 +54,21 @@ jobs:
     runs-on: ubuntu-latest
     needs: upload
     steps:
-      - name: Clone repository
-        uses: actions/checkout@v4
-        with:
-          submodules: true
-      - name: Get Release Info
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract Release Info
         run: |
-          RELEASE_INFO=$(gh release view --json tagName,url -q '{tagName: .tagName, url: .url}')
-          echo "RELEASE_INFO=$RELEASE_INFO" >> $GITHUB_ENV
-      - name: Extract Details
-        run: |
-          VERSION=$(echo '${{ env.RELEASE_INFO }}' | jq -r '.tagName')
-          RELEASE_URL=$(echo '${{ env.RELEASE_INFO }}' | jq -r '.url')
-          DOWNLOAD_URL="${RELEASE_URL}/download/${VERSION}/mozilla-vpn-extension-unsigned.xpi"
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          RELEASE_TAG="${{ github.event.release.tag_name }}"
+          RELEASE_URL="${{ github.event.release.html_url }}"
+          DOWNLOAD_URL="${RELEASE_URL}/download/${RELEASE_TAG}/mozilla-vpn-extension-unsigned.xpi"
+          echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_ENV
           echo "RELEASE_URL=$RELEASE_URL" >> $GITHUB_ENV
           echo "DOWNLOAD_URL=$DOWNLOAD_URL" >> $GITHUB_ENV
+
       - name: Send Slack Notification
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
           curl -X POST -H 'Content-type: application/json' --data '{
-            "version": "${{ env.VERSION }}",
+            "version": "${{ env.RELEASE_TAG }}",
             "release": "${{ env.RELEASE_URL }}",
             "download": "${{ env.DOWNLOAD_URL }}"
           }' $SLACK_WEBHOOK_URL
