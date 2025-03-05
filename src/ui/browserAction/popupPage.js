@@ -391,12 +391,7 @@ export class BrowserActionPopup extends LitElement {
           ${hasSiteContext && !siteContext.excluded
             ? html`<span class="in-use in-use-light"> In Use </span>`
             : null}
-          <img
-            src="../../assets/img/arrow-icon-right.svg"
-            height="12"
-            width="12"
-            class="arrow"
-          />
+          <img aria-disabled="true" height="12" width="12" class="arrow" />
         </button>
       `;
     })();
@@ -560,6 +555,9 @@ export class BrowserActionPopup extends LitElement {
       display: flex;
       flex-direction: row;
     }
+    #telemetry-checkbox input {
+      accent-color: var(--action-button-color);
+    }
 
     .telemetry-checkbox-headline {
       font-family: "Inter Semi Bold";
@@ -609,7 +607,12 @@ export class BrowserActionPopup extends LitElement {
     }
 
     .arrow {
-      margin: auto 0 auto auto;
+      margin: auto 0px auto auto;
+      mask-size: 8px;
+      mask-image: url("../../assets/img/arrow-icon-right.svg");
+      background: var(--firefox-popup_text);
+      mask-position: center;
+      mask-repeat: no-repeat;
     }
 
     .flag {
@@ -742,54 +745,54 @@ export class BrowserActionPopup extends LitElement {
     }
 
     #settingsList button::before {
+      background: var(--firefox-popup_text);
       left: 8px;
     }
 
     #settingsList button::after {
       position: absolute;
       right: 16px;
-      background-image: url("../../assets/img/open-in-web.svg");
+      mask-image: url("../../assets/img/open-in-web.svg");
+      background-color: var(--action-button-color);
     }
 
     .contactSupport::before {
-      background-image: url("../../assets/img/mail.svg");
+      mask-image: url("../../assets/img/mail.svg");
     }
 
     .websitePreferences::before {
-      background-image: url("../../assets/img/developer.svg");
+      mask-image: url("../../assets/img/developer.svg");
     }
 
     .helpCenter::before {
-      background-image: url("../../assets/img/question.svg");
+      mask-image: url("../../assets/img/question.svg");
     }
 
     @media (prefers-color-scheme: dark) {
       #settingsList button {
         color: var(--text-color-headline);
       }
-      .arrow,
-      #settingsList button::before {
-        filter: invert();
-      }
-
-      #settingsList button::after {
-        filter: grayscale(1) brightness(2);
-      }
-
       button {
         color: rgba(255, 255, 255, 1);
       }
 
       #resetPageSettings {
-        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.7);
+        box-shadow: none;
+        border: none;
+        background: var(--action-button-color);
+        color: black;
       }
 
       #resetPageSettings:hover {
-        background: rgba(255, 255, 255, 0.1);
+        background: lch(from var(--action-button-color) calc(l - 20) c h);
       }
 
       #resetPageSettings:active {
-        background: rgba(255, 255, 255, 0.15);
+        background: lch(from var(--action-button-color) calc(l - 20) c h);
+      }
+
+      #give-feedback {
+        color: var(--action-button-color);
       }
     }
   `;
