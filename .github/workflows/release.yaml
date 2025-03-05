@@ -45,9 +45,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          RELEASE_ID=$(jq --raw-output '.release.id' $GITHUB_EVENT_PATH)
-          echo "Uploading mozilla-vpn-extension-unsigned.xpi to release $RELEASE_ID"
-          gh release upload "$RELEASE_ID" "mozilla-vpn-extension-unsigned.xpi"
+          RELEASE_TAG=$(jq --raw-output '.release.tag_name' "$GITHUB_EVENT_PATH")
+          echo "Uploading mozilla-vpn-extension-unsigned.xpi to release $RELEASE_TAG"
+          gh release upload "$RELEASE_TAG" "mozilla-vpn-extension-unsigned.xpi"
 
   notify:
     name: Notify Slack
