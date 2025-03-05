@@ -3,8 +3,7 @@ name: Release Draft Workflow
 on:
   release:
     types:
-      - published
-      - created
+      - prereleased
 
 jobs:
   build:
