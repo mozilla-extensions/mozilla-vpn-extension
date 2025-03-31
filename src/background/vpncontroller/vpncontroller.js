@@ -117,7 +117,7 @@ export class VPNController extends Component {
   }
 
   async init() {
-    this.#mState.value = new StateVPNClosed();
+    this.#mState.value = new StateVPNUnavailable();
     this.#mServers.value = await fromStorage(
       browser.storage.local,
       MOZILLA_VPN_SERVERS_KEY,
