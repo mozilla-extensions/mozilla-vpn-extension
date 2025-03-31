@@ -7,7 +7,7 @@ import { MessageScreen } from "./message-screen.js";
 import { tr } from "../shared/i18n.js";
 import {
   onboardingController,
-  availabilityService
+  availabilityService,
 } from "../ui/browserAction/backend.js";
 import { NUMBER_OF_ONBOARDING_PAGES } from "../background/onboarding.js";
 
@@ -203,11 +203,15 @@ defineMessageScreen({
   img: "onboarding-2.svg",
   heading: "Mozilla VPN is not yet available in your country",
   bodyText: html`
-    <p>Mozilla VPN isn’t available in your country yet, but you can join our waitlist to be notified when it launches. If you already have a subscription, please sign in to manage your account.</p>
+    <p>
+      Mozilla VPN isn’t available in your country yet, but you can join our
+      waitlist to be notified when it launches. If you already have a
+      subscription, please sign in to manage your account.
+    </p>
   `,
-  onPrimaryAction:  () => closeAfter(() => open(availabilityService.waitlistURL.value)),
+  onPrimaryAction: () =>
+    closeAfter(() => open(availabilityService.waitlistURL.value)),
   primaryAction: "Join the Waitlist",
   secondaryAction: "I already have a Subscription",
   onSecondaryAction: () => availabilityService.ignore(),
 });
-

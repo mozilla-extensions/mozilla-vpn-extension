@@ -4,7 +4,11 @@
 
 import { propertySum } from "../../shared/property.js";
 import { Utils } from "../../shared/utils.js";
-import { vpnController, onboardingController, availabilityService} from "./backend.js";
+import {
+  vpnController,
+  onboardingController,
+  availabilityService,
+} from "./backend.js";
 import { NUMBER_OF_ONBOARDING_PAGES } from "../../background/onboarding.js";
 import { LitElement, html } from "../../vendor/lit-all.min.js";
 
@@ -85,10 +89,13 @@ export class PopUpConditionalView extends LitElement {
     if (!supportedPlatform && !features.webExtension) {
       //return html`<unsupported-os-message-screen></unsupported-os-message-screen>`;
     }
-    if( (!state.installed || !state.subscribed) && isSubscriptionAvailable=="unavailable"){
-      return html`<unsupported-country-message-screen></unsupported-country-message-screen>`
+    if (
+      (!state.installed || !state.subscribed) &&
+      isSubscriptionAvailable == "unavailable"
+    ) {
+      return html`<unsupported-country-message-screen></unsupported-country-message-screen>`;
     }
-    if(!state.installed){
+    if (!state.installed) {
       return html`<install-message-screen></install-message-screen>`;
     }
     if (state.needsUpdate) {
