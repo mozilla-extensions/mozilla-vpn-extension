@@ -26,71 +26,76 @@ export class AvailablityService extends Component {
   };
 
   /** @type {WritableProperty<String>} */
-  // Availablity status: 
+  // Availablity status:
   // Valid Strings: "pending, available, unavailable, ignored"
   isAvailable = property("pending");
   /** @type {WritableProperty<String>} */
   waitlistURL = property("");
 
-  async ignore(){
+  async ignore() {
     this.isAvailable.value = "ignored";
   }
 
-  async check(){
-    return await fetch('https://www.mozilla.org/products/vpn/', { cache: "reload" })
-        .then(response => response.text())
-        .then(htmlString => {
-            // Parse the HTML string into a document
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(htmlString, 'text/html');
-            
-            // Now you can use querySelector on the parsed document
-            /** @type {HTMLAnchorElement?} */
-            const waitlistbutton = doc.querySelector(`[data-testid="join-waitlist-hero-button"]`);
-            const available = !!waitlistbutton ? "unavailable" : "available";
-            
-           
-            if(waitlistbutton){
-                const buttonURL = new URL( waitlistbutton.href);
-                const realURL = new URL("https://www.mozilla.org/")
-                realURL.pathname = buttonURL.pathname;
-                this.waitlistURL.value = realURL.toString();
-            }
-            console.log(`A vpn subscribtion is: ${available}, waitlist ${this.waitlistURL.value}`);
+  async check() {
+    return await fetch("https://www.mozilla.org/products/vpn/", {
+      cache: "reload",
+    })
+      .then((response) => response.text())
+      .then((htmlString) => {
+        // Parse the HTML string into a document
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlString, "text/html");
 
-            this.isAvailable.value = available;
-            return available; 
-        })
-        .catch(error => {
-            console.error('Error fetching or parsing the HTML:', error);
-        });
+        // Now you can use querySelector on the parsed document
+        /** @type {HTMLAnchorElement?} */
+        const waitlistbutton = doc.querySelector(
+          `[data-testid="join-waitlist-hero-button"]`
+        );
+        const available = !!waitlistbutton ? "unavailable" : "available";
+
+        if (waitlistbutton) {
+          const buttonURL = new URL(waitlistbutton.href);
+          const realURL = new URL("https://www.mozilla.org/");
+          realURL.pathname = buttonURL.pathname;
+          this.waitlistURL.value = realURL.toString();
+        }
+        console.log(
+          `A vpn subscribtion is: ${available}, waitlist ${this.waitlistURL.value}`
+        );
+
+        this.isAvailable.value = available;
+        return available;
+      })
+      .catch((error) => {
+        console.error("Error fetching or parsing the HTML:", error);
+      });
   }
 
   /**
-   * 
-   * @param {*} receiver 
-   * @param {VPNController} controller 
+   *
+   * @param {*} receiver
+   * @param {VPNController} controller
    */
   constructor(receiver, controller) {
-    controller.state.subscribe(state =>{
-        // We already checked if the vpn is available for the user.
-        if(this.isAvailable.value != "pending"){
-            return;
-        }
-        /**
-         * Check if the VPN is available when 
-         * the user has not yet installed the vpn 
-         * or if the user has not yet subscribed.
-         */
-        if(!state.installed){
-            this.check();
-            return;
-        }
-        if(!state.subscribed){
-            this.check();
-            return;
-        }
-    })
+    controller.state.subscribe((state) => {
+      // We already checked if the vpn is available for the user.
+      if (this.isAvailable.value != "pending") {
+        return;
+      }
+      /**
+       * Check if the VPN is available when
+       * the user has not yet installed the vpn
+       * or if the user has not yet subscribed.
+       */
+      if (!state.installed) {
+        this.check();
+        return;
+      }
+      if (!state.subscribed) {
+        this.check();
+        return;
+      }
+    });
     super(receiver);
   }
 
