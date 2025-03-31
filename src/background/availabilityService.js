@@ -6,14 +6,13 @@
 import { Component } from "./component.js";
 import { PropertyType } from "../shared/ipc.js";
 
-import { IBindable, property, WritableProperty } from "../shared/property.js";
+import { property, WritableProperty } from "../shared/property.js";
 import { VPNController } from "./vpncontroller/vpncontroller.js";
-import { VPNState } from "./vpncontroller/states.js";
 
 /**
  *
- * ButterBarService manages 'Butter Bar' alerts shown
- * in the UI.
+ * AvailablityService reports if a user will be able to
+ * create a subscription in at the current location.
  */
 
 export class AvailablityService extends Component {
