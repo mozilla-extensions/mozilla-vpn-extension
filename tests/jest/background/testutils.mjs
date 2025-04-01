@@ -4,10 +4,8 @@
 
 import { jest } from "@jest/globals"; // Import test and beforeEach/afterEach
 
-// Drop in mock for browser.storage
 /**
- *
- *
+ * Drop in mock for browser.storage
  * @returns A drop in mock for a browser.storage.<location>
  */
 export const createMockedBrowserStore = () => {
