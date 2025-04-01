@@ -13,9 +13,14 @@
 
 body {
   width: var(--window-width);
-  background-color: var(--panel-bg-color);
+  background-color: var(--firefox-popup);
   padding: 0;
   margin: 0;
+}
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: lch(from var(--firefox-popup) calc(l - 20) c h);
+  }
 }
 
 .limit-panel-height {

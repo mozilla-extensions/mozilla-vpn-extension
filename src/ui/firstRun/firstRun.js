@@ -183,20 +183,20 @@ export class FirstRunPage extends LitElement {
 
     @media (prefers-color-scheme: dark) {
       h1 {
-        color: rgba(255, 255, 255, 1);
+        color: var(--firefox-popup_text);
       }
       p.bold,
       a,
       li,
       label {
-        color: rgba(255, 255, 255, 0.9);
+        color: var(--firefox-popup_text);
       }
       p,
       li {
-        color: rgba(255, 255, 255, 0.7);
+        color: var(--firefox-popup_text);
       }
       .footer {
-        border-color: rgba(255, 255, 255, 0.6);
+        border-color: var(--firefox-popup_text);
       }
     }
 

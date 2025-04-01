@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="popup.css" />
     <link rel="stylesheet" href="../variables.css" />
     <!-- Load placeholder sync so it's ready first -->
+    <script src="../../components/firefox-theme.js" type="module"></script>
     <script src="./popup-placeholder.js" type="module"></script>
     <script src="./popupPage.js" type="module"></script>
     <script src="./popupConditional.js" type="module"></script>
@@ -21,6 +22,7 @@
     <title>Mozilla VPN</title>
   </head>
   <body class="stack">
+    <firefox-theme></firefox-theme>
     <popup-placeholder></popup-placeholder>
     <popup-condview id="conditional-view" class="needsSlotted">
     </popup-condview>
