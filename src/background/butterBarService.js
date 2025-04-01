@@ -45,6 +45,13 @@ export class ButterBarService extends Component {
 
   async init() {
     console.log("Initializing ButterBarService");
+
+    // Load dismissed alerts from browser.storage.local
+    const storedDismissedAlerts = await this.loadDismissedAlerts();
+    if (storedDismissedAlerts) {
+      this.dismissedAlerts = storedDismissedAlerts;
+    }
+
     await this.conflictObserver.updateList();
 
     this.vpnController.interventions.subscribe((interventions) => {
@@ -68,6 +75,19 @@ export class ButterBarService extends Component {
       this.maybeCreateAlert(conflictingAddons, alert);
     });
   }
+
+  /**
+   * Load dismissed alerts from browser.storage.local
+   * @returns {Promise<Array<String>>}
+   */
+  async loadDismissedAlerts() {
+    return new Promise((resolve) => {
+      browser.storage.local.get("dismissedAlerts").then((result) => {
+        resolve(result.dismissedAlerts || []);
+      });
+    });
+  }
+
   /**
    * @param {Array} list
    * @param {ButterBarAlert} alert
@@ -115,13 +135,25 @@ export class ButterBarService extends Component {
   }
 
   // Called from the UI when a user has dismissed the butter bar
-  dismissAlert(id) {
+  async dismissAlert(id) {
     const newAlertList = this.butterBarList.value.filter(
       ({ alertId }) => alertId !== id
     );
     this.dismissedAlerts.push(id);
+
+    // Save the updated dismissedAlerts to browser.storage.local
+    await this.saveDismissedAlerts(this.dismissedAlerts);
+
     this.butterBarList.set(newAlertList);
     return;
+  }
+
+  /**
+   * Save dismissed alerts to browser.storage.local
+   * @param {Array<String>} dismissedAlerts
+   */
+  async saveDismissedAlerts(dismissedAlerts) {
+    await browser.storage.local.set({ dismissedAlerts });
   }
 
   // Removes an alert from the butter bar list without adding
