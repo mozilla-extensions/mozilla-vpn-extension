@@ -1,6 +1,6 @@
 {
   "manifest_version": 2,
-  "version": "1.25.0",
+  "version": "1.35.0",
   "author": "Mozilla",
   "name": "__MSG_extensionName__",
   "description": "__MSG_extensionDescription__",
