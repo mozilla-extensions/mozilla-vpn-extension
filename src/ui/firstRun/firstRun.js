@@ -184,23 +184,19 @@ export class FirstRunPage extends LitElement {
     @media (prefers-color-scheme: dark) {
       h1 {
         color: var(--firefox-popup_text);
-        filter: brightness(90%);
       }
       p.bold,
       a,
       li,
       label {
         color: var(--firefox-popup_text);
-        filter: brightness(90%);
       }
       p,
       li {
         color: var(--firefox-popup_text);
-        filter: brightness(70%);
       }
       .footer {
         border-color: var(--firefox-popup_text);
-        filter: brightness(60%);
       }
     }
 
