@@ -386,16 +386,16 @@ export function fromVPNStatusResponse(
   const resolveCity = (countryCode, cityName) => {
     const country = serverList.find((country) => country.code === countryCode);
     const city = country?.cities.find((city) => city.name === cityName);
-    return [country, city];
+    return { country, city };
   };
 
   //
   const controllerState = status.vpn;
-  const [entryServerCountry, entryServerCity] = resolveCity(
+  const { country: entryServerCountry, city: entryServerCity } = resolveCity(
     status.location["entry_country_code"],
     status.location["entry_city_name"]
   );
-  const [exitServerCountry, exitServerCity] = resolveCity(
+  const { country: exitServerCountry, city: exitServerCity } = resolveCity(
     status.location["exit_country_code"],
     status.location["exit_city_name"]
   );
