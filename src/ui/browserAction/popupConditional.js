@@ -75,7 +75,6 @@ export class PopUpConditionalView extends LitElement {
     currentOnboardingPage,
     onBoardingScreens
   ) {
-    return html`<subscribenow-message-screen></subscribenow-message-screen>`;
     if (!supportedPlatform && !features.webExtension) {
       return html`<unsupported-os-message-screen></unsupported-os-message-screen>`;
     }
