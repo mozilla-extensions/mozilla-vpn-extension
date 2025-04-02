@@ -201,17 +201,11 @@ defineMessageScreen({
 defineMessageScreen({
   tag: "unsupported-country-message-screen",
   img: "onboarding-2.svg",
-  heading: "Mozilla VPN is not yet available in your country",
-  bodyText: html`
-    <p>
-      Mozilla VPN isn’t available in your country yet, but you can join our
-      waitlist to be notified when it launches. If you already have a
-      subscription, please sign in to manage your account.
-    </p>
-  `,
+  heading: tr("headerSubscriptionNotAvailable"),
+  bodyText: html` <p>${tr("bodySubscriptionNotAvailable")}</p> `,
   onPrimaryAction: () =>
     closeAfter(() => open(availabilityService.waitlistURL.value)),
-  primaryAction: "Join the Waitlist",
-  secondaryAction: "I already have a Subscription",
+  primaryAction: tr("btnjoinWaitlist"),
+  secondaryAction: tr("btnContinue"),
   onSecondaryAction: () => availabilityService.ignore(),
 });
