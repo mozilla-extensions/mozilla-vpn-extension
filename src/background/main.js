@@ -134,3 +134,5 @@ function openFirstRun(details) {
   });
 }
 browser.runtime.onInstalled.addListener(openFirstRun);
+
+browser.browserAction.openPopup();
