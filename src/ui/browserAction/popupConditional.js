@@ -83,7 +83,7 @@ export class PopUpConditionalView extends LitElement {
     onBoardingScreens
   ) {
     if (!supportedPlatform && !features.webExtension) {
-      //return html`<unsupported-os-message-screen></unsupported-os-message-screen>`;
+      return html`<unsupported-os-message-screen></unsupported-os-message-screen>`;
     }
     if (
       (!state.installed || !state.subscribed) &&
