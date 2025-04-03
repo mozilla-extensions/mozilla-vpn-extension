@@ -88,7 +88,10 @@ defineMessageScreen({
   tag: "subscribenow-message-screen",
   img: "message-header.svg",
   heading: "Subscribe to Mozilla VPN",
-  bodyText: tr("bodySubscribeNow"),
+  bodyText: html`
+    <p>${tr("bodySubscribeNow2")}</p>
+    <p class="footnote">${tr("footerSubscribeNow")}</p>
+  `,
   primaryAction: tr("btnSubscribeNow"),
   onPrimaryAction: () =>
     closeAfter(() => open("https://www.mozilla.org/products/vpn#pricing")),
