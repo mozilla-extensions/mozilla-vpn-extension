@@ -233,8 +233,10 @@ export class BrowserActionPopup extends LitElement {
               @toggle=${handleVPNToggle}
               .enabled=${this.extState?.enabled}
               .clientConnected=${this.vpnState?.connected}
-              .cityName=${this.vpnState?.exitServerCity?.name}
-              .countryFlag=${this.vpnState?.exitServerCountry?.code}
+              .entryCityName=${this.vpnState?.entryServerCity?.name}
+              .entryCountryFlag=${this.vpnState?.entryServerCountry?.code}
+              .exitCityName=${this.vpnState?.exitServerCity?.name}
+              .exitCountryFlag=${this.vpnState?.exitServerCountry?.code}
               .connectedSince=${this.extState?.connectedSince}
               .stability=${this.vpnState?.connectionHealth}
               .hasContext=${this._siteContext}

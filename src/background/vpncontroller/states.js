@@ -58,6 +58,12 @@ export class VPNState {
   /** @type {ServerCountry | undefined } */
   exitServerCountry = new ServerCountry();
 
+  /** @type {ServerCity | undefined } */
+  entryServerCity = new ServerCity();
+
+  /** @type {ServerCountry | undefined } */
+  entryServerCountry = new ServerCountry();
+
   static NoSignal = "NoSignal";
   static Unstable = "Unstable";
   static Stable = "Stable";
@@ -115,11 +121,20 @@ export class StateVPNDisabled extends StateVPNSubscriptionNeeded {
 
   /**
    *
+   * @param {ServerCity | undefined} entryServerCity
+   * @param {ServerCountry | undefined } entryServerCountry
    * @param {ServerCity | undefined} exitServerCity
    * @param {ServerCountry | undefined } exitServerCountry
    */
-  constructor(exitServerCity, exitServerCountry) {
+  constructor(
+    entryServerCity,
+    entryServerCountry,
+    exitServerCity,
+    exitServerCountry
+  ) {
     super();
+    this.entryServerCity = entryServerCity;
+    this.entryServerCountry = entryServerCountry;
     this.exitServerCity = exitServerCity;
     this.exitServerCountry = exitServerCountry;
   }
@@ -137,14 +152,19 @@ export class StateVPNEnabled extends StateVPNDisabled {
    * @param {ServerCountry | undefined } exitServerCountry
    */
   constructor(
+    entryServerCity,
+    entryServerCountry,
     exitServerCity,
     exitServerCountry,
     aloophole,
     connectionHealth = "Stable"
   ) {
-    super(exitServerCity, exitServerCountry);
-    this.exitServerCity = exitServerCity;
-    this.exitServerCountry = exitServerCountry;
+    super(
+      entryServerCity,
+      entryServerCountry,
+      exitServerCity,
+      exitServerCountry
+    );
     this.loophole = aloophole;
     if (
       ![VPNState.NoSignal, VPNState.Stable, VPNState.Unstable].includes(

@@ -28,8 +28,10 @@ export class VPNCard extends LitElement {
     enabled: { type: Boolean },
     clientConnected: { type: Boolean },
     connectedSince: { type: Date },
-    cityName: { type: String },
-    countryFlag: { type: String },
+    entryCityName: { type: String },
+    entryCountryFlag: { type: String },
+    exitCityName: { type: String },
+    exitCountryFlag: { type: String },
     stability: { type: String },
     hasContext: { type: Boolean },
     connecting: { type: Boolean },
@@ -40,8 +42,8 @@ export class VPNCard extends LitElement {
     super();
     this.enabled = false;
     this.clientConnected = false;
-    this.cityName = "";
-    this.countryFlag = "";
+    this.exitCityName = "";
+    this.exitCountryFlag = "";
     this.connectedSince = 0;
     this.stability = VPNState.Stable;
     this.connecting = false;
@@ -158,24 +160,50 @@ export class VPNCard extends LitElement {
             ></mz-pill>
           </main>
           ${this.enabled || this.connecting
-            ? VPNCard.footer(this.cityName, this.countryFlag)
+            ? VPNCard.footer(
+                this.entryCityName,
+                this.entryCountryFlag,
+                this.exitCityName,
+                this.exitCountryFlag
+              )
             : null}
         </div>
       </div>
     `;
   }
 
-  static footer(name, countryFlag) {
-    return html`
-      <footer>
+  static footer(
+    entryCityName,
+    entryCountryFlag,
+    exitCityName,
+    exitCountryFlag
+  ) {
+    let extra = html``;
+    if (entryCityName && entryCountryFlag) {
+      extra = html`
         <div class="positioner">
           <img
-            src="../../assets/flags/${countryFlag.toUpperCase()}.png"
+            src="../../assets/flags/${entryCountryFlag.toUpperCase()}.png"
             width="16"
             height="16"
           />
         </div>
-        <p>${name}</p>
+        <p>${entryCityName}</p>
+        <p class="arrow">-></p>
+      `;
+    }
+
+    return html`
+      <footer>
+        ${extra}
+        <div class="positioner">
+          <img
+            src="../../assets/flags/${exitCountryFlag.toUpperCase()}.png"
+            width="16"
+            height="16"
+          />
+        </div>
+        <p>${exitCityName}</p>
       </footer>
     `;
   }
@@ -323,6 +351,9 @@ export class VPNCard extends LitElement {
       font-size: 14px;
       line-height: 18px;
       opacity: 0.7;
+    }
+    .arrow {
+      margin: 0px 10px;
     }
 
     .timer {

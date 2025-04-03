@@ -383,19 +383,27 @@ export function fromVPNStatusResponse(
     return new StateVPNSubscriptionNeeded();
   }
 
+  const resolveCity = (countryCode, cityName) => {
+    const country = serverList.find((country) => country.code === countryCode);
+    const city = country?.cities.find((city) => city.name === cityName);
+    return { country, city };
+  };
+
   //
   const controllerState = status.vpn;
-  const exit_city_name = status.location["exit_city_name"];
-  const exit_country_code = status.location["exit_country_code"];
-  const exitServerCountry = serverList.find(
-    (country) => country.code === exit_country_code
+  const { country: entryServerCountry, city: entryServerCity } = resolveCity(
+    status.location["entry_country_code"],
+    status.location["entry_city_name"]
   );
-  const exitServerCity = exitServerCountry?.cities.find(
-    (city) => city.name === exit_city_name
+  const { country: exitServerCountry, city: exitServerCity } = resolveCity(
+    status.location["exit_country_code"],
+    status.location["exit_city_name"]
   );
 
   if (controllerState === "StateOn") {
     return new StateVPNEnabled(
+      entryServerCity,
+      entryServerCountry,
       exitServerCity,
       exitServerCountry,
       status.localProxy?.url,
@@ -404,6 +412,8 @@ export function fromVPNStatusResponse(
   }
   if (controllerState === "StateOnPartial") {
     return new StateVPNOnPartial(
+      entryServerCity,
+      entryServerCountry,
       exitServerCity,
       exitServerCountry,
       status.localProxy?.url,
@@ -414,7 +424,12 @@ export function fromVPNStatusResponse(
     controllerState === "StateOff" ||
     controllerState === "StateDisconnecting"
   ) {
-    return new StateVPNDisabled(exitServerCity, exitServerCountry);
+    return new StateVPNDisabled(
+      entryServerCity,
+      entryServerCountry,
+      exitServerCity,
+      exitServerCountry
+    );
   }
   return;
 }
