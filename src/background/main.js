@@ -76,8 +76,6 @@ class Main {
     expose(this.telemetry);
     expose(this.avilabilityService);
 
-    this.avilabilityService.check();
-
     this.#handlingEvent = false;
     this.#processPendingEvents();
   }
