@@ -80,7 +80,7 @@ export class ButterBarService extends Component {
    * Load dismissed alerts from browser.storage.local
    * @returns {Promise<Array<String>>}
    */
-  async loadDismissedAlerts() {
+  loadDismissedAlerts() {
     return new Promise((resolve) => {
       browser.storage.local.get("dismissedAlerts").then((result) => {
         resolve(result.dismissedAlerts || []);
