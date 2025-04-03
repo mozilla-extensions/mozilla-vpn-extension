@@ -28,6 +28,8 @@ export class VPNCard extends LitElement {
     enabled: { type: Boolean },
     clientConnected: { type: Boolean },
     connectedSince: { type: Date },
+    entryCityName: { type: String },
+    entryCountryFlag: { type: String },
     exitCityName: { type: String },
     exitCountryFlag: { type: String },
     stability: { type: String },
