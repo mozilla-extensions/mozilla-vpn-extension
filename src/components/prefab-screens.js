@@ -7,7 +7,7 @@ import { MessageScreen } from "./message-screen.js";
 import { tr } from "../shared/i18n.js";
 import {
   onboardingController,
-  telemetry,
+  availabilityService,
 } from "../ui/browserAction/backend.js";
 import { NUMBER_OF_ONBOARDING_PAGES } from "../background/onboarding.js";
 
@@ -189,4 +189,17 @@ defineMessageScreen({
   primaryAction: null,
   secondaryAction: tr("getHelp"),
   onSecondaryAction: () => closeAfter(() => open(getHelpUrl)),
+});
+
+// TODO: ADD STRINGS !!
+defineMessageScreen({
+  tag: "unsupported-country-message-screen",
+  img: "onboarding-2.svg",
+  heading: tr("headerSubscriptionNotAvailable"),
+  bodyText: html` <p>${tr("bodySubscriptionNotAvailable")}</p> `,
+  onPrimaryAction: () =>
+    closeAfter(() => open(availabilityService.waitlistURL.value)),
+  primaryAction: tr("btnjoinWaitlist"),
+  secondaryAction: tr("btnContinue"),
+  onSecondaryAction: () => availabilityService.ignore(),
 });
