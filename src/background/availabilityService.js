@@ -41,11 +41,9 @@ export class AvailablityService extends Component {
     })
       .then((response) => response.text())
       .then((htmlString) => {
-        // Parse the HTML string into a document
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlString, "text/html");
 
-        // Now you can use querySelector on the parsed document
         /** @type {HTMLAnchorElement?} */
         const waitlistbutton = doc.querySelector(
           `[data-testid="join-waitlist-hero-button"]`
@@ -97,6 +95,5 @@ export class AvailablityService extends Component {
     });
     super(receiver);
   }
-
   async init() {}
 }
