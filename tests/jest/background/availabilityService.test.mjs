@@ -16,6 +16,8 @@ import {
 import { property } from "../../../src/shared/property";
 import {
   StateVPNClosed,
+  StateVPNDisabled,
+  StateVPNEnabled,
   StateVPNNeedsUpdate,
   StateVPNOnPartial,
   StateVPNSubscriptionNeeded,
@@ -44,8 +46,13 @@ describe("availabilityService", () => {
       };
     });
     // Not all states should cause a check
-    mockVpnController.state.set(new StateVPNClosed());
-    mockVpnController.state.set(new StateVPNNeedsUpdate());
+    // @ts-ignore
+    mockVpnController.state.set(new StateVPNOnPartial());
+    // @ts-ignore
+    mockVpnController.state.set(new StateVPNEnabled());
+    // @ts-ignore
+    mockVpnController.state.set(new StateVPNDisabled());
+
     expect(target.check).toBeCalledTimes(0);
     // Those each should call a a check
     mockVpnController.state.set(new StateVPNSubscriptionNeeded());

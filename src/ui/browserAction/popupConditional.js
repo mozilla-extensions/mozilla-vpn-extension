@@ -44,7 +44,7 @@ export class PopUpConditionalView extends LitElement {
           currentPage,
           this.onBoadingScreens,
           isExcluded,
-          isAvailable,
+          isAvailable
         );
       },
       vpnController.state,
@@ -85,7 +85,8 @@ export class PopUpConditionalView extends LitElement {
     currentOnboardingPage,
     onBoardingScreens,
     isExcluded,
-    isSubscriptionAvailable) {
+    isSubscriptionAvailable
+  ) {
     if (!supportedPlatform && !features.webExtension) {
       return html`<unsupported-os-message-screen></unsupported-os-message-screen>`;
     }

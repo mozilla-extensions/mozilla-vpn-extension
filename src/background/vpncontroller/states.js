@@ -36,7 +36,7 @@ export class VPNState {
   // True if firefox is split-tunneled
   isExcluded = false;
   // True if a subscription is found
-  subscribed = true;
+  subscribed = false;
   // True if it is authenticated
   authenticated = false;
   // Can be "Stable", "Unstable", "NoSignal"
