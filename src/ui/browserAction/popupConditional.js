@@ -32,7 +32,7 @@ export class PopUpConditionalView extends LitElement {
     const supportedPlatform = Utils.isSupportedOs(deviceOs.os);
 
     propertySum(
-      (state, features, currentPage,isExcluded) => {
+      (state, features, currentPage, isExcluded) => {
         this.targetElement = PopUpConditionalView.toSlotname(
           state,
           features,
@@ -71,7 +71,14 @@ export class PopUpConditionalView extends LitElement {
    * @param {Boolean} isExcluded
    * @returns {String}
    */
-  static toSlotname(state, features, supportedPlatform, currentOnboardingPage,onBoardingScreens, isExcluded) {
+  static toSlotname(
+    state,
+    features,
+    supportedPlatform,
+    currentOnboardingPage,
+    onBoardingScreens,
+    isExcluded
+  ) {
     if (!supportedPlatform && !features.webExtension) {
       return html`<unsupported-os-message-screen></unsupported-os-message-screen>`;
     }
@@ -96,8 +103,8 @@ export class PopUpConditionalView extends LitElement {
     ) {
       return onBoardingScreens[currentOnboardingPage];
     }
-    if(isExcluded){
-      return html`<split-tunnel-message-screen></split-tunnel-message-screen>`
+    if (isExcluded) {
+      return html`<split-tunnel-message-screen></split-tunnel-message-screen>`;
     }
 
     return html`<popup-browseraction></popup-browseraction>`;
