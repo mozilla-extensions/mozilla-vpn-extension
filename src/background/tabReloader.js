@@ -36,7 +36,11 @@ export class TabReloader extends Component {
   }
 
   async init() {
-    this.proxyHandler.lastChangedOrigin.subscribe(TabReloader.onOriginChanged);
+    this.proxyHandler.lastChangedOrigin.subscribe((origin) => {
+      if (origin) {
+        TabReloader.onOriginChanged(origin);
+      }
+    });
     this.extController.state.subscribe((s) => {
       TabReloader.onExtensionStateChanged(s);
     });
@@ -45,6 +49,8 @@ export class TabReloader extends Component {
   currentExtState;
 
   static async onExtensionStateChanged(newState) {
+    this.currentExtState ??= newState.state;
+
     if (
       this.currentExtState == newState.state ||
       !["Enabled", "Disabled", "Connecting"].includes(newState.state)
@@ -54,6 +60,11 @@ export class TabReloader extends Component {
 
     const cachedCurrentState = this.currentExtState;
     this.currentExtState = newState.state;
+
+    // Moving from idle -> disabled does not need a refresh of the tabs
+    if (cachedCurrentState === "Idle" && newState.state === "Disabled") {
+      return;
+    }
 
     // We don't need to reload tabs when we move to "Connecting"
     // so return
