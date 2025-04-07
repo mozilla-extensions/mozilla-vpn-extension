@@ -19,6 +19,11 @@
     gh release create v1.35.0 --prerelease --generate-notes
     ```
     __This will notify QA and give them the XPI.__ 
-6. Request a Link from QA to the QA-Ticket i.e [Example Ticket](https://mozilla-hub.atlassian.net/browse/QA-3231)
-7. Open a Review Ticket in ADDONSOPS, linking the QA Ticket. [Example ticket](https://mozilla-hub.atlassian.net/browse/ADDONSOPS-785)
-8. After a Positive Review from QA go to [AMO Store](https://addons.mozilla.org/en-US/developers/addons) and upload the `amo_sources.zip` from [Github Release](https://github.com/mozilla-extensions/mozilla-vpn-extension/releases)
+7. Await QA Sign-Off
+    7.1 In case of new Bugs fix those on main
+    7.2 Cherry pick to the release branch
+    7.3 Delete Tag & Pre-Release from Github
+    7.4 Goto step 3
+8. Request a Link from QA to the QA-Ticket i.e [Example Ticket](https://mozilla-hub.atlassian.net/browse/QA-3231)
+9. Open a Review Ticket in ADDONSOPS, linking the QA Ticket. [Example ticket](https://mozilla-hub.atlassian.net/browse/ADDONSOPS-785)
+10. Go to [AMO Store](https://addons.mozilla.org/en-US/developers/addons) and upload the `amo_sources.zip` from [Github Release](https://github.com/mozilla-extensions/mozilla-vpn-extension/releases)
