@@ -197,7 +197,7 @@ defineMessageScreen({
   heading: tr("messageSplitTunnelHeader"),
   bodyText: tr("messageSplitTunnelBody"),
 });
-// TODO: ADD STRINGS !!
+
 defineMessageScreen({
   tag: "unsupported-country-message-screen",
   img: "onboarding-2.svg",
