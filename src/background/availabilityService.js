@@ -11,11 +11,11 @@ import { VPNController } from "./vpncontroller/vpncontroller.js";
 
 /**
  *
- * AvailablityService reports if a user will be able to
+ * AvailabilityService reports if a user will be able to
  * create a subscription in at the current location.
  */
 
-export class AvailablityService extends Component {
+export class AvailabilityService extends Component {
   // Gets exposed to UI
   static properties = {
     isAvailable: PropertyType.Bindable,
@@ -25,47 +25,35 @@ export class AvailablityService extends Component {
   };
 
   /** @type {WritableProperty<String>} */
-  // Availablity status:
+  // Availability status:
   // Valid Strings: "pending, available, unavailable, ignored"
   isAvailable = property("pending");
   /** @type {WritableProperty<String>} */
   waitlistURL = property("");
 
-  async ignore() {
+  ignore() {
     this.isAvailable.value = "ignored";
   }
 
   async check() {
-    return await fetch("https://www.mozilla.org/products/vpn/", {
-      cache: "reload",
-    })
-      .then((response) => response.text())
-      .then((htmlString) => {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(htmlString, "text/html");
-
-        /** @type {HTMLAnchorElement?} */
-        const waitlistbutton = doc.querySelector(
-          `[data-testid="join-waitlist-hero-button"]`
-        );
-        const available = !!waitlistbutton ? "unavailable" : "available";
-
-        if (waitlistbutton) {
-          const buttonURL = new URL(waitlistbutton.href);
-          const realURL = new URL("https://www.mozilla.org/");
-          realURL.pathname = buttonURL.pathname;
-          this.waitlistURL.value = realURL.toString();
-        }
-        console.log(
-          `A vpn subscribtion is: ${available}, waitlist ${this.waitlistURL.value}`
-        );
-
-        this.isAvailable.value = available;
-        return available;
+    try {
+      const htmlString = await fetch("https://www.mozilla.org/products/vpn/", {
+        cache: "reload",
       })
-      .catch((error) => {
-        console.error("Error fetching or parsing the HTML:", error);
-      });
+        .then((response) => response.text())
+        .then((s) => s);
+
+      const res = AvailabilityService.checkContent(htmlString);
+      this.isAvailable.set(res.available);
+      if (res.waitlistURL) {
+        this.waitlistURL.set(res.waitlistURL);
+      } else {
+        this.waitlistURL.set("");
+      }
+      return res;
+    } catch (error) {
+      console.error("Error fetching or parsing the HTML:", error);
+    }
   }
 
   /**
@@ -84,16 +72,36 @@ export class AvailablityService extends Component {
        * the user has not yet installed the vpn
        * or if the user has not yet subscribed.
        */
-      if (!state.installed) {
-        this.check();
+      if (state.installed && state.subscribed) {
         return;
       }
-      if (!state.subscribed) {
-        this.check();
-        return;
-      }
+      this.check();
     });
     super(receiver);
   }
-  async init() {}
+
+  static checkContent(html = "") {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+
+    /** @type {HTMLAnchorElement?} */
+    const waitlistbutton = doc.querySelector(
+      `[data-testid="join-waitlist-hero-button"]`
+    );
+    const available = !!waitlistbutton ? "unavailable" : "available";
+
+    if (!waitlistbutton) {
+      return {
+        available,
+      };
+    }
+    const buttonURL = new URL(waitlistbutton.href);
+    const realURL = new URL("https://www.mozilla.org/");
+    realURL.pathname = buttonURL.pathname;
+
+    return {
+      available,
+      waitlistURL: realURL.toString(),
+    };
+  }
 }

@@ -17,7 +17,7 @@ import { TabReloader } from "./tabReloader.js";
 import { ConflictObserver } from "./conflictObserver.js";
 import { ButterBarService } from "./butterBarService.js";
 import { Telemetry } from "./telemetry.js";
-import { AvailablityService } from "./availabilityService.js";
+import { AvailabilityService } from "./availabilityService.js";
 
 const log = Logger.logger("Main");
 
@@ -59,7 +59,7 @@ class Main {
     this.vpnController,
     this.conflictObserver
   );
-  avilabilityService = new AvailablityService(this, this.vpnController);
+  availabilityService = new AvailabilityService(this, this.vpnController);
 
   async init() {
     log("Hello from the background script!");
@@ -74,7 +74,7 @@ class Main {
     expose(this.onboardingController);
     expose(this.butterBarService);
     expose(this.telemetry);
-    expose(this.avilabilityService);
+    expose(this.availabilityService);
 
     this.#handlingEvent = false;
     this.#processPendingEvents();

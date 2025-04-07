@@ -45,7 +45,9 @@ export const butterBarService = await getExposedObject("ButterBarService");
 /** @type {ipcTelemetry} */
 export const telemetry = await getExposedObject("Telemetry");
 
-export const availabilityService = await getExposedObject("AvailablityService");
+export const availabilityService = await getExposedObject(
+  "AvailabilityService"
+);
 
 export const ready = Promise.all([vpnController, proxyHandler]);
 
