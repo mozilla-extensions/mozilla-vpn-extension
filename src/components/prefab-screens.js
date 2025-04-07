@@ -196,6 +196,8 @@ defineMessageScreen({
   img: "message-split-tunnel.svg",
   heading: tr("messageSplitTunnelHeader"),
   bodyText: tr("messageSplitTunnelBody"),
+  secondaryAction: tr("getHelp"),
+  onSecondaryAction: () => closeAfter(() => open(getHelpUrl)),
 });
 
 defineMessageScreen({
