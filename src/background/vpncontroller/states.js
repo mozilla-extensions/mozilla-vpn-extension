@@ -246,4 +246,6 @@ export class BridgeResponse {
   status;
   /** @type {string|undefined} */
   error;
+  /** @type {string|undefined} */
+  exe;
 }
