@@ -34,8 +34,11 @@ const sendToApp = (customElement, command = "") => {
   );
 };
 
-const openVPN = (elm) => {
+const startVPN = (elm) => {
   sendToApp(elm, "start");
+};
+const openVPN = (elm) => {
+  sendToApp(elm, "focus");
 };
 
 const openAuth = (elm) => {
@@ -142,7 +145,7 @@ defineMessageScreen({
   img: "message-open.svg",
   heading: tr("headerOpenMozillaVPN"),
   bodyText: html` <p>${tr("bodyOpenMsg")}</p> `,
-  onPrimaryAction: openVPN,
+  onPrimaryAction: startVPN,
   primaryAction: tr("headerOpenMozillaVPN"),
   secondaryAction: tr("getHelp"),
   onSecondaryAction: () => closeAfter(() => open(getHelpUrl)),
@@ -196,6 +199,8 @@ defineMessageScreen({
   img: "message-split-tunnel.svg",
   heading: tr("messageSplitTunnelHeader"),
   bodyText: tr("messageSplitTunnelBody"),
+  primaryAction: tr("headerOpenMozillaVPN"),
+  onPrimaryAction: openVPN,
   secondaryAction: tr("getHelp"),
   onSecondaryAction: () => closeAfter(() => open(getHelpUrl)),
 });
