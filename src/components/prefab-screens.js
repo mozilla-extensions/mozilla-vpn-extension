@@ -7,7 +7,7 @@ import { MessageScreen } from "./message-screen.js";
 import { tr } from "../shared/i18n.js";
 import {
   onboardingController,
-  telemetry,
+  availabilityService,
 } from "../ui/browserAction/backend.js";
 import { NUMBER_OF_ONBOARDING_PAGES } from "../background/onboarding.js";
 
@@ -196,4 +196,16 @@ defineMessageScreen({
   img: "message-split-tunnel.svg",
   heading: tr("messageSplitTunnelHeader"),
   bodyText: tr("messageSplitTunnelBody"),
+});
+
+defineMessageScreen({
+  tag: "unsupported-country-message-screen",
+  img: "onboarding-2.svg",
+  heading: tr("headerSubscriptionNotAvailable"),
+  bodyText: tr("bodySubscriptionNotAvailable"),
+  onPrimaryAction: () =>
+    closeAfter(() => open(availabilityService.waitlistURL.value)),
+  primaryAction: tr("btnjoinWaitlist"),
+  secondaryAction: tr("btnContinue"),
+  onSecondaryAction: () => availabilityService.ignore(),
 });

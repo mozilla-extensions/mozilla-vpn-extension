@@ -4,7 +4,11 @@
 
 import { propertySum } from "../../shared/property.js";
 import { Utils } from "../../shared/utils.js";
-import { vpnController, onboardingController, telemetry } from "./backend.js";
+import {
+  vpnController,
+  onboardingController,
+  availabilityService,
+} from "./backend.js";
 import { NUMBER_OF_ONBOARDING_PAGES } from "../../background/onboarding.js";
 import { LitElement, html } from "../../vendor/lit-all.min.js";
 
@@ -32,20 +36,22 @@ export class PopUpConditionalView extends LitElement {
     const supportedPlatform = Utils.isSupportedOs(deviceOs.os);
 
     propertySum(
-      (state, features, currentPage, isExcluded) => {
+      (state, features, currentPage, isExcluded, isAvailable) => {
         this.targetElement = PopUpConditionalView.toSlotname(
           state,
           features,
           supportedPlatform,
           currentPage,
           this.onBoadingScreens,
-          isExcluded
+          isExcluded,
+          isAvailable
         );
       },
       vpnController.state,
       vpnController.featureList,
       onboardingController.currentOnboardingPage,
-      vpnController.isExcluded
+      vpnController.isExcluded,
+      availabilityService.isAvailable
     );
 
     // Messages may dispatch an event requesting to send a Command to the VPN
@@ -69,6 +75,7 @@ export class PopUpConditionalView extends LitElement {
    * @param {Boolean} supportedPlatform
    * @param {Number} currentOnboardingPage
    * @param {Boolean} isExcluded
+   * @param {Boolean} isSubscriptionAvailable
    * @returns {String}
    */
   static toSlotname(
@@ -77,10 +84,17 @@ export class PopUpConditionalView extends LitElement {
     supportedPlatform,
     currentOnboardingPage,
     onBoardingScreens,
-    isExcluded
+    isExcluded,
+    isSubscriptionAvailable
   ) {
     if (!supportedPlatform && !features.webExtension) {
       return html`<unsupported-os-message-screen></unsupported-os-message-screen>`;
+    }
+    if (
+      (!state.installed || !state.subscribed) &&
+      isSubscriptionAvailable == "unavailable"
+    ) {
+      return html`<unsupported-country-message-screen></unsupported-country-message-screen>`;
     }
     if (!state.installed) {
       return html`<install-message-screen></install-message-screen>`;
