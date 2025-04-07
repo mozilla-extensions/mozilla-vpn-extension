@@ -202,7 +202,7 @@ defineMessageScreen({
   tag: "unsupported-country-message-screen",
   img: "onboarding-2.svg",
   heading: tr("headerSubscriptionNotAvailable"),
-  bodyText: html` <p>${tr("bodySubscriptionNotAvailable")}</p> `,
+  bodyText: tr("bodySubscriptionNotAvailable"),
   onPrimaryAction: () =>
     closeAfter(() => open(availabilityService.waitlistURL.value)),
   primaryAction: tr("btnjoinWaitlist"),
