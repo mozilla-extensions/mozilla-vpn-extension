@@ -104,11 +104,11 @@ export class ToolbarIconHandler extends Component {
     const base64 = btoa(logo);
     return `data:image/svg+xml;base64,${base64}`;
   }
-  static getFillColor(themeColors) {
+  static getFillColor(themeColors, windowInfo) {
     const darkMode =
       window.matchMedia &&
       window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const defaultColor = darkMode ? "white" : "black";
+    const defaultColor = darkMode || windowInfo.incognito ? "white" : "black";
 
     // If there is no theme selected in firefox, just use defaults
     if (!themeColors) {
@@ -132,7 +132,7 @@ export class ToolbarIconHandler extends Component {
       return;
     }
     const theme = await browser.theme.getCurrent();
-    const iconFill = ToolbarIconHandler.getFillColor(theme.colors);
+    const iconFill = ToolbarIconHandler.getFillColor(theme.colors, windowInfo);
 
     if (!this.isSupportedPlatform) {
       return this.setIcon(iconFill, disabledColor, windowInfo.id);
