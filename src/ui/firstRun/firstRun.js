@@ -43,7 +43,7 @@ export class FirstRunPage extends LitElement {
       <main>
         <h1>${tr("thankYouForAdding")}</h1>
         <div class="flex-row">
-          <img src="firstrun.svg" />
+          <img src="firstrun.svg" aria-hidden="true" />
           <div class="copy">
             <p class="bold p1">${tr("optionalDataCollection")}</p>
             <p class="p1">${tr("first-install-body")}</p>
