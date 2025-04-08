@@ -61,7 +61,7 @@ export class MessageScreen extends LitElement {
       <vpn-titlebar title=${this.titleHeader}></vpn-titlebar>
       <div class="inner">
         <div class="upper">
-          <img class="${this.identifier}" src="/assets/img/${this.img}" />
+          <img class="${this.identifier}" src="/assets/img/${this.img}" aria-hidden="true"/>
           <h1>${this.heading}</h1>
           <slot></slot>
         </div>
