@@ -62,7 +62,7 @@ export class MessageScreen extends LitElement {
       <div class="inner">
         <div class="upper">
           <img class="${this.identifier}" src="/assets/img/${this.img}" aria-hidden="true"/>
-          <h1>${this.heading}</h1>
+          <h2>${this.heading}</h2>
           <slot></slot>
         </div>
         ${when(
@@ -225,7 +225,7 @@ export class MessageScreen extends LitElement {
       background: var(--action-button-color);
     }
 
-    h1 {
+    h2 {
       font-family: var(--font-family-bold);
       margin-block: 16px;
       color: #3d3d3d;
@@ -267,7 +267,7 @@ export class MessageScreen extends LitElement {
     }
 
     @media (prefers-color-scheme: dark) {
-      h1 {
+      h2 {
         color: #ffffff;
       }
 
