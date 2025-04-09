@@ -52,6 +52,8 @@ export class ButterBar extends LitElement {
             dismissAlert(this.alertId);
           }}
           class="butter-bar-close ghost-btn"
+          title="${tr("close")}"
+          aria-label="${tr("close")}"
         >
           <img aria-hidden="true" src="./../../assets/img/close.svg" />
         </button>
