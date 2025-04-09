@@ -79,8 +79,10 @@ export class FirstRunPage extends LitElement {
             <div class="footer bold">
               <button
                 class="primarybtn"
-                @click=${(e) => {
+                @click=${async (e) => {
                   browser.browserAction.openPopup();
+                  const tab = await browser.tabs.getCurrent();
+                  browser.tabs.remove(tab.id);
                 }}
               >
                 ${tr("next")}
