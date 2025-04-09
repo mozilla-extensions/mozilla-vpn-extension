@@ -200,7 +200,7 @@ defineMessageScreen({
   heading: tr("messageSplitTunnelHeader"),
   bodyText: tr("messageSplitTunnelBody"),
   primaryAction: tr("headerOpenMozillaVPN"),
-  onPrimaryAction: closeAfter(()=>openVPN()),
+  onPrimaryAction: ()=> closeAfter(()=>openVPN()),
   secondaryAction: tr("getHelp"),
   onSecondaryAction: () => closeAfter(() => open(getHelpUrl)),
 });
