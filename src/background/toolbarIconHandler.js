@@ -137,7 +137,7 @@ export class ToolbarIconHandler extends Component {
     if (!this.isSupportedPlatform) {
       return this.setIcon(iconFill, disabledColor, windowInfo.id);
     }
-    if (!this.extState.state) {
+    if (!this.extState?.state) {
       return;
     }
 
