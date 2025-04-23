@@ -232,7 +232,7 @@ export class BrowserActionPopup extends LitElement {
             <vpn-card
               @toggle=${handleVPNToggle}
               .enabled=${this.extState?.enabled}
-              .clientConnected=${this.vpnState?.connected}
+              .clientConnected=${this.vpnState?.state === "Enabled"}
               .entryCityName=${this.vpnState?.entryServerCity?.name}
               .entryCountryFlag=${this.vpnState?.entryServerCountry?.code}
               .exitCityName=${this.vpnState?.exitServerCity?.name}
