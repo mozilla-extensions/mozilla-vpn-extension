@@ -43,8 +43,21 @@ class Main {
   requestHandler = new RequestHandler(
     this,
     this.extController,
-    this.proxyHandler
+    this.proxyHandler,
+    {
+      incognito: false,
+    }
   );
+
+  pbmRequestHandler = new RequestHandler(
+    this,
+    this.extPBMController,
+    this.proxyHandler,
+    {
+      incognito: true,
+    }
+  );
+
   telemetry = new Telemetry(
     this.vpnController,
     this.extController,
