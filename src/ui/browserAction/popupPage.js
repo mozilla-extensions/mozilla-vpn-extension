@@ -38,6 +38,7 @@ import "./../../components/titlebar.js";
 import "./../../components/iconbutton.js";
 import "./../../components/mz-rings.js";
 import "./../../components/butter-bar.js";
+import "./popup-toggles.js";
 import { SiteContext } from "../../background/proxyHandler/siteContext.js";
 import {
   ServerCity,
@@ -443,7 +444,7 @@ export class BrowserActionPopup extends LitElement {
     `;
   }
 
-  static createSettingsPanel(telemEnabled, toggleTelemetry = () => {}) {
+  static createSettingsPanel() {
     const viewElement = document.createElement("section");
     viewElement.classList = ["settings-panel"];
     viewElement.dataset.title = "Settings";
@@ -481,8 +482,6 @@ export class BrowserActionPopup extends LitElement {
       },
     ];
 
-    let telemetryStatus = telemEnabled;
-
     render(
       html`
         <ul id="settingsList">
@@ -496,26 +495,7 @@ export class BrowserActionPopup extends LitElement {
             `
           )}
         </ul>
-        <div class="telemetry">
-          <div id="telemetry-checkbox" class="checkbox-wrapper">
-            <input 
-            .checked=${telemEnabled}
-            @click=${() => {
-              telemetryStatus = !telemetryStatus;
-              toggleTelemetry(telemetryStatus);
-            }} type="checkbox" />
-          </div>
-          <div class="telemetry-checkbox-label">
-            <label for="telemetry-checkbox" class="telemetry-checkbox-headline">${tr("telemetry_toggle_text")}</label>
-            <p class="telemetry-checkbox-body">${tr("telemetrySettingsCheckboxLabel")} 
-            <a href="" @click=${() => {
-              openInNewTab(
-                "https://addons.mozilla.org/firefox/addon/mozilla-vpn-extension/privacy/"
-              );
-            }} class="in-copy-link">${tr("learnMore")}</>
-            </p>
-          </div>
-        </div>
+        <popup-toggles></popup-toggles>
       `,
       viewElement
     );
@@ -549,31 +529,6 @@ export class BrowserActionPopup extends LitElement {
 
   static styles = css`
     ${fontStyling}${resetSizing}${ghostButtonStyles}${inUseLabel}${positioner}
-
-    .telemetry {
-      border-top: 1px solid var(--divider-color);
-      padding: 24px 8px 16px 1px;
-      margin: 20px 24px 24px 20px;
-      display: flex;
-      flex-direction: row;
-    }
-    #telemetry-checkbox input {
-      accent-color: var(--action-button-color);
-    }
-
-    .telemetry-checkbox-headline {
-      font-family: "Inter Semi Bold";
-      font-size: 14px;
-    }
-
-    .telemetry-checkbox-body {
-      font-size: 13px;
-      margin-block-start: 4px;
-      padding-inline-end: 8px;
-    }
-    .telemetry-checkbox-label {
-      margin-inline-start: 18px;
-    }
 
     section {
       background-color: var(--panel-bg-color);

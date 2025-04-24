@@ -18,9 +18,13 @@ import {
 } from "@jest/globals"; // Import test and beforeEach/afterEach
 
 import { createMockedBrowserStore } from "./testutils.mjs";
+import { property } from "../../../src/shared/property";
 
 class TestRegister {
   registerObserver() {}
+}
+class TestExt {
+  autoConnect = property(false);
 }
 
 // Minimal mocks needed just to avoid errors during instantiation/init
@@ -54,27 +58,16 @@ describe("ButterBarService", () => {
     mockStorage.clearMocks();
   });
 
-  test("Alerts are not created if conflict lists are empty", () => {
-    const butterBarService = new ButterBarService(
-      new TestRegister(),
-      mockVpnController,
-      mockConflictObserver
-    );
-    const list = [];
-    // maybeCreateAlert doesn't return anything, test the side effect
-    butterBarService.maybeCreateAlert(list, testButterBarAlert);
-    expect(butterBarService.butterBarList.value).toEqual([]); // Check the list state
-  });
-
   test("Alerts can be added to the butter bar list and removed", async () => {
     // Made async for dismissAlert
     const butterBarService = new ButterBarService(
       new TestRegister(),
       mockVpnController,
-      mockConflictObserver
+      mockConflictObserver,
+      new TestExt()
     );
     const list = [1];
-    butterBarService.maybeCreateAlert(list, testButterBarAlert);
+    butterBarService.maybeCreateAlert(testButterBarAlert);
     expect(butterBarService.butterBarList.value.length).toBe(1);
 
     await butterBarService.dismissAlert("new-alert");
@@ -87,41 +80,27 @@ describe("ButterBarService", () => {
     const butterBarService = new ButterBarService(
       new TestRegister(),
       mockVpnController,
-      mockConflictObserver
+      mockConflictObserver,
+      new TestExt()
     );
     const list = [1];
-    butterBarService.maybeCreateAlert(list, testButterBarAlert);
+    butterBarService.maybeCreateAlert(testButterBarAlert);
     expect(butterBarService.butterBarList.value.length).toBe(1);
 
-    butterBarService.maybeCreateAlert(list, testButterBarAlert);
+    butterBarService.maybeCreateAlert(testButterBarAlert);
     expect(butterBarService.butterBarList.value.length).toBe(1);
-  });
-
-  test("Alerts are removed when the conflict that triggered them is gone", () => {
-    const butterBarService = new ButterBarService(
-      new TestRegister(),
-      mockVpnController,
-      mockConflictObserver
-    );
-
-    let list = [1];
-    butterBarService.maybeCreateAlert(list, testButterBarAlert);
-    expect(butterBarService.butterBarList.value.length).toBe(1);
-
-    list = [];
-    butterBarService.maybeCreateAlert(list, testButterBarAlert);
-    expect(butterBarService.butterBarList.value.length).toBe(0);
   });
 
   test("Alerts are only added to the dismissed list when dismissed from the UI", async () => {
     const butterBarService = new ButterBarService(
       new TestRegister(),
       mockVpnController,
-      mockConflictObserver
+      mockConflictObserver,
+      new TestExt()
     );
 
     let list = [1];
-    butterBarService.maybeCreateAlert(list, testButterBarAlert);
+    butterBarService.maybeCreateAlert(testButterBarAlert);
     expect(butterBarService.butterBarList.value.length).toBe(1);
 
     // Use removeAlert (doesn't dismiss/save)
@@ -130,7 +109,7 @@ describe("ButterBarService", () => {
 
     // Now dismiss an alert to ensure dismissedAlerts *can* be populated
     const secondAlert = new ButterBarAlert("second", "m", "l", "u");
-    butterBarService.maybeCreateAlert([1], secondAlert); // Add another alert
+    butterBarService.maybeCreateAlert(secondAlert); // Add another alert
     await butterBarService.dismissAlert(secondAlert.alertId); // Dismiss it
     expect(butterBarService.dismissedAlerts.length).toBe(1); // Should contain 'second'
     expect(butterBarService.dismissedAlerts).not.toContain(
@@ -142,11 +121,12 @@ describe("ButterBarService", () => {
     const butterBarService = new ButterBarService(
       new TestRegister(),
       mockVpnController,
-      mockConflictObserver
+      mockConflictObserver,
+      new TestExt()
     );
 
     let list = [1];
-    butterBarService.maybeCreateAlert(list, testButterBarAlert);
+    butterBarService.maybeCreateAlert(testButterBarAlert);
     expect(butterBarService.butterBarList.value.length).toBe(1);
 
     // Use removeAlert (not dismissAlert)
@@ -154,7 +134,7 @@ describe("ButterBarService", () => {
     expect(butterBarService.dismissedAlerts.length).toBe(0);
 
     // Conflict resurfaces
-    butterBarService.maybeCreateAlert([1], testButterBarAlert);
+    butterBarService.maybeCreateAlert(testButterBarAlert);
     expect(butterBarService.butterBarList.value.length).toBe(1); // Should reappear
   });
 
@@ -162,7 +142,8 @@ describe("ButterBarService", () => {
     const butterBarService = new ButterBarService(
       new TestRegister(),
       mockVpnController,
-      mockConflictObserver
+      mockConflictObserver,
+      new TestExt()
     );
     const list = ["someId"];
     const dismissed = butterBarService.alertWasDismissed("someId", list);
@@ -173,7 +154,8 @@ describe("ButterBarService", () => {
     const butterBarService = new ButterBarService(
       new TestRegister(),
       mockVpnController,
-      mockConflictObserver
+      mockConflictObserver,
+      new TestExt()
     );
     const list = [];
     const dismissed = butterBarService.alertWasDismissed("someId", list);
@@ -185,7 +167,8 @@ describe("ButterBarService", () => {
       const butterBarService = new ButterBarService(
         new TestRegister(),
         mockVpnController,
-        mockConflictObserver
+        mockConflictObserver,
+        new TestExt()
       );
 
       const list = [];
@@ -202,7 +185,8 @@ describe("ButterBarService", () => {
       const butterBarService = new ButterBarService(
         new TestRegister(),
         mockVpnController,
-        mockConflictObserver
+        mockConflictObserver,
+        new TestExt()
       );
       const list = [];
       const alertAlreadyInList = butterBarService.alertInButterBarList(
@@ -217,7 +201,8 @@ describe("ButterBarService", () => {
     const butterBarService = new ButterBarService(
       new TestRegister(),
       mockVpnController,
-      mockConflictObserver
+      mockConflictObserver,
+      new TestExt()
     );
     const alertIdToDismiss = "alert-1";
     // Add the alert to the list first so the filter works
@@ -260,7 +245,8 @@ describe("ButterBarService", () => {
     const butterBarService = new ButterBarService(
       new TestRegister(),
       mockVpnController,
-      mockConflictObserver
+      mockConflictObserver,
+      new TestExt()
     );
 
     // Act: Call the init method which internally calls loadDismissedAlerts
@@ -281,7 +267,8 @@ describe("ButterBarService", () => {
     const butterBarService = new ButterBarService(
       new TestRegister(),
       mockVpnController,
-      mockConflictObserver
+      mockConflictObserver,
+      new TestExt()
     );
 
     // Act
