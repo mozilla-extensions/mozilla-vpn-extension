@@ -170,14 +170,14 @@ export class RequestHandler extends Component {
         const proxyInfo = proxyMap.get(parsedHostname);
         if (proxyInfo) {
           console.error(
-            `Setting ${proxyInfo[0].host} for ${parsedHostname} -> filtered for ${this.filter.incognito}`
+            `Setting ${proxyInfo[0].host} for ${parsedHostname} -> filtered for ${requestInfo.incognito}`
           );
           return proxyInfo;
         }
       }
     }
     console.error(
-      `Setting ${self.defaultProxyInfo.value.host} for ${documentUrl} - filtered for ${this.filter.incognito}`
+      `Setting ${self.defaultProxyInfo.value[0].host} for ${documentUrl} - filtered for ${requestInfo.incognito}`
     );
     // No custom proxy for the site, return default connection
     return defaultProxy;
