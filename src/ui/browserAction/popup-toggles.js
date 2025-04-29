@@ -1,7 +1,12 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-import { html, css, LitElement } from "../../vendor/lit-all.min.js";
+import {
+  html,
+  css,
+  LitElement,
+  asyncReplace,
+} from "../../vendor/lit-all.min.js";
 
 import { extPBMController, telemetry } from "./backend.js";
 
@@ -21,7 +26,7 @@ import { property } from "../../shared/property.js";
  */
 export class PopupToggles extends LitElement {
   render() {
-    const toggles = this.toggles.map(PopupToggles.toggle);
+    const toggles = this.toggles.map(PopupToggles.toggleTemplate);
     return html`
       <main>
         <hr />
@@ -39,7 +44,7 @@ export class PopupToggles extends LitElement {
       onClick: () => {
         extPBMController.toggleAutoConnect();
       },
-      description: html` <p>${tr("labelDescribeAutoStartOnPBM")}</p> `,
+      description: asyncReplace(PopupToggles.pbmDescription()),
     },
     {
       prefix: html`<hr></hr>`,
@@ -59,7 +64,7 @@ export class PopupToggles extends LitElement {
             `,
     },
   ];
-  static toggle(
+  static toggleTemplate(
     args = {
       prefix: html``,
       checked: property(true),
@@ -90,6 +95,19 @@ export class PopupToggles extends LitElement {
     `;
   }
 
+  static async *pbmDescription() {
+    yield html`<p>${tr("labelDescribeAutoStartOnPBM")}</p>`;
+    const hasPBM_Rights = await browser.extension.isAllowedIncognitoAccess();
+    if (hasPBM_Rights) {
+      yield html`<p>${tr("labelDescribeAutoStartOnPBM")}</p>`;
+    } else {
+      yield html`
+        <p>${tr("labelDescribeAutoStartOnPBM")}</p>
+        <p class="error">${tr("errorPBMPermissionNotGiven")}</p>
+      `;
+    }
+  }
+
   static styles = css`
     ${fontStyling}${resetSizing}${positioner}
     main {
@@ -111,6 +129,9 @@ export class PopupToggles extends LitElement {
     }
     input {
       accent-color: var(--action-button-color);
+    }
+    .error {
+      color: var(--action-button-color);
     }
 
     .headline {
