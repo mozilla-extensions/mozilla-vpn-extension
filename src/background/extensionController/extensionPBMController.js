@@ -33,7 +33,7 @@ export class ExtensionPBMController extends ExtensionController {
   }
 
   async init() {
-    await super.init();
+    const wasInitialized = super.init();
 
     const { autstartOnPBM } = await browser.storage.local.get("autstartOnPBM");
     this.autoConnect.value = autstartOnPBM || false;
@@ -42,7 +42,7 @@ export class ExtensionPBMController extends ExtensionController {
       browser.storage.local.set({ autstartOnPBM: newValue });
     });
 
-    browser.windows.onCreated.addListener((window) => {
+    browser.windows.onCreated.addListener(async (window) => {
       if (!window.incognito) {
         return;
       }
@@ -51,22 +51,46 @@ export class ExtensionPBMController extends ExtensionController {
       if (this.privateWindowIds.size == 0) {
         this.mState.value = this.parentExtController.state.value;
       }
-      // In case autoconnect is on, trigger a connection, if we arent't connected.
-      if (this.autoConnect.value === true && !this.mState.value.enabled) {
-        this.toggleConnectivity();
-      }
       // Keep the id, so we have a count of active private window sessions.
       this.privateWindowIds.add(window.id);
+
+      // In case autoconnect is off, or we're connected, all good.
+      if (this.autoConnect.value === false || this.mState.value.enabled) {
+        return;
+      }
+      // Wait for the VPN to start, if it's stopped.
+      await this.waitForVPN();
+      // The VPN just started. it might auto-connect,
+      // so wait the init part
+      await wasInitialized;
+      // We started now, so all good.
+      if (this.mState.value.enabled) {
+        return;
+      }
+      this.toggleConnectivity();
     });
     browser.windows.onRemoved.addListener((windowID) => {
       if (this.privateWindowIds.has(windowID)) {
         this.privateWindowIds.delete(windowID);
       }
     });
+    await wasInitialized;
   }
 
   toggleAutoConnect() {
     this.autoConnect.value = !this.autoConnect.value;
+  }
+
+  async waitForVPN() {
+    if (this.vpnController.state.value.alive) {
+      return;
+    }
+    this.vpnController.postToApp("start", { minimized: true });
+    for await (const state of this.vpnController.state) {
+      if (state.alive) {
+        return;
+      }
+    }
   }
 
   parentExtController;

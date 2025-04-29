@@ -53,7 +53,7 @@ export class ExtensionController extends Component {
     );
     // After that subscribe to any changes
     this.vpnController.state.subscribe(
-      this.handleClientStateChanges.bind(this)
+      this.handleUnexpectedClientStateChanges.bind(this)
     );
   }
 
@@ -104,24 +104,18 @@ export class ExtensionController extends Component {
     setTimeout(() => {
       this.#mAllowDisconnect.value = true;
     }, 10000);
-
     // Send activation to client and wait for response
     this.vpnController.postToApp("activate");
-    this.mState.value = await new Promise((res) => {
-      const unsub = this.vpnController.state.subscribe((newstate) => {
-        let done = (v) => {
-          unsub(), res(v);
-        };
-        switch (newstate.state) {
-          case "Enabled":
-            done(new StateFirefoxVPNEnabled(false, Date.now()));
-          case "Disabled":
-            done(new StateFirefoxVPNDisabled(false));
-          case "OnPartial":
-            done(new StateFirefoxVPNEnabled(true, Date.now()));
-        }
-      });
-    });
+    for await (const value of this.vpnController.state) {
+      switch (value.state) {
+        case "Enabled":
+          this.mState.set(new StateFirefoxVPNEnabled(false, Date.now()));
+          return;
+        case "OnPartial":
+          this.mState.set(new StateFirefoxVPNEnabled(true, Date.now()));
+          return;
+      }
+    }
   }
 
   get state() {
@@ -133,14 +127,17 @@ export class ExtensionController extends Component {
   }
 
   /**
-   *
+   * Called when the VPN Client changes states,
+   * in case we're expecting client changes
+   * (i.e we're connecting this function just exists)
    * @param {VPNState} newClientState
    * @returns {Promise<Void>}
    */
-  async handleClientStateChanges(newClientState) {
+  async handleUnexpectedClientStateChanges(newClientState) {
     const currentExtState = this.mState.value;
     this.clientState = newClientState;
     if (currentExtState.connecting) {
+      // We're handling this in toggleActivity.
       return;
     }
     const maybeSet = (s = new FirefoxVPNState()) => {

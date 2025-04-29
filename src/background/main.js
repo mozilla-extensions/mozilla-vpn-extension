@@ -87,7 +87,7 @@ class Main {
   async init() {
     log("Hello from the background script!");
 
-    await Promise.all(
+    const init_done = Promise.all(
       this.observers
         .values()
         .map((observer) => observer.init())
@@ -106,6 +106,9 @@ class Main {
 
     this.#handlingEvent = false;
     this.#processPendingEvents();
+
+    await init_done;
+    console.info("All subsystems have init.");
   }
 
   // In order to avoid race conditions amongst multiple events

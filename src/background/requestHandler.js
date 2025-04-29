@@ -13,7 +13,6 @@ import { ProxyHandler, ProxyUtils } from "./proxyHandler/index.js";
 import { propertySum, property } from "../shared/property.js";
 
 const log = Logger.logger("RequestHandler");
-let self;
 /**
  * Handles request interception, inspection, and determines whether a request should be proxied.
  *
@@ -39,7 +38,6 @@ export class RequestHandler extends Component {
       proxyHandler.currentExitRelays
     );
     this.filter = filter;
-    self = this;
 
     browser.proxy.settings.get({}).then((v) => {
       this.browserProxySettings.set(v);
@@ -113,7 +111,7 @@ export class RequestHandler extends Component {
         this.extState,
         this.proxyMap,
         this.localProxyInfo,
-        this.defaultProxyInfo
+        this.defaultProxyInfo.value
       );
     };
     console.log(
@@ -169,16 +167,10 @@ export class RequestHandler extends Component {
         const parsedHostname = Utils.getDomainName(urlString);
         const proxyInfo = proxyMap.get(parsedHostname);
         if (proxyInfo) {
-          console.error(
-            `Setting ${proxyInfo[0].host} for ${parsedHostname} -> filtered for ${requestInfo.incognito}`
-          );
           return proxyInfo;
         }
       }
     }
-    console.error(
-      `Setting ${self.defaultProxyInfo.value[0].host} for ${documentUrl} - filtered for ${requestInfo.incognito}`
-    );
     // No custom proxy for the site, return default connection
     return defaultProxy;
   }
