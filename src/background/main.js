@@ -79,8 +79,7 @@ class Main {
   butterBarService = new ButterBarService(
     this,
     this.vpnController,
-    this.conflictObserver,
-    this.extPBMController
+    this.conflictObserver
   );
   availabilityService = new AvailabilityService(this, this.vpnController);
 

@@ -6,10 +6,9 @@
 import { Component } from "./component.js";
 import { PropertyType } from "../shared/ipc.js";
 
-import { IBindable, property, propertySum } from "../shared/property.js";
+import { IBindable, property } from "../shared/property.js";
 import { VPNController } from "./vpncontroller/vpncontroller.js";
 import { ConflictObserver } from "./conflictObserver.js";
-import { ExtensionPBMController } from "./extensionController/extensionPBMController.js";
 
 /**
  *
@@ -37,13 +36,11 @@ export class ButterBarService extends Component {
    * @param {*} receiver
    * @param {VPNController} vpnController
    * @param {ConflictObserver} conflictObserver
-   * @param {ExtensionPBMController} extPBMController
    */
-  constructor(receiver, vpnController, conflictObserver, extPBMController) {
+  constructor(receiver, vpnController, conflictObserver) {
     super(receiver);
     this.vpnController = vpnController;
     this.conflictObserver = conflictObserver;
-    this.extPBMController = extPBMController;
   }
 
   async init() {
@@ -64,11 +61,7 @@ export class ButterBarService extends Component {
         "howToFix",
         "https://support.mozilla.org/kb/program-your-computer-interferes-mozilla-vpn-exten?utm_medium=mozilla-vpn&utm_source=vpn-extension"
       );
-      if (interventions.length == 0) {
-        this.removeAlert(alert.alertId);
-        return;
-      }
-      this.maybeCreateAlert(alert);
+      this.maybeCreateAlert(interventions, alert);
     });
 
     this.conflictObserver.conflictingAddons.subscribe((conflictingAddons) => {
@@ -78,26 +71,8 @@ export class ButterBarService extends Component {
         "learnWhatToDo",
         "https://support.mozilla.org/kb/if-another-extension-interferes-mozilla-vpn?utm_medium=mozilla-vpn&utm_source=vpn-extension"
       );
-      if (conflictingAddons.length == 0) {
-        this.removeAlert(alert.alertId);
-        return;
-      }
 
-      this.maybeCreateAlert(alert);
-    });
-
-    this.extPBMController.autoConnect.subscribe(async (isEnabled) => {
-      const alert = new ButterBarAlert(
-        "alertPbmPermissionRequired",
-        "alertPbmPermissionRequired",
-        "howToFix",
-        "https://youtu.be/dQw4w9WgXcQ?t=0"
-      );
-      if (!isEnabled || (await browser.extension.isAllowedIncognitoAccess())) {
-        this.removeAlert(alert.alertId);
-        return;
-      }
-      this.maybeCreateAlert(alert);
+      this.maybeCreateAlert(conflictingAddons, alert);
     });
   }
 
@@ -114,14 +89,25 @@ export class ButterBarService extends Component {
   }
 
   /**
+   * @param {Array} list
    * @param {ButterBarAlert} alert
    */
-  maybeCreateAlert(alert) {
+  maybeCreateAlert(list, alert) {
     const { alertId } = alert;
     const alertInButterBarList = this.alertInButterBarList(
       alertId,
       this.butterBarList.value
     );
+
+    if (list.length == 0) {
+      if (!alertInButterBarList) {
+        return;
+      }
+
+      this.removeAlert(alertId);
+      return;
+    }
+
     if (
       this.alertWasDismissed(alertId, this.dismissedAlerts) ||
       this.alertInButterBarList(alertId, this.butterBarList.value)
@@ -131,6 +117,7 @@ export class ButterBarService extends Component {
     this.butterBarList.set([...this.butterBarList.value, alert]);
     return;
   }
+
   /**
    * @param {string} id
    * @param {Array} dismissedAlerts
