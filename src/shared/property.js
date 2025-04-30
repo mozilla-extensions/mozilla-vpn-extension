@@ -30,25 +30,6 @@ export class IBindable {
     throw new Error("not implemented");
   }
 
-  /**
-   * Returns a promise that awaits the first non-null value of a bindable
-   * @template T
-   * @returns {Promise<NonNullable<T>>} - A promise that resovles with the first value of Bindable
-   */
-  waitForFirstValue = () => {
-    if (this.value != null && this.value != undefined) {
-      return Promise.resolve(this.value);
-    }
-    return new Promise((res) => {
-      const unsubscribe = this.subscribe((v) => {
-        if (this.value != null && this.value != undefined) {
-          res(v);
-          unsubscribe();
-        }
-      });
-    });
-  };
-
   async *[Symbol.asyncIterator]() {
     let currentResolve;
     const queue = [];

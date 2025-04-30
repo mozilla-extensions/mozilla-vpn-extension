@@ -194,9 +194,7 @@ export class ExtensionController extends Component {
    * should only be called once.
    */
   static async getInitalState(stateReadable) {
-    return computed(stateReadable, (a) => {
-      /** @type {VPNState} */
-      const vpnState = a;
+    for await (const vpnState of stateReadable) {
       switch (vpnState.state) {
         case "Enabled":
           return new StateFirefoxVPNEnabled(false, Date.now());
@@ -205,8 +203,7 @@ export class ExtensionController extends Component {
         case "OnPartial":
           return new StateFirefoxVPNDisabled(false);
       }
-      return null;
-    }).waitForFirstValue();
+    }
   }
 
   mState = property(new FirefoxVPNState());
