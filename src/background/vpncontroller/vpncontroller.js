@@ -147,6 +147,9 @@ export class VPNController extends Component {
     if (!REQUEST_TYPES.includes(command)) {
       log(`Command ${command} not in known command list`);
     }
+    if (command === "telemetry") {
+      console.debug(args);
+    }
     if (!this.#port) {
       this.initNativeMessaging();
       setTimeout(() => this.#postToAppInternal(command, args), 500);
@@ -168,7 +171,7 @@ export class VPNController extends Component {
 
   // Handle responses from MozillaVPN client
   async handleResponse(response) {
-    console.log(response);
+    console.debug(response);
     if (!response.t) {
       // The VPN Client always sends a ".t : string"
       // to determing the message type.
@@ -215,7 +218,7 @@ export class VPNController extends Component {
         this.#settings.set(settings);
         break;
       default:
-        console.log("Unexpected Message type: " + response.t);
+        console.debug("Unexpected Message type: " + response.t);
     }
   }
 

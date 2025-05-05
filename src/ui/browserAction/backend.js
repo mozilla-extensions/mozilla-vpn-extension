@@ -26,7 +26,23 @@ const t0 = performance.now();
  * @type {vpnController}
  */
 export const vpnController = await getExposedObject("VPNController");
-export const extController = await getExposedObject("ExtensionController");
+export const extNormalController = await getExposedObject(
+  "ExtensionController"
+);
+export const extPBMController = await getExposedObject(
+  "ExtensionPBMController"
+);
+
+export const extController = await (async () => {
+  const win = await browser.windows.getCurrent();
+  if (win.incognito) {
+    console.log(`${win.incognito} -> returning ${extPBMController}`);
+    return extPBMController;
+  }
+  console.log(`${win.incognito} -> returning ${extNormalController}`);
+  return extNormalController;
+})();
+
 export const proxyHandler = await getExposedObject("ProxyHandler");
 export const onboardingController = await getExposedObject(
   "OnboardingController"

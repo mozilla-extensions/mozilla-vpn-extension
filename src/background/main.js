@@ -9,7 +9,10 @@ import { TabHandler } from "./tabHandler.js";
 import { ToolbarIconHandler } from "./toolbarIconHandler.js";
 
 import { VPNController } from "./vpncontroller/index.js";
-import { ExtensionController } from "./extensionController/index.js";
+import {
+  ExtensionController,
+  ExtensionPBMController,
+} from "./extensionController/index.js";
 import { OnboardingController } from "./onboarding.js";
 
 import { expose } from "../shared/ipc.js";
@@ -29,14 +32,32 @@ class Main {
   conflictObserver = new ConflictObserver();
   vpnController = new VPNController(this);
   extController = new ExtensionController(this, this.vpnController);
+  extPBMController = new ExtensionPBMController(
+    this,
+    this.vpnController,
+    this.extController
+  );
   onboardingController = new OnboardingController(this);
   logger = new Logger(this);
   proxyHandler = new ProxyHandler(this, this.vpnController);
   requestHandler = new RequestHandler(
     this,
     this.extController,
-    this.proxyHandler
+    this.proxyHandler,
+    {
+      incognito: false,
+    }
   );
+
+  pbmRequestHandler = new RequestHandler(
+    this,
+    this.extPBMController,
+    this.proxyHandler,
+    {
+      incognito: true,
+    }
+  );
+
   telemetry = new Telemetry(
     this.vpnController,
     this.extController,
@@ -51,7 +72,8 @@ class Main {
   toolbarIconHandler = new ToolbarIconHandler(
     this,
     this.extController,
-    this.vpnController
+    this.vpnController,
+    this.extPBMController
   );
   tabReloader = new TabReloader(this, this.extController, this.proxyHandler);
   butterBarService = new ButterBarService(
@@ -64,11 +86,16 @@ class Main {
   async init() {
     log("Hello from the background script!");
 
-    for (let observer of this.observers) {
-      await observer.init();
-    }
+    const init_done = Promise.all(
+      this.observers
+        .values()
+        .map((observer) => observer.init())
+        .toArray()
+    );
+
     expose(this.vpnController);
     expose(this.extController);
+    expose(this.extPBMController);
     expose(this.proxyHandler);
     expose(this.conflictObserver);
     expose(this.onboardingController);
@@ -78,6 +105,9 @@ class Main {
 
     this.#handlingEvent = false;
     this.#processPendingEvents();
+
+    await init_done;
+    console.info("All subsystems have init.");
   }
 
   // In order to avoid race conditions amongst multiple events

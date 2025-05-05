@@ -29,6 +29,34 @@ export class IBindable {
   subscribe(_) {
     throw new Error("not implemented");
   }
+
+  async *[Symbol.asyncIterator]() {
+    let currentResolve;
+    const queue = [];
+
+    const subscription = (value) => {
+      if (currentResolve) {
+        currentResolve(value);
+        currentResolve = null;
+      } else {
+        queue.push(value);
+      }
+    };
+
+    const unsubscribe = this.subscribe(subscription);
+
+    try {
+      while (true) {
+        if (queue.length > 0) {
+          yield queue.shift();
+        } else {
+          yield await new Promise((resolve) => (currentResolve = resolve));
+        }
+      }
+    } finally {
+      unsubscribe();
+    }
+  }
 }
 
 /**
@@ -68,7 +96,7 @@ export class WritableProperty extends IBindable {
     Object.freeze(value);
     Object.seal(value);
     // Notify subscribtions
-    this.#subscriptions.forEach((s) => s(value));
+    this.__subscriptions.forEach((s) => s(value));
   }
   /**
    * Returns a bindable for the Property
@@ -85,16 +113,16 @@ export class WritableProperty extends IBindable {
    */
   subscribe(callback) {
     const unsubscribe = () => {
-      this.#subscriptions = this.#subscriptions.filter((t) => t !== callback);
+      this.__subscriptions = this.__subscriptions.filter((t) => t !== callback);
     };
-    this.#subscriptions.push(callback);
+    this.__subscriptions.push(callback);
     queueMicrotask(() => callback(this.#innerValue));
     return unsubscribe;
   }
   /**
    * @type {Array<(arg0: T)=>void> }
    */
-  #subscriptions = [];
+  __subscriptions = [];
   /**
    * @type {T}
    */

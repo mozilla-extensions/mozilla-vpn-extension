@@ -118,5 +118,8 @@ export function isEquatable(
   if (state.constructor !== other.constructor) {
     return false;
   }
-  return state.useExitRelays === other.useExitRelays;
+  return (
+    state.useExitRelays === other.useExitRelays &&
+    state.bypassTunnel === other.bypassTunnel
+  );
 }
