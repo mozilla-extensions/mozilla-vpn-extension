@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import { html, css, LitElement, until } from "../../vendor/lit-all.min.js";
 
-import { extPBMController, telemetry } from "./backend.js";
+import { extPBMController, telemetry, extNormalController } from "./backend.js";
 
 import {
   fontStyling,
@@ -42,6 +42,15 @@ export class PopupToggles extends LitElement {
             return html` <p>${tr("bodyAutoStartOnPBM")}</p>`;
           })()
         )}
+      `,
+    },
+    {
+      checked: extNormalController.autoConnect,
+      onClick: () => {
+        extNormalController.toggleAutoConnect();
+      },
+      description: html`
+        <p class="control-checkbox-body">${tr("labelDescribeStartOnBoot")}</p>
       `,
     },
     {

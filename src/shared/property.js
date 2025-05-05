@@ -31,6 +31,11 @@ export class IBindable {
     throw new Error("not implemented");
   }
 
+  /**
+   * @asyncIterator
+   * Returns an async iterator of T.
+   * @returns {AsyncGenerator<T>}
+   */
   async *[Symbol.asyncIterator]() {
     let currentResolve;
     const queue = [];
