@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { describe, expect, test, jest } from "@jest/globals";
+import { createMockedBrowserStore } from "../testutils.mjs";
 
 import { property } from "../../../../src/shared/property.js";
 
@@ -27,11 +28,20 @@ class TestController {
   lastPostToApp = property("");
 }
 
+const mockStorage = createMockedBrowserStore();
+
+global.browser = {
+  storage: {
+    local: mockStorage,
+  },
+};
+
 /**
  * Inits a small test case.
  * -> Starts with the VPN closed, then switchting to $vpnstate
  */
 async function initWith(vpnstate = new StateVPNDisabled()) {
+  mockStorage.clearStore();
   const controller = new TestController();
   controller.state.set(new StateVPNClosed());
   const target = new ExtensionController(new TestRegister(), controller);
