@@ -16,11 +16,6 @@ import { ExtensionController } from "./extensionController.js";
  * the "Firefox VPN".
  */
 export class ExtensionPBMController extends ExtensionController {
-  static properties = {
-    ...super.properties,
-    toggleAutoConnect: PropertyType.Function,
-    autoConnect: PropertyType.Bindable,
-  };
   /**
    *
    * @param {*} receiver
@@ -30,17 +25,11 @@ export class ExtensionPBMController extends ExtensionController {
   constructor(receiver, vpnController, parentExtController) {
     super(receiver, vpnController);
     this.parentExtController = parentExtController;
+    this.autoStartStorageKey = "autostartOnPBM";
   }
 
   async init() {
     const wasInitialized = super.init();
-
-    const { autstartOnPBM } = await browser.storage.local.get("autstartOnPBM");
-    this.autoConnect.value = autstartOnPBM || false;
-
-    this.autoConnect.subscribe((newValue) => {
-      browser.storage.local.set({ autstartOnPBM: newValue });
-    });
 
     browser.windows.onCreated.addListener(async (window) => {
       if (!window.incognito) {
@@ -58,10 +47,7 @@ export class ExtensionPBMController extends ExtensionController {
       if (this.autoConnect.value === false || this.mState.value.enabled) {
         return;
       }
-      // Wait for the VPN to start, if it's stopped.
       await this.waitForVPN();
-      // The VPN just started. it might auto-connect,
-      // so wait the init part
       await wasInitialized;
       // We started now, so all good.
       if (this.mState.value.enabled) {
@@ -77,10 +63,6 @@ export class ExtensionPBMController extends ExtensionController {
     await wasInitialized;
   }
 
-  toggleAutoConnect() {
-    this.autoConnect.value = !this.autoConnect.value;
-  }
-
   async waitForVPN() {
     if (this.vpnController.state.value.alive) {
       return;
@@ -93,7 +75,13 @@ export class ExtensionPBMController extends ExtensionController {
     }
   }
 
+  async shouldAutoConnect() {
+    if (this.privateWindowIds.size == 0) {
+      return false;
+    }
+    return this.autoConnect.value;
+  }
+
   parentExtController;
   privateWindowIds = new Set();
-  autoConnect = property(false);
 }

@@ -8,13 +8,11 @@ import {
   asyncReplace,
 } from "../../vendor/lit-all.min.js";
 
-import { extPBMController, telemetry } from "./backend.js";
+import { extPBMController, telemetry, extNormalController } from "./backend.js";
 
 import {
   fontStyling,
-  ghostButtonStyles,
   resetSizing,
-  inUseLabel,
   positioner,
 } from "../../components/styles.js";
 
@@ -45,6 +43,15 @@ export class PopupToggles extends LitElement {
         extPBMController.toggleAutoConnect();
       },
       description: asyncReplace(PopupToggles.pbmDescription()),
+    },
+    {
+      checked: extNormalController.autoConnect,
+      onClick: () => {
+        extNormalController.toggleAutoConnect();
+      },
+      description: html`
+        <p class="control-checkbox-body">${tr("labelDescribeStartOnBoot")}</p>
+      `,
     },
     {
       prefix: html`<hr></hr>`,
