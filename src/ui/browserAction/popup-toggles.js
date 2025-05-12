@@ -1,20 +1,13 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-import {
-  html,
-  css,
-  LitElement,
-  asyncReplace,
-} from "../../vendor/lit-all.min.js";
+import { html, css, LitElement, until } from "../../vendor/lit-all.min.js";
 
 import { extPBMController, telemetry } from "./backend.js";
 
 import {
   fontStyling,
-  ghostButtonStyles,
   resetSizing,
-  inUseLabel,
   positioner,
 } from "../../components/styles.js";
 
@@ -26,25 +19,30 @@ import { property } from "../../shared/property.js";
  */
 export class PopupToggles extends LitElement {
   render() {
-    const toggles = this.toggles.map(PopupToggles.toggleTemplate);
-    return html`
-      <main>
-        <hr />
-        ${toggles}
-      </main>
-    `;
+    const toggles = this.toggles.map(PopupToggles.toggleTemplate).map(until);
+    return html` <main>${toggles}</main> `;
   }
 
   toggles = [
     {
-      prefix: html`<h3 class="headline">
-        ${tr("headlineAutoConnectOptions")}
-      </h3>`,
+      prefix: html` <hr />
+        <h3 class="headline">${tr("headlineAutoConnectOptions")}</h3>`,
+      canClick: browser.extension.isAllowedIncognitoAccess(),
       checked: extPBMController.autoConnect,
       onClick: () => {
         extPBMController.toggleAutoConnect();
       },
-      description: asyncReplace(PopupToggles.pbmDescription()),
+      description: html`
+        <p>${tr("labelDescribeAutoStartOnPBM")}</p>
+        ${until(
+          (async () => {
+            if (await browser.extension.isAllowedIncognitoAccess()) {
+              return;
+            }
+            return html` <p>${tr("bodyAutoStartOnPBM")}</p>`;
+          })()
+        )}
+      `,
     },
     {
       prefix: html`<hr></hr>`,
@@ -52,6 +50,7 @@ export class PopupToggles extends LitElement {
       onClick: () => {
         telemetry.setTelemetryEnabled(!telemetry.telemetryEnabled.value);
       },
+      canClick: Promise.resolve(true),
       headline: tr("telemetry_toggle_text"),
       description: html`
                 <p class="control-checkbox-body">${tr("telemetrySettingsCheckboxLabel")} 
@@ -64,20 +63,23 @@ export class PopupToggles extends LitElement {
             `,
     },
   ];
-  static toggleTemplate(
+  static async toggleTemplate(
     args = {
       prefix: html``,
       checked: property(true),
+      canClick: Promise.resolve(true),
       onClick: () => {},
       description: html``,
       headline: "",
     }
   ) {
+    const canClick = await args.canClick;
     return html`
       ${args.prefix}
       <div class="control">
         <div id="control-checkbox" class="checkbox-wrapper">
           <input
+            ?disabled=${!canClick && !args.checked.value}
             .checked=${args.checked.value}
             @click=${() => {
               args.onClick();
@@ -94,20 +96,6 @@ export class PopupToggles extends LitElement {
       </div>
     `;
   }
-
-  static async *pbmDescription() {
-    yield html`<p>${tr("labelDescribeAutoStartOnPBM")}</p>`;
-    const hasPBM_Rights = await browser.extension.isAllowedIncognitoAccess();
-    if (hasPBM_Rights) {
-      yield html`<p>${tr("labelDescribeAutoStartOnPBM")}</p>`;
-    } else {
-      yield html`
-        <p>${tr("labelDescribeAutoStartOnPBM")}</p>
-        <p class="error">${tr("errorPBMPermissionNotGiven")}</p>
-      `;
-    }
-  }
-
   static styles = css`
     ${fontStyling}${resetSizing}${positioner}
     main {
