@@ -27,6 +27,16 @@ export class PopupToggles extends LitElement {
     {
       prefix: html` <hr />
         <h3 class="headline">${tr("headlineAutoConnectOptions")}</h3>`,
+      checked: extNormalController.autoConnect,
+      canClick: Promise.resolve(true),
+      onClick: () => {
+        extNormalController.toggleAutoConnect();
+      },
+      description: html`
+        <p class="control-checkbox-body">${tr("labelDescribeAutoStart")}</p>
+      `,
+    },
+    {
       canClick: browser.extension.isAllowedIncognitoAccess(),
       checked: extPBMController.autoConnect,
       onClick: () => {
@@ -42,15 +52,6 @@ export class PopupToggles extends LitElement {
             return html` <p>${tr("bodyAutoStartOnPBM")}</p>`;
           })()
         )}
-      `,
-    },
-    {
-      checked: extNormalController.autoConnect,
-      onClick: () => {
-        extNormalController.toggleAutoConnect();
-      },
-      description: html`
-        <p class="control-checkbox-body">${tr("labelDescribeStartOnBoot")}</p>
       `,
     },
     {
@@ -119,7 +120,7 @@ export class PopupToggles extends LitElement {
       font-family: var(--font-family);
     }
     .control {
-      padding: 15px 8px 5px 1px;
+      padding: 5px 5px 2.5px 0px;
       margin: 0px 24px;
       display: flex;
       flex-direction: row;
