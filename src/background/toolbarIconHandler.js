@@ -25,10 +25,11 @@ export class ToolbarIconHandler extends Component {
    * @param {*} receiver
    * @param {ExtensionController} extController
    */
-  constructor(receiver, extController, vpnController) {
+  constructor(receiver, extController, vpnController, extPBMController) {
     super(receiver);
     this.extController = extController;
     this.vpnController = vpnController;
+    this.extPBMController = extPBMController;
     this.isSupportedPlatform = true;
     browser.runtime.getPlatformInfo().then((deviceOs) => {
       this.isSupportedPlatform = Utils.isSupportedOs(deviceOs.os);
@@ -38,12 +39,16 @@ export class ToolbarIconHandler extends Component {
 
   /** @type {FirefoxVPNState | undefined} */
   extState;
-
+  pbmState;
   vpnState;
 
   async init() {
     this.extController.state.subscribe((s) => {
       this.extState = s;
+      this.maybeUpdateBrowserActionIcon();
+    });
+    this.extPBMController.state.subscribe((s) => {
+      this.pbmState = s;
       this.maybeUpdateBrowserActionIcon();
     });
 
@@ -127,32 +132,39 @@ export class ToolbarIconHandler extends Component {
   }
 
   async maybeUpdateBrowserActionIcon() {
-    const windowInfo = await browser.windows.getCurrent();
-    if (!windowInfo) {
-      return;
-    }
+    const windows = await browser.windows.getAll();
+
     const theme = await browser.theme.getCurrent();
-    const iconFill = ToolbarIconHandler.getFillColor(theme.colors, windowInfo);
-
-    if (!this.isSupportedPlatform) {
-      return this.setIcon(iconFill, disabledColor, windowInfo.id);
-    }
-    if (!this.extState.state) {
-      return;
-    }
-
-    let statusColor = ["Connecting", "Enabled"].includes(this.extState?.state)
-      ? enabledColor
-      : disabledColor;
-
     const stability = this.vpnState?.connectionHealth;
 
-    if (!stability || stability == "Stable") {
-      return this.setIcon(iconFill, statusColor, windowInfo.id);
-    }
+    windows.forEach((windowInfo) => {
+      const iconFill = ToolbarIconHandler.getFillColor(
+        theme.colors,
+        windowInfo
+      );
 
-    statusColor = stability === "Unstable" ? unstableColor : disabledColor;
+      if (!this.isSupportedPlatform) {
+        this.setIcon(iconFill, disabledColor, windowInfo.id);
+        return;
+      }
+      const relevantExtState = windowInfo.incognito
+        ? this.pbmState
+        : this.extState;
+      if (!relevantExtState?.state) {
+        return;
+      }
+      let statusColor = ["Connecting", "Enabled"].includes(
+        relevantExtState?.state
+      )
+        ? enabledColor
+        : disabledColor;
 
-    return this.setIcon(iconFill, statusColor, windowInfo.id);
+      if (!stability || stability == "Stable") {
+        return this.setIcon(iconFill, statusColor, windowInfo.id);
+      }
+      statusColor = stability === "Unstable" ? unstableColor : disabledColor;
+
+      this.setIcon(iconFill, statusColor, windowInfo.id);
+    });
   }
 }

@@ -42,6 +42,24 @@ describe("property()", () => {
     prop.set({ value: "UPDATED" });
     expect(maybeValue).toBeNull();
   });
+
+  test("You can iterate over the values", async () => {
+    const prop1 = property(false);
+    (async () => {
+      for await (const val of prop1) {
+        if (val === true) {
+          console.log("Iterator terminated.");
+          return;
+        }
+      }
+    })();
+    expect(prop1.__subscriptions.length).toBe(1);
+    console.log("Subscriptions before:", prop1.__subscriptions.length); // 1 subscription
+    prop1.value = true;
+    await new Promise((r) => setTimeout(r, 10));
+    console.log("Subscriptions after:", prop1.__subscriptions.length); // Should be 0 subscription
+    expect(prop1.__subscriptions.length).toBe(0);
+  });
 });
 
 describe("ReadOnlyProperties", () => {

@@ -4,3 +4,4 @@
 
 export * from "./states.js";
 export * from "./extensionController.js";
+export * from "./extensionPBMController.js";
