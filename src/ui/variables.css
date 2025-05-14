@@ -88,7 +88,7 @@
     --text-color-invert: var(--grey50);
     --text-secondary-color: var(#ffffff);
     --button-ghost-bg-color: #ffffff;
-    --divider-color: lch(from var(--color-divider) l c h / 0.2);
+    --divider-color: lch(from var(--firefox-popup) calc(l + 10) c h);
     --secondary-btn-color: #ffffff;
     --settings-secondary-text-color: rgba(255, 255, 255, 0.8);
     --settings-border-color: #e7e7e74d;
@@ -103,7 +103,7 @@
   :root {
     --in-copy-link-text-color: var(--blue50);
     --color-enabled: var(--green50);
-    --divider-color: var(--color-divider);
+    --divider-color: lch(from var(--firefox-popup) calc(l - 10) c h);
     --action-button-color: var(--blue50);
     --text-color-primary: var(--grey50);
     --text-color-headline: var(--grey60);
