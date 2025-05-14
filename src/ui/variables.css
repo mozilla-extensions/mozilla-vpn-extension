@@ -63,11 +63,8 @@
   );
   --settings-link-color: var(--action-button-color);
 
-  /**
-        Note this color is not from our figma but the 
-        firefox "light" theme, otherwise it looks wierd
-        **/
   --panel-bg-color: var(--firefox-popup);
+  --toolbar-icon-bg-color: var(--firefox-icons, var(--firefox-toolbar_text));
 }
 
 @media (prefers-color-scheme: dark) {
