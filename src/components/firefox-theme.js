@@ -32,13 +32,21 @@ export class FirefoxThemeImporter extends HTMLElement {
     }
     this.importColors(theme.colors);
   }
-  async importColors(colors) {
-    var r = document.querySelector(":root");
-    Object.entries(colors).forEach(([key, value]) => {
-      if (!value) {
-        return;
-      }
-      r.style.setProperty(`--firefox-${key}`, value);
+  importColors(colors) {
+    requestAnimationFrame(() => {
+      /** @type {HTMLHtmlElement} */
+      var r = document.querySelector(":root");
+      Object.values(r)
+        .filter((e) => e.startsWith("--firefox"))
+        .forEach((e) => {
+          r.style.removeProperty(e);
+        });
+      Object.entries(colors).forEach(([key, value]) => {
+        if (!value) {
+          return;
+        }
+        r.style.setProperty(`--firefox-${key}`, value);
+      });
     });
   }
 
