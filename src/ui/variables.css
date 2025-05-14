@@ -44,7 +44,6 @@
   --main-card-background: #321c64;
   --main-card-text-color: #ffffff;
   --settings-secondary-text-color: #5b5b66;
-  --settings-border-color: #e7e7e7;
 }
 /* Globals */
 :root {
@@ -84,6 +83,7 @@
     --grey40: lch(from var(--panel-bg-color) calc(l + 40) c h);
     --grey50: lch(from var(--panel-bg-color) calc(l + 50) c h);
     --grey60: lch(from var(--panel-bg-color) calc(l + 60) c h);
+    --grey80: lch(from var(--panel-bg-color) calc(l + 80) c h);
 
     --border-color: lch(from var(--panel-bg-color) calc(l + 15) c h);
     --text-secondary-color: rbga(255, 255, 255, 0.6);
@@ -94,7 +94,6 @@
     --button-ghost-bg-color: #ffffff;
     --secondary-btn-color: #ffffff;
     --settings-secondary-text-color: rgba(255, 255, 255, 0.8);
-    --settings-border-color: #e7e7e74d;
 
     --action-button-color: var(--cyan-50);
     --color-enabled: var(--cyan-50);
@@ -111,6 +110,7 @@
     --grey40: lch(from var(--panel-bg-color) calc(l - 40) c h);
     --grey50: lch(from var(--panel-bg-color) calc(l - 50) c h);
     --grey60: lch(from var(--panel-bg-color) calc(l - 60) c h);
+    --grey80: lch(from var(--panel-bg-color) calc(l - 80) c h);
 
     --in-copy-link-text-color: var(--blue50);
     --color-enabled: var(--green50);
