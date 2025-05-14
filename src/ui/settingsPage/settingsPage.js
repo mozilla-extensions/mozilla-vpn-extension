@@ -159,7 +159,7 @@ export class SettingsPage extends LitElement {
     }
 
     .secondary {
-      color: var(--settings-secondary-text-color);
+      color: var(--grey80);
     }
 
     @media (prefers-color-scheme: dark) {
