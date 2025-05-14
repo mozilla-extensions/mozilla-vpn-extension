@@ -42,6 +42,11 @@ export class ExtensionPBMController extends ExtensionController {
       browser.storage.local.set({ autstartOnPBM: newValue });
     });
 
+    // In case we got pbm-permission removed, clear the setting.
+    if (!(await browser.extension.isAllowedIncognitoAccess())) {
+      this.autoConnect.value = false;
+    }
+
     browser.windows.onCreated.addListener(async (window) => {
       if (!window.incognito) {
         return;
