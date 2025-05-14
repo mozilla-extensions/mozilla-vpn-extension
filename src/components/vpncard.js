@@ -270,7 +270,7 @@ export class VPNCard extends LitElement {
     }
     .box {
       border-radius: 8px;
-      background: lch(from var(--panel-bg-color) calc(l + 5) c h);
+      background: var(--grey5);
       box-shadow: var(--box-shadow-off);
     }
 
@@ -407,7 +407,6 @@ export class VPNCard extends LitElement {
     }
     @media (prefers-color-scheme: dark) {
       .box {
-        background: lch(from var(--panel-bg-color) calc(l - 10) c h);
         --shield-color: var(--color-warning);
       }
     }

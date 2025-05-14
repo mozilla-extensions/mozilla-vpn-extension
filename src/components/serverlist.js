@@ -236,7 +236,7 @@ export class ServerList extends LitElement {
 
     .default-location-item {
       padding: 8px 8px 24px;
-      border-bottom: 1px solid var(--divider-color);
+      border-bottom: 1px solid var(--grey10);
       border-radius: 0px;
       margin-inline: 16px;
       width: calc(var(--window-width) - 32px);
