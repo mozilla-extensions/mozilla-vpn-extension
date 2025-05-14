@@ -123,7 +123,7 @@ export class SettingsPage extends LitElement {
       display: flex;
       flex-direction: row;
       padding: 20px 30px;
-      border-bottom: 1px solid var(--settings-border-color);
+      border-bottom: 1px solid var(--grey20);
       width: 100%;
       margin-bottom: 32px;
     }
