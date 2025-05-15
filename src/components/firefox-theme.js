@@ -9,11 +9,6 @@ export class FirefoxThemeImporter extends HTMLElement {
   // to the default DARK / LIGHT theme colors
   static EXPECTED_KEYS = ["popup", "toolbar"];
 
-  static FALLBACKS = {
-    "color-accent-primary":
-      "light-dark(var(--color-blue-50), var(--color-cyan-50))",
-  };
-
   connectedCallback() {
     this.update();
     browser.theme.onUpdated.addListener(() => {
@@ -31,13 +26,15 @@ export class FirefoxThemeImporter extends HTMLElement {
       return;
     }
     this.importColors(theme.colors);
+    this.importAccentColors(theme.colors);
   }
-  importColors(colors) {
+
+  importColors(colors, prefix = "firefox") {
     requestAnimationFrame(() => {
       /** @type {HTMLHtmlElement} */
       var r = document.querySelector(":root");
       Object.values(r)
-        .filter((e) => e.startsWith("--firefox"))
+        .filter((e) => e.startsWith(`--${prefix}`))
         .forEach((e) => {
           r.style.removeProperty(e);
         });
@@ -45,11 +42,129 @@ export class FirefoxThemeImporter extends HTMLElement {
         if (!value) {
           return;
         }
-        r.style.setProperty(`--firefox-${key}`, value);
+        r.style.setProperty(`--${prefix}-${key}`, value);
       });
     });
   }
+  /**
+   *
+   * @param {*} colors - The theme colors.
+   * @param {*} isDarkMode - True if the theme is dark mode, false otherwise.
+   */
+  importAccentColors(colors, isDarkMode) {
+    const fallback = {
+      "card-background": "#321c64",
+      "card-text-color": "#ffffff",
+      "accent-color": isDarkMode ? "00ddff" : "#0060df",
+    };
+    if (colors == null) {
+      this.importColors(fallback, "mz");
+      return;
+    }
+    const targets = Object.entries(colors).filter(([key, value]) => {
+      const keys = ["popup", "toolbar"];
+      return keys.includes(key);
+    });
+    //TODO:
+  }
 
+  /**
+   * Parses a CSS color string into its HSL components.
+   * Supports HSL, RGB, and Hex color formats.
+   * @param {string | null | undefined} colorString The CSS color string.
+   * @returns {{h: number, s: number, l: number} | null} An object with h, s, l components, or null if parsing fails.
+   */
+  static parseCssColorToHsl(colorString) {
+    if (!colorString || typeof colorString !== "string") {
+      return null;
+    }
+
+    try {
+      // Create a proper OffscreenCanvas
+      const canvas = new OffscreenCanvas(1, 1);
+      const ctx = canvas.getContext("2d");
+
+      // Clear canvas
+      ctx.clearRect(0, 0, 1, 1);
+
+      // Set the fill style to our color and draw a pixel
+      ctx.fillStyle = colorString.trim();
+      ctx.fillRect(0, 0, 1, 1);
+
+      // Extract the RGB values from the pixel
+      const imageData = ctx.getImageData(0, 0, 1, 1).data;
+      const r = imageData[0];
+      const g = imageData[1];
+      const b = imageData[2];
+
+      // Convert the RGB values to HSL
+      return FirefoxThemeImporter.rsbgToHsl(r, g, b);
+    } catch (e) {
+      // If there's any error in parsing, return null
+      return null;
+    }
+  }
+
+  static rsbgToHsl(r, g, b) {
+    const r_norm = r / 255;
+    const g_norm = g / 255;
+    const b_norm = b / 255;
+
+    const cmax = Math.max(r_norm, g_norm, b_norm);
+    const cmin = Math.min(r_norm, g_norm, b_norm);
+    const delta = cmax - cmin;
+
+    // Calculate Hue
+    if (delta === 0) {
+      h = 0;
+    } else if (cmax === r_norm) {
+      h = 60 * (((g_norm - b_norm) / delta) % 6);
+    } else if (cmax === g_norm) {
+      h = 60 * ((b_norm - r_norm) / delta + 2);
+    } else {
+      // cmax === b_norm
+      h = 60 * ((r_norm - g_norm) / delta + 4);
+    }
+    if (h < 0) {
+      h += 360;
+    }
+    h = Math.round(h);
+
+    // Calculate Lightness
+    l = (cmax + cmin) / 2;
+
+    // Calculate Saturation
+    if (delta === 0) {
+      s = 0;
+    } else {
+      s = delta / (1 - Math.abs(2 * l - 1));
+    }
+    s = Math.round(s * 100); // Convert to percentage
+    l = Math.round(l * 100); // Convert to percentage
+
+    return { h, s, l };
+  }
+
+  /**
+   * Checks if a given CSS color string is suitable as an accent color.
+   * A color is considered "good" if it's not monochrome (saturation > 20%).
+   * @param {string | null | undefined} colorString The CSS color string (e.g., hsl, rgb, hex).
+   * @returns {boolean} True if the color is suitable, false otherwise.
+   */
+  static isGoodAccentColor(colorString) {
+    const hslColor = FirefoxThemeImporter.parseCssColorToHsl(colorString);
+    if (!hslColor) {
+      return false;
+    }
+    // Condition: not monochrome (saturation > 20%)
+    return hslColor.s > 20;
+  }
+
+  /**
+   * Checks if the theme provides all colors we need.
+   * @param {*} colors - The theme colors.
+   * @returns {boolean} True if the theme is valid, false otherwise.
+   */
   isValidTheme(colors) {
     if (!colors) {
       return false;
