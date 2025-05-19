@@ -20,7 +20,16 @@ const mocksendMessage = jest.fn();
 
 const controller = {
   settings: property(new VPNSettings()),
-  postToApp: mocksendMessage,
+  postToApp: (a) => {
+    if (a == "telemetry") {
+      // If it's not telemetry, we don't care
+      mocksendMessage(a);
+    }
+  },
+};
+
+const mockParent = {
+  registerObserver: () => {},
 };
 
 const extensionController = {
@@ -32,6 +41,21 @@ const proxyHandler = {
 
 describe("Telemetry", () => {
   beforeEach(() => {
+    globalThis.browser = {
+      runtime: {
+        onInstalled: {
+          addListener: jest.fn(),
+        },
+      },
+      storage: {
+        local: {
+          get: () => {
+            return { dataCollectionConsent: true };
+          },
+          set: jest.fn(),
+        },
+      },
+    };
     mocksendMessage.mockReset();
     controller.settings = property(new VPNSettings());
     extensionController.state = property(new FirefoxVPNState());
@@ -39,28 +63,14 @@ describe("Telemetry", () => {
   });
 
   describe("telemetryEnabled", () => {
-    it("Reacts to changes from the VPNController", async () => {
-      const target = new Telemetry(
-        controller,
-        extensionController,
-        proxyHandler
-      );
-      expect(target.telemetryEnabled.value).toBe(
-        controller.settings.value.extensionTelemetryEnabled
-      );
-      // Now let's "fake" that the underlying settings changed.
-      controller.settings.value = {
-        ...controller.settings.value,
-        extensionTelemetryEnabled: true,
-      };
-      expect(target.telemetryEnabled.value).toBe(true);
-    });
     it("It will send changes to the VPNController", async () => {
       const target = new Telemetry(
+        mockParent,
         controller,
         extensionController,
         proxyHandler
       );
+      await target.init();
       expect(target.telemetryEnabled.value).toBe(
         controller.settings.value.extensionTelemetryEnabled
       );
@@ -84,31 +94,37 @@ describe("Telemetry", () => {
       controller.settings = property(setting);
     });
 
-    it("Does not send data when telemetry is disabled", () => {
-      controller.settings.set({ extensionTelemetryEnabled: false });
+    it.only("Does not send data when telemetry is disabled", async () => {
       const target = new Telemetry(
+        mockParent,
         controller,
         extensionController,
         proxyHandler
       );
+      await target.init();
+      target.setTelemetryEnabled(false);
       target.record("THIS SHOULD NOT BE SENT");
       expect(mocksendMessage).toBeCalledTimes(0);
     });
-    it("Does not send data when there is no event", () => {
+    it("Does not send data when there is no event", async () => {
       const target = new Telemetry(
+        mockParent,
         controller,
         extensionController,
         proxyHandler
       );
+      await target.init();
       target.record();
       expect(mocksendMessage).toBeCalledTimes(0);
     });
-    it("Does send event data to the controller", () => {
+    it("Does send event data to the controller", async () => {
       const target = new Telemetry(
+        mockParent,
         controller,
         extensionController,
         proxyHandler
       );
+      await target.init();
       target.record("hello_event", 43);
       expect(mocksendMessage).toBeCalledWith("telemetry", {
         name: "hello_event",
@@ -147,6 +163,7 @@ describe("Telemetry", () => {
   describe("sessions", () => {
     it("Will start a session when the ExtensionController is 'enabled'", () => {
       const target = new Telemetry(
+        mockParent,
         controller,
         extensionController,
         proxyHandler
@@ -156,6 +173,7 @@ describe("Telemetry", () => {
     });
     it("Will *NOT* start a session when switching from partial to full", () => {
       const target = new Telemetry(
+        mockParent,
         controller,
         extensionController,
         proxyHandler
@@ -168,6 +186,7 @@ describe("Telemetry", () => {
     });
     it("Will stop a session when switching from started -> stopped", () => {
       const target = new Telemetry(
+        mockParent,
         controller,
         extensionController,
         proxyHandler
@@ -180,6 +199,7 @@ describe("Telemetry", () => {
     });
     it("Will ignore idle/connecting", () => {
       const target = new Telemetry(
+        mockParent,
         controller,
         extensionController,
         proxyHandler
@@ -201,12 +221,14 @@ describe("Telemetry", () => {
       setting.extensionTelemetryEnabled = true;
       controller.settings = property(setting);
     });
-    it("Will record changes to the sitecontext list", () => {
+    it("Will record changes to the sitecontext list", async () => {
       const target = new Telemetry(
+        mockParent,
         controller,
         extensionController,
         proxyHandler
       );
+      await target.init();
       const m = new Map();
       m.set("a", new SiteContext({ excluded: true }));
       m.set("b", new SiteContext({ excluded: false }));

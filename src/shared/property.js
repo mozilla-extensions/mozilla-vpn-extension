@@ -24,9 +24,10 @@ export class IBindable {
   /**
    * Subscribe to changes of the Value
    * @param {(arg0: T)=>void} _ - Callback when the value changes
+   * @param {{immediate?: boolean}=} __ - Options for the subscription. `immediate`: If true, the callback is called immediately with the current value.
    * @returns {()=>void} - A Function to stop the subscription
    */
-  subscribe(_) {
+  subscribe(_, __) {
     throw new Error("not implemented");
   }
 
@@ -108,15 +109,23 @@ export class WritableProperty extends IBindable {
 
   /**
    *
-   * @param {(T)=>void} callback - This callback will be called when the value changes
+   * @param {(arg0: T)=>void} callback - This callback will be called when the value changes
+   * @param {{immediate?: boolean}=} options - Options for the subscription. `immediate`: If true (default), the callback is called immediately with the current value.
    * @returns {()=>void} unsubscribe function, this will stop all callbacks
    */
-  subscribe(callback) {
+  subscribe(
+    callback,
+    options = {
+      immediate: true,
+    }
+  ) {
     const unsubscribe = () => {
       this.__subscriptions = this.__subscriptions.filter((t) => t !== callback);
     };
     this.__subscriptions.push(callback);
-    queueMicrotask(() => callback(this.#innerValue));
+    if (options.immediate) {
+      queueMicrotask(() => callback(this.#innerValue));
+    }
     return unsubscribe;
   }
   /**

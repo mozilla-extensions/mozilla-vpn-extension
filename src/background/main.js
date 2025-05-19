@@ -59,6 +59,7 @@ class Main {
   );
 
   telemetry = new Telemetry(
+    this,
     this.vpnController,
     this.extController,
     this.proxyHandler
@@ -156,14 +157,3 @@ class Main {
 const main = new Main();
 main.init();
 globalThis["main"] = main;
-
-function openFirstRun(details) {
-  if (details.reason !== "install") {
-    return;
-  }
-  const url = browser.runtime.getURL("/ui/firstRun/firstRun.html");
-  browser.tabs.create({
-    url,
-  });
-}
-browser.runtime.onInstalled.addListener(openFirstRun);
