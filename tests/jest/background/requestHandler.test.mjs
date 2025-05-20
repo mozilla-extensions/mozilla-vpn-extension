@@ -71,13 +71,13 @@ describe("RequestHandler", () => {
         extState,
         currentExitRelays
       );
-      expect(res).toBe(currentExitRelays);
+      expect(res).toStrictEqual({"type": "direct"});
 
       const res2 = RequestHandler.toDefaultProxyInfo(
         browserSetting,
         {
           ...extState,
-          useExitRelays: false,
+          useExitRelays: true,
           enabled: true,
           state: "Enabled",
         },

@@ -154,7 +154,7 @@ export class RequestHandler extends Component {
       return browserProxySettings.value;
     }
     // If VPN is disabled (including bypassTunnel=true), use browser proxy if set, otherwise direct
-    if (extensionState.bypassTunnel) {
+    if (extState.bypassTunnel) {
       return bypassProxy;
     }
     // Otherwise, direct connection
