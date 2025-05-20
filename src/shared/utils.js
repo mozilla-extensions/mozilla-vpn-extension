@@ -145,4 +145,84 @@ export const Utils = {
       .find((sc) => sc.code === countryCode)
       ?.cities.find((c) => c.code === cityCode);
   },
+
+  deepEquals: (a, b) => {
+    if (a === b) return true;
+    if (a == null || b == null) return false;
+
+    // Handle arrays
+    if (Array.isArray(a) && Array.isArray(b)) {
+      if (a.length !== b.length) return false;
+      for (let i = 0; i < a.length; i++) {
+        if (!Utils.deepEquals(a[i], b[i])) return false;
+      }
+      return true;
+    }
+
+    // Handle Set
+    if (a instanceof Set && b instanceof Set) {
+      if (a.size !== b.size) return false;
+      // Sets are unordered, so compare values as arrays after sorting
+      const arrA = Array.from(a).sort();
+      const arrB = Array.from(b).sort();
+      return Utils.deepEquals(arrA, arrB);
+    }
+
+    // Handle Map
+    if (a instanceof Map && b instanceof Map) {
+      if (a.size !== b.size) return false;
+      // Compare entries as arrays after sorting by key
+      const arrA = Array.from(a.entries()).sort();
+      const arrB = Array.from(b.entries()).sort();
+      return Utils.deepEquals(arrA, arrB);
+    }
+
+    // Handle plain objects
+    if (typeof a === "object" && typeof b === "object") {
+      if (
+        Array.isArray(a) ||
+        Array.isArray(b) ||
+        a instanceof Set ||
+        b instanceof Set ||
+        a instanceof Map ||
+        b instanceof Map
+      ) {
+        // Already handled above
+        return false;
+      }
+      const keysA = Object.keys(a);
+      const keysB = Object.keys(b);
+      if (keysA.length !== keysB.length) return false;
+      keysA.sort();
+      keysB.sort();
+      for (let i = 0; i < keysA.length; i++) {
+        if (keysA[i] !== keysB[i]) return false;
+        if (!Utils.deepEquals(a[keysA[i]], b[keysB[i]])) return false;
+      }
+      return true;
+    }
+
+    // Handle general iterables (not array, set, map, or plain object)
+    if (
+      typeof a === "object" &&
+      typeof b === "object" &&
+      a[Symbol.iterator] &&
+      b[Symbol.iterator] &&
+      typeof a !== "string" &&
+      typeof b !== "string"
+    ) {
+      const iterA = a[Symbol.iterator]();
+      const iterB = b[Symbol.iterator]();
+      while (true) {
+        const resultA = iterA.next();
+        const resultB = iterB.next();
+        if (resultA.done && resultB.done) return true;
+        if (resultA.done !== resultB.done) return false;
+        if (!Utils.deepEquals(resultA.value, resultB.value)) return false;
+      }
+    }
+
+    // If we reach here, the values are not equal
+    return false;
+  },
 };
