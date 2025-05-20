@@ -65,6 +65,10 @@ export class StateFirefoxVPNEnabled extends FirefoxVPNState {
 
 /**
  * When Firefox VPN is Off
+ *
+ * bypassTunnel = true means the VPN client is still connected, but the extension is off.
+ * In this case, all traffic should be routed through the Firefox proxy (bypassTunnel = true),
+ * otherwise (bypassTunnel = false) the browser proxy is used if set, or direct if not.
  */
 export class StateFirefoxVPNDisabled extends FirefoxVPNState {
   /**
