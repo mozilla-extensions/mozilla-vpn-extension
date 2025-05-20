@@ -176,14 +176,18 @@ export class RequestHandler extends Component {
   }
 
   static toDefaultProxyInfo(browserProxySettings, extState, relays) {
-    if (
-      extState?.useExitRelays ||
-      ProxyUtils.browserProxySettingIsValid(browserProxySettings?.value)
-    ) {
+    // If VPN is enabled (useExitRelays or enabled), use relays (VPN)
+    if (extState?.useExitRelays || extState?.enabled) {
       return relays;
-    } else {
-      return ProxyUtils.getDirectProxyInfoObject();
     }
+    // If VPN is not enabled and a Firefox proxy is set, use the browser proxy
+    if (ProxyUtils.browserProxySettingIsValid(browserProxySettings?.value)) {
+      // Return the browser proxy info (manual, pac, etc.)
+      // This assumes browserProxySettings.value is in the correct format for the browser
+      return browserProxySettings.value;
+    }
+    // Otherwise, direct connection
+    return ProxyUtils.getDirectProxyInfoObject();
   }
 }
 
