@@ -7,7 +7,7 @@ export class FirefoxThemeImporter extends HTMLElement {
   // We will depend on some CSS variables beeing set
   // if the theme does not set them, we will fall back
   // to the default DARK / LIGHT theme colors
-  static EXPECTED_KEYS = ["popup", "toolbar"];
+  static EXPECTED_KEYS = ["popup", "toolbar_text"];
 
   connectedCallback() {
     this.update();
@@ -22,11 +22,12 @@ export class FirefoxThemeImporter extends HTMLElement {
       !!window.matchMedia("(prefers-color-scheme:dark)").matches;
 
     if (!theme || !this.isValidTheme(theme.colors)) {
+      this.importAccentColors(null, isDarkMode);
       this.importColors(isDarkMode ? DEFAULT_DARK : DEFAULT_LIGHT);
       return;
     }
     this.importColors(theme.colors);
-    this.importAccentColors(theme.colors);
+    this.importAccentColors(theme.colors, isDarkMode);
   }
 
   importColors(colors, prefix = "firefox") {
@@ -55,17 +56,52 @@ export class FirefoxThemeImporter extends HTMLElement {
     const fallback = {
       "card-background": "#321c64",
       "card-text-color": "#ffffff",
-      "accent-color": isDarkMode ? "00ddff" : "#0060df",
+      "accent-color": isDarkMode ? "#00ddff" : "#0060df",
     };
     if (colors == null) {
       this.importColors(fallback, "mz");
       return;
     }
-    const targets = Object.entries(colors).filter(([key, value]) => {
-      const keys = ["popup", "toolbar"];
-      return keys.includes(key);
+    const possibleAccentColors = Object.entries(colors).filter(([key, value]) => {
+      const keys = [...FirefoxThemeImporter.EXPECTED_KEYS, "icons"];
+      return keys.includes(key) && value  != null
+    }).filter( ([key,value]) =>{
+      console.log(`${key} / ${value} -> is good: ${FirefoxThemeImporter.isGoodAccentColor(value)}`)
+      return FirefoxThemeImporter.isGoodAccentColor(value);
     });
-    //TODO:
+
+    if(possibleAccentColors.length == 0 ){
+      this.importColors(fallback, "mz");
+      return;
+    }
+
+    const darken = (variable, intensity) => {
+      return `lch(from var(--firefox-${variable}) calc(l - 30)  c h )`
+    }
+
+    const cardTextColor = (color) => {
+      const hsl = FirefoxThemeImporter.parseCssColorToHsl(color);
+      if( (hsl.l -30)  > 50){
+        return "black";
+      }
+      return "white;"
+    }
+
+
+    if(possibleAccentColors.length >= 2 ){
+      this.importColors({
+      "card-background": darken(possibleAccentColors[0][0]),
+      "card-text-color": cardTextColor(possibleAccentColors[0][1]),
+      "accent-color": possibleAccentColors[1][0],
+      }, "mz");
+      return;
+    }
+    this.importColors({
+      "card-background": darken(possibleAccentColors[0][0]),
+      "card-text-color": cardTextColor(possibleAccentColors[0][1]),
+      "accent-color":possibleAccentColors[0][0],
+    }, "mz");
+
   }
 
   /**
@@ -114,6 +150,7 @@ export class FirefoxThemeImporter extends HTMLElement {
     const cmin = Math.min(r_norm, g_norm, b_norm);
     const delta = cmax - cmin;
 
+    let h = 0;
     // Calculate Hue
     if (delta === 0) {
       h = 0;
@@ -131,9 +168,10 @@ export class FirefoxThemeImporter extends HTMLElement {
     h = Math.round(h);
 
     // Calculate Lightness
-    l = (cmax + cmin) / 2;
+    let l = (cmax + cmin) / 2;
 
     // Calculate Saturation
+    let s =0;
     if (delta === 0) {
       s = 0;
     } else {

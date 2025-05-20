@@ -276,7 +276,7 @@ export class VPNCard extends LitElement {
 
     .box.on,
     .box.connecting {
-      background: var(--main-card-background);
+      background: var(--mz-card-background);
       box-shadow: var(--box-shadow-on);
     }
 
@@ -318,7 +318,7 @@ export class VPNCard extends LitElement {
     }
     .box.on *,
     .box.connecting * {
-      color: var(--main-card-text-color);
+      color: var(--mz-card-text-color);
     }
     .box.unstable {
       --shield-color: var(--color-warning);

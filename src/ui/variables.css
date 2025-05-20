@@ -35,11 +35,6 @@
   --color-warning: #ffa436;
   --color-fatal-error: #ff6a75;
   --green50: hsl(162, 73%, 56%);
-
-  --blue50: #0060df;
-  --cyan-50: #00ddff;
-  --main-card-background: #321c64;
-  --main-card-text-color: #ffffff;
 }
 /* Globals */
 :root {
@@ -87,9 +82,9 @@
     --button-ghost-bg-color: #ffffff;
     --secondary-btn-color: #ffffff;
 
-    --action-button-color: var(--cyan-50);
-    --color-enabled: var(--cyan-50);
-    --in-copy-link-text-color: var(--cyan-50);
+    --action-button-color: var(--mz-accent-color);
+    --color-enabled: var(--mz-accent-color);
+    --in-copy-link-text-color: var(--mz-accent-color);
   }
 }
 
@@ -104,9 +99,10 @@
     --grey60: lch(from var(--panel-bg-color) calc(l - 60) c h);
     --grey80: lch(from var(--panel-bg-color) calc(l - 80) c h);
 
-    --in-copy-link-text-color: var(--blue50);
-    --color-enabled: var(--green50);
-    --action-button-color: var(--blue50);
+    --action-button-color: var(--mz-accent-color);
+    --in-copy-link-text-color: var(--mz-accent-color);
+    --color-enabled: var(--mz-accent-color);
+    
     --text-color-primary: var(--grey50);
     --text-color-headline: var(--grey60);
     --text-color-invert: #ffffff;
