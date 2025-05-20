@@ -71,7 +71,7 @@ describe("RequestHandler", () => {
         extState,
         currentExitRelays
       );
-      expect(res).toStrictEqual({"type": "direct"});
+      expect(res).toStrictEqual({ type: "direct" });
 
       const res2 = RequestHandler.toDefaultProxyInfo(
         browserSetting,
@@ -87,12 +87,9 @@ describe("RequestHandler", () => {
     });
     test("If VPN is disabled and a Firefox proxy is set, it uses the browser proxy", () => {
       const browserProxy = {
-        levelOfControl: "controllable_by_this_extension",
-        value: {
-          proxyType: "manual",
-          http: "proxy.example.com:8080",
-          ssl: "proxy.example.com:8080",
-        },
+        proxyType: "manual",
+        http: "proxy.example.com:8080",
+        ssl: "proxy.example.com:8080",
       };
       const disabledState = {
         ...extState,
@@ -105,7 +102,7 @@ describe("RequestHandler", () => {
         disabledState,
         currentExitRelays
       );
-      expect(res).toBe(browserProxy.value);
+      expect(res).toBe(browserProxy);
     });
     test("If VPN is disabled and no Firefox proxy is set, it uses direct", () => {
       const disabledState = {
@@ -115,7 +112,7 @@ describe("RequestHandler", () => {
         state: "Disabled",
       };
       const res = RequestHandler.toDefaultProxyInfo(
-        browserSetting,
+        null,
         disabledState,
         currentExitRelays
       );

@@ -65,13 +65,13 @@ export class ProxyHandler extends Component {
       }
     });
 
-    const applyValidBrowserProxy = (v) => {
-      if(ProxyUtils.browserProxySettingIsValid(v)){
-          this.#browserProxySettings.set(v);
-          return;
-        }
+    const applyValidBrowserProxy = (setting) => {
+      if (ProxyUtils.browserProxySettingIsValid(setting.value)) {
+        this.#browserProxySettings.set(setting.value);
+        return;
+      }
       this.#browserProxySettings.set(null);
-    }
+    };
     // Listen to browser proxy settings changes
     browser.proxy.settings.get({}).then(applyValidBrowserProxy);
     browser.proxy.settings.onChange.addListener(applyValidBrowserProxy);
@@ -82,7 +82,6 @@ export class ProxyHandler extends Component {
     setInterval(() => {
       browser.proxy.settings.get().then(applyValidBrowserProxy);
     }, 600000);
-
   }
 
   /** @type {VPNState | undefined} */
@@ -123,7 +122,7 @@ export class ProxyHandler extends Component {
 
   /**
    * Returns an Object containing proxy information
-   * 
+   *
    * Is empty if the user has not set a proxy
    * or the proxy is invalid.
    */
@@ -201,7 +200,7 @@ export class ProxyHandler extends Component {
     const result = new Map();
     newProxyMap.forEach((ctx, origin) => {
       if (ctx.excluded) {
-        if(this.#browserProxySettings.value){
+        if (this.#browserProxySettings.value) {
           // If the user has set a proxy, we need to use it
           // instead of the local proxy.
           result.set(origin, this.#browserProxySettings.value);
@@ -211,8 +210,8 @@ export class ProxyHandler extends Component {
         return;
       }
       result.set(
-          origin,
-          ProxyUtils.getProxies(ctx.countryCode, ctx.cityCode, servers)
+        origin,
+        ProxyUtils.getProxies(ctx.countryCode, ctx.cityCode, servers)
       );
     });
     this.#mProxyMap.value = result;
