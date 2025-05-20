@@ -28,33 +28,17 @@ export class RequestHandler extends Component {
   constructor(receiver, extController, proxyHandler, filter = {}) {
     super(receiver);
     this.active = false;
-    this.localProxyInfo = [];
-    this.currentExitRelays = [];
-    this.browserProxySettings = property();
+    this.localProxyInfo = proxyHandler.localProxyInfo;
+    this.currentExitRelays = proxyHandler.currentExitRelays;
+    this.browserProxySettings = proxyHandler.browserProxySettings;
     this.defaultProxyInfo = propertySum(
       RequestHandler.toDefaultProxyInfo,
       this.browserProxySettings,
       extController.state,
-      proxyHandler.currentExitRelays
+      this.currentExitRelays,
+      this.localProxyInfo
     );
     this.filter = filter;
-
-    browser.proxy.settings.get({}).then((v) => {
-      this.browserProxySettings.set(v);
-    });
-    browser.proxy.settings.onChange.addListener((v) => {
-      debugger;
-      this.browserProxySettings.set(v);
-    });
-    // Every 10 Minutes Check poll the proxy settings
-    // As browser.proxy.settings.onChange does not seem
-    // to notify us if the user Changes the setting,
-    // just another extension would...
-    setInterval(() => {
-      browser.proxy.settings.get({}).then((v) => {
-        this.browserProxySettings.set(v);
-      });
-    }, 600000);
 
     /** @type {FirefoxVPNState | undefined} */
     this.extState = {};
@@ -64,23 +48,10 @@ export class RequestHandler extends Component {
       return this.addOrRemoveRequestListener();
     });
 
-    propertySum(
-      (loophole, exitRelays) => {
-        this.updateProxyInfoFromClient(loophole, exitRelays);
-      },
-      proxyHandler.localProxyInfo,
-      proxyHandler.currentExitRelays
-    );
-
     proxyHandler.proxyMap.subscribe((proxyMap) => {
       this.proxyMap = proxyMap;
       this.addOrRemoveRequestListener();
     });
-  }
-
-  updateProxyInfoFromClient(localProxy, exitRelays) {
-    this.localProxyInfo = localProxy;
-    this.currentExitRelay = exitRelays;
   }
 
   async init() {
@@ -95,7 +66,7 @@ export class RequestHandler extends Component {
       return this.removeRequestListener();
     }
 
-    if (this.proxyMap.size > 0) {
+    if (this.proxyMap.value.size > 0) {
       return this.addRequestListener();
     }
   }
@@ -108,9 +79,8 @@ export class RequestHandler extends Component {
     this.#requestListener = (requestInfo) => {
       return RequestHandler.selectProxy(
         requestInfo,
-        this.extState,
-        this.proxyMap,
-        this.localProxyInfo,
+        this.proxyMap.value,
+        this.localProxyInfo.value,
         this.defaultProxyInfo.value
       );
     };
@@ -143,15 +113,9 @@ export class RequestHandler extends Component {
 
   static selectProxy(
     requestInfo,
-    extensionState,
     proxyMap,
-    bypassProxy,
     defaultProxy
   ) {
-    if (extensionState.bypassTunnel) {
-      return bypassProxy;
-    }
-
     let { documentUrl, url } = requestInfo;
     // If we load an iframe request the top level document.
     // if (requestInfo.frameId !== 0) {
@@ -175,16 +139,23 @@ export class RequestHandler extends Component {
     return defaultProxy;
   }
 
-  static toDefaultProxyInfo(browserProxySettings, extState, relays) {
-    // If VPN is enabled (useExitRelays or enabled), use relays (VPN)
-    if (extState?.useExitRelays || extState?.enabled) {
-      return relays;
+  static toDefaultProxyInfo(browserProxySettings, extState, relays, bypassProxy) {
+    // If the VPN is enabled for Firefox, either use the exit relays or the direct connection. 
+    if (extState?.enabled) {
+      if(extState?.useExitRelays) {
+        // If useExitRelays is enabled, use the relays
+        return relays;
+      }
+      return ProxyUtils.getDirectProxyInfoObject();
     }
-    // If VPN is not enabled and a Firefox proxy is set, use the browser proxy
-    if (ProxyUtils.browserProxySettingIsValid(browserProxySettings?.value)) {
-      // Return the browser proxy info (manual, pac, etc.)
-      // This assumes browserProxySettings.value is in the correct format for the browser
+    // The VPN for Firefox is disabled, check if the browser proxy is set
+    if(ProxyUtils.browserProxySettingIsValid(browserProxySettings?.value)){
+      // If the browser proxy is valid, use it
       return browserProxySettings.value;
+    }
+    // If VPN is disabled (including bypassTunnel=true), use browser proxy if set, otherwise direct
+    if (extensionState.bypassTunnel) {
+      return bypassProxy;
     }
     // Otherwise, direct connection
     return ProxyUtils.getDirectProxyInfoObject();
