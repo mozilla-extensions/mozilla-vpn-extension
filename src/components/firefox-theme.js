@@ -1,6 +1,7 @@
 /**
  * This Class will
  */
+const CARD_DARKEN_INTENSITY = 20;
 
 export class FirefoxThemeImporter extends HTMLElement {
   // Not every theme set's all variables.
@@ -8,6 +9,15 @@ export class FirefoxThemeImporter extends HTMLElement {
   // if the theme does not set them, we will fall back
   // to the default DARK / LIGHT theme colors
   static EXPECTED_KEYS = ["popup", "toolbar_text"];
+
+  static CARD_ACCENT_KEYS = [
+    "frame",
+    "tab_selected",
+    "ntp_card_background",
+    "toolbar",
+    "sidebar",
+    "icons",
+  ];
 
   connectedCallback() {
     this.update();
@@ -62,46 +72,125 @@ export class FirefoxThemeImporter extends HTMLElement {
       this.importColors(fallback, "mz");
       return;
     }
-    const possibleAccentColors = Object.entries(colors).filter(([key, value]) => {
-      const keys = [...FirefoxThemeImporter.EXPECTED_KEYS, "icons"];
-      return keys.includes(key) && value  != null
-    }).filter( ([key,value]) =>{
-      console.log(`${key} / ${value} -> is good: ${FirefoxThemeImporter.isGoodAccentColor(value)}`)
-      return FirefoxThemeImporter.isGoodAccentColor(value);
-    });
 
-    if(possibleAccentColors.length == 0 ){
+    // For the Card we will select a subset of colors
+    // that are always visible in the browser frame.
+    const cardKeyColor = FirefoxThemeImporter.selectKeyColor(
+      colors,
+      FirefoxThemeImporter.CARD_ACCENT_KEYS
+    );
+    if (!cardKeyColor) {
       this.importColors(fallback, "mz");
       return;
     }
+    // The Accent Color (for buttons and active state), that can be selected
+    // from any color in the theme.
+    const accentKeyColor = FirefoxThemeImporter.selectKeyColor(colors, []);
+    const cardCompareColor = cardKeyColor.hslColor;
+    cardCompareColor.l = cardCompareColor.l - CARD_DARKEN_INTENSITY;
+    const textColor = FirefoxThemeImporter.selectHighestContrastTextColor(
+      colors,
+      cardCompareColor
+    );
 
-    const darken = (variable, intensity) => {
-      return `lch(from var(--firefox-${variable}) calc(l - 30)  c h )`
+    //Check the text contrast to cardCompare, use white dark if the contrast is not enough
+
+    const textContrast = Math.abs(textColor.hslColor.l - cardCompareColor.l);
+    const cardText = `var(--firefox-${textColor.key})`;
+    if (textContrast < 40) {
+      cardCompareColor.l > 50 ? (cardText = "white") : (cardText = "black");
     }
 
-    const cardTextColor = (color) => {
-      const hsl = FirefoxThemeImporter.parseCssColorToHsl(color);
-      if( (hsl.l -30)  > 50){
-        return "black";
-      }
-      return "white;"
+    const darken = (variable, intensity = CARD_DARKEN_INTENSITY) => {
+      return `lch(from var(--firefox-${variable}) calc(l - ${intensity})  c h )`;
+    };
+
+    this.importColors(
+      {
+        "card-background": darken(cardKeyColor.key),
+        "card-text-color": cardText,
+        "accent-color": `var(--firefox-${accentKeyColor.key})`,
+      },
+      "mz"
+    );
+  }
+
+  /**
+   * Selects a key color from the provided colors.
+   * The selected color should be a good accent color and have enough contrast with the background.
+   */
+  static selectKeyColor(colors, allowedKeys = null) {
+    // First Check the Background color.
+    const background = FirefoxThemeImporter.parseCssColorToHsl(colors["popup"]);
+    if (!background) {
+      return null;
     }
+    const hasEnoughContrast = (hslColor) => {
+      // Check if the color is sufficiently different from the background
+      const contrast = Math.abs(
+        hslColor.l - CARD_DARKEN_INTENSITY - background.l
+      );
+      return contrast > 20;
+    };
 
+    const mappedColors = Object.entries(colors)
+      // Only consider the colors that are in ACCENT_KEYS
+      .filter(([key, value]) => {
+        const keys = allowedKeys;
+        if (keys == null || keys.length == 0) {
+          return true;
+        }
+        return keys.includes(key) && value != null;
+      })
+      // Parse the color to HSL
+      .map(([key, value]) => {
+        const hslColor = FirefoxThemeImporter.parseCssColorToHsl(value);
+        return { key, value, hslColor };
+      })
+      // Filter out colors that couldn't be parsed or aren't good accent colors
+      .filter(({ hslColor }) => {
+        return (
+          hslColor &&
+          hasEnoughContrast(hslColor) &&
+          FirefoxThemeImporter.isGoodAccentColor(hslColor)
+        );
+      })
+      // Sort by a combined score of saturation and luminance (favoring mid-luminance)
+      .sort((a, b) => {
+        const score = (hsl) => hsl.s * (1 - Math.abs(hsl.l - 50) / 50);
+        return score(b.hslColor) - score(a.hslColor);
+      });
 
-    if(possibleAccentColors.length >= 2 ){
-      this.importColors({
-      "card-background": darken(possibleAccentColors[0][0]),
-      "card-text-color": cardTextColor(possibleAccentColors[0][1]),
-      "accent-color": possibleAccentColors[1][0],
-      }, "mz");
-      return;
+    // Return the first element or null
+    const selectedColor = mappedColors.length > 0 ? mappedColors[0] : null;
+    if (selectedColor) {
+      console.log("Selected color:", selectedColor.key);
+      console.log(`Other Colors: ${mappedColors.map((c) => c.key).join(", ")}`);
     }
-    this.importColors({
-      "card-background": darken(possibleAccentColors[0][0]),
-      "card-text-color": cardTextColor(possibleAccentColors[0][1]),
-      "accent-color":possibleAccentColors[0][0],
-    }, "mz");
+    return selectedColor;
+  }
 
+  static selectHighestContrastTextColor(colorList, hslColor) {
+    const mappedColors = Object.entries(colorList)
+      .filter(([key, value]) => {
+        // the key should contain "text"
+        return key.includes("text") && value != null;
+      })
+      // Parse the color to HSL
+      .map(([key, value]) => {
+        const hslColor = FirefoxThemeImporter.parseCssColorToHsl(value);
+        return { key, value, hslColor };
+      })
+      // Sort by who has the most contrast to hslColor
+      .sort((a, b) => {
+        const contrastA = Math.abs(a.hslColor.l - hslColor.l);
+        const contrastB = Math.abs(b.hslColor.l - hslColor.l);
+        return contrastB - contrastA;
+      });
+    // Return the first element or null
+    const selectedColor = mappedColors.length > 0 ? mappedColors[0] : null;
+    console.log("Selected text color:", selectedColor.key);
+    return selectedColor;
   }
 
   /**
@@ -171,7 +260,7 @@ export class FirefoxThemeImporter extends HTMLElement {
     let l = (cmax + cmin) / 2;
 
     // Calculate Saturation
-    let s =0;
+    let s = 0;
     if (delta === 0) {
       s = 0;
     } else {
@@ -186,15 +275,19 @@ export class FirefoxThemeImporter extends HTMLElement {
   /**
    * Checks if a given CSS color string is suitable as an accent color.
    * A color is considered "good" if it's not monochrome (saturation > 20%).
-   * @param {string | null | undefined} colorString The CSS color string (e.g., hsl, rgb, hex).
+   * @param {{h: number, s: number, l: number}} hslColor The HSL color representation.
    * @returns {boolean} True if the color is suitable, false otherwise.
    */
-  static isGoodAccentColor(colorString) {
-    const hslColor = FirefoxThemeImporter.parseCssColorToHsl(colorString);
-    if (!hslColor) {
+  static isGoodAccentColor(hslColor) {
+    if (hslColor.l > 90) {
+      // If the lightness is above 90, is a shade of white
       return false;
     }
-    // Condition: not monochrome (saturation > 20%)
+    // If the lightness is below 10, it's a shade of black
+    if (hslColor.l < 10) {
+      return false;
+    }
+
     return hslColor.s > 20;
   }
 
@@ -207,12 +300,12 @@ export class FirefoxThemeImporter extends HTMLElement {
     if (!colors) {
       return false;
     }
-    return Object.entries(colors).every(([key, value]) => {
-      if (FirefoxThemeImporter.EXPECTED_KEYS.includes(key)) {
-        return value != null;
+    const hasAllRequiredKeys = FirefoxThemeImporter.EXPECTED_KEYS.every(
+      (key) => {
+        return colors[key] != null;
       }
-      return true;
-    });
+    );
+    return hasAllRequiredKeys;
   }
 }
 customElements.define("firefox-theme", FirefoxThemeImporter);
