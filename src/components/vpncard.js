@@ -254,7 +254,7 @@ export class VPNCard extends LitElement {
       `;
     }
     return html`
-      <svg ${ref(shieldRef)}>
+      <svg ${ref(shieldRef)} class="globe-shield">
         <use xlink:href="../../assets/img/globe-shield-on.svg#globe"></use>
       </svg>
     `;
@@ -287,6 +287,9 @@ export class VPNCard extends LitElement {
     .box.connecting.allowDisconnect mz-pill {
       pointer-events: all;
       opacity: 1;
+    }
+    .globe-shield {
+      mix-blend-mode: luminosity;
     }
     main,
     footer {
