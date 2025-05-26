@@ -289,7 +289,7 @@ export class VPNCard extends LitElement {
       opacity: 1;
     }
     .globe-shield {
-      mix-blend-mode: luminosity;
+      mix-blend-mode: screen;
     }
     main,
     footer {
