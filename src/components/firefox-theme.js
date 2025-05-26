@@ -9,20 +9,27 @@
  */
 const CARD_DARKEN_INTENSITY = 20;
 
-class HSLColor {
+/**
+ * Represents a color in HSL and RGB format.
+ */
+class HSLRGBColor {
   /** The hue of the color */
   h;
   /** The saturation of the color */
   s;
   /** The lightness of the color */
   l;
+
+  r;
+  g;
+  b;
 }
 class Color {
   /** @type {string} The key used in the theme */
   key;
   /** @type {string} the raw css value */
   value;
-  /** @type {HSLColor} the HSL color representation */
+  /** @type {HSLRGBColor} the HSL color representation */
   hslColor;
 }
 
@@ -176,7 +183,6 @@ export class FirefoxThemeImporter extends HTMLElement {
         cardKeyColor.value
       );
       yield { key: "card-background", value: darken(cardKeyColor.key) };
-      return;
     }
 
     // The Accent Color (for buttons and active state), that can be selected
@@ -195,12 +201,11 @@ export class FirefoxThemeImporter extends HTMLElement {
         key: "accent-color",
         value: `var(--firefox-${accentKeyColor.key})`,
       };
-      return;
     }
 
     if (cardKeyColor === null) {
       yield { key: "card-text-color", value: "white" };
-      return;
+      return; // We're using the default card color. so white text.
     }
     // @ts-ignore
     const cardCompareColor = cardKeyColor.hslColor;
@@ -216,14 +221,39 @@ export class FirefoxThemeImporter extends HTMLElement {
     const textContrast = Math.abs(textColor.hslColor.l - cardCompareColor.l);
 
     let cardText = `var(--firefox-${textColor.key})`;
-    if (textContrast < 40) {
+    if (textContrast < 50) {
       console.warn(
         `Text color ${textColor.key} has not enough contrast to card color ${cardKeyColor.key}. Using white/black instead.`
       );
-      cardCompareColor.l > 50 ? (cardText = "white") : (cardText = "black");
+      const luminance = FirefoxThemeImporter.relativeLuminance(
+        cardCompareColor.r,
+        cardCompareColor.g,
+        cardCompareColor.b
+      );
+      cardText = luminance > 0.5 ? "black" : "white";
     }
     console.log("Selected text color:", textColor.key, textColor.value);
     yield { key: "card-text-color", value: cardText };
+  }
+
+  /**
+   * Calculates the relative luminance of an RGB color.
+   * @param {number} r - Red (0-255)
+   * @param {number} g - Green (0-255)
+   * @param {number} b - Blue (0-255)
+   * @returns {number} Relative luminance (0.0 - 1.0)
+   */
+  static relativeLuminance(r, g, b) {
+    // Convert sRGB to linear values
+    const srgbToLinear = (c) => {
+      c = c / 255;
+      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    };
+    const R = srgbToLinear(r);
+    const G = srgbToLinear(g);
+    const B = srgbToLinear(b);
+    // Calculate luminance
+    return 0.2126 * R + 0.7152 * G + 0.0722 * B;
   }
 
   /**
@@ -255,9 +285,7 @@ export class FirefoxThemeImporter extends HTMLElement {
         return value != null;
       })
       .map(([key, value]) => {
-        const hslColor = FirefoxThemeImporter.parseCssColorToHsl(
-          value.toString()
-        );
+        const hslColor = FirefoxThemeImporter.parseCssColor(value.toString());
         if (!hslColor) {
           throw new Error(`Could not parse color: ${value}`);
         }
@@ -280,7 +308,7 @@ export class FirefoxThemeImporter extends HTMLElement {
     }
     /**
      * Checks if the color has enough contrast with the background.
-     * @param {HSLColor} hslColor
+     * @param {HSLRGBColor} hslColor
      * @returns {boolean}
      */
     const hasEnoughContrast = (hslColor) => {
@@ -288,7 +316,7 @@ export class FirefoxThemeImporter extends HTMLElement {
       const contrast = Math.abs(
         hslColor.l -
           CARD_DARKEN_INTENSITY -
-          /** @type {HSLColor} */ (background.hslColor).l
+          /** @type {HSLRGBColor} */ (background.hslColor).l
       );
       return contrast > 20;
     };
@@ -316,7 +344,7 @@ export class FirefoxThemeImporter extends HTMLElement {
   /**
    * Selects the text color with the highest contrast to the given HSL color.
    * @param {Array<Color>} colorList - The list of colors to choose from.
-   * @param {HSLColor} hslColor - The HSL color to compare against.
+   * @param {HSLRGBColor} hslColor - The HSL color to compare against.
    * @returns {Color | null} The selected color or null if no suitable color is found.
    */
   static selectHighestContrastTextColor(colorList, hslColor) {
@@ -341,9 +369,9 @@ export class FirefoxThemeImporter extends HTMLElement {
    * Parses a CSS color string into its HSL components.
    * Supports HSL, RGB, and Hex color formats.
    * @param {string | null | undefined} colorString The CSS color string.
-   * @returns {{h: number, s: number, l: number} | null} An object with h, s, l components, or null if parsing fails.
+   * @returns {{h: number, s: number, l: number, r:number, g:number, b:number} | null} An object with h, s, l components, or null if parsing fails.
    */
-  static parseCssColorToHsl(colorString) {
+  static parseCssColor(colorString) {
     if (!colorString || typeof colorString !== "string") {
       return null;
     }
@@ -382,7 +410,7 @@ export class FirefoxThemeImporter extends HTMLElement {
    * @param {number} r - Red (0-255)
    * @param {number} g - Green (0-255)
    * @param {number} b - Blue (0-255)
-   * @returns {HSLColor}
+   * @returns {HSLRGBColor}
    */
   static rsbgToHsl(r, g, b) {
     const r_norm = r / 255;
@@ -423,7 +451,7 @@ export class FirefoxThemeImporter extends HTMLElement {
     s = Math.round(s * 100); // Convert to percentage
     l = Math.round(l * 100); // Convert to percentage
 
-    return { h, s, l };
+    return { h, s, l, r, g, b };
   }
 
   /**
