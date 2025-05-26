@@ -25,7 +25,13 @@ export class FirefoxThemeImporter extends HTMLElement {
   // We will depend on some CSS variables beeing set
   // if the theme does not set them, we will fall back
   // to the default DARK / LIGHT theme colors
-  static EXPECTED_KEYS = ["popup", "toolbar_text"];
+  static EXPECTED_KEYS = ["popup", "toolbar_text", "popup_text"];
+  static OPTIONAL_KEYS = ["icons", "toolbar_text"];
+
+  static IMPORT_KEYS = [
+    ...FirefoxThemeImporter.EXPECTED_KEYS,
+    ...FirefoxThemeImporter.OPTIONAL_KEYS,
+  ];
 
   static CARD_ACCENT_KEYS = [
     "frame",
@@ -52,11 +58,17 @@ export class FirefoxThemeImporter extends HTMLElement {
       !!window.matchMedia("(prefers-color-scheme:dark)").matches;
 
     if (!colors || !this.isValidTheme(colors)) {
-      this.importColors(isDarkMode ? DEFAULT_DARK : DEFAULT_LIGHT);
+      this.importColors(isDarkMode ? DEFAULT_DARK : DEFAULT_LIGHT).filter(
+        (color) => FirefoxThemeImporter.IMPORT_KEYS.includes(color.key)
+      );
       this.importAccentColors(null, isDarkMode);
       return;
     }
-    this.importColors(colors);
+    this.importColors(
+      colors.filter((color) =>
+        FirefoxThemeImporter.IMPORT_KEYS.includes(color.key)
+      )
+    );
     this.importAccentColors(colors, isDarkMode);
   }
 
@@ -120,8 +132,9 @@ export class FirefoxThemeImporter extends HTMLElement {
     // For the Card we will select a subset of colors
     // that are always visible in the browser frame.
     const cardKeyColor = FirefoxThemeImporter.selectKeyColor(
-      colors,
-      FirefoxThemeImporter.CARD_ACCENT_KEYS
+      colors.filter(({ key }) =>
+        FirefoxThemeImporter.CARD_ACCENT_KEYS.includes(key)
+      )
     );
     if (!cardKeyColor) {
       this.importColors(fallback, "mz");
@@ -129,7 +142,7 @@ export class FirefoxThemeImporter extends HTMLElement {
     }
     // The Accent Color (for buttons and active state), that can be selected
     // from any color in the theme.
-    const accentKeyColor = FirefoxThemeImporter.selectKeyColor(colors, []);
+    const accentKeyColor = FirefoxThemeImporter.selectKeyColor(colors);
     const cardCompareColor = cardKeyColor.hslColor;
     cardCompareColor.l = cardCompareColor.l - CARD_DARKEN_INTENSITY;
     const textColor = FirefoxThemeImporter.selectHighestContrastTextColor(
@@ -182,7 +195,7 @@ export class FirefoxThemeImporter extends HTMLElement {
    * @param {Array<string>} allowedKeys - The keys to consider for selection.
    * @returns {Color | null} The selected color or null if no suitable color is found.
    */
-  static selectKeyColor(colors, allowedKeys = null) {
+  static selectKeyColor(colors) {
     // First Check the Background color.
     const background = FirefoxThemeImporter.parseCssColorToHsl(colors["popup"]);
     if (!background) {
@@ -197,14 +210,6 @@ export class FirefoxThemeImporter extends HTMLElement {
     };
 
     const mappedColors = colors
-      // Only consider the colors that are in ACCENT_KEYS
-      .filter(({ key, value }) => {
-        const keys = allowedKeys;
-        if (keys == null || keys.length == 0) {
-          return true;
-        }
-        return keys.includes(key) && value != null;
-      })
       // Filter out colors that couldn't be parsed or aren't good accent colors
       .filter(({ hslColor }) => {
         return (
