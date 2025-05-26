@@ -57,18 +57,17 @@ export class FirefoxThemeImporter extends HTMLElement {
       window.matchMedia &&
       !!window.matchMedia("(prefers-color-scheme:dark)").matches;
 
+    const needsColor = (c) => FirefoxThemeImporter.IMPORT_KEYS.includes(c.key);
+
     if (!colors || !this.isValidTheme(colors)) {
-      this.importColors(isDarkMode ? DEFAULT_DARK : DEFAULT_LIGHT).filter(
-        (color) => FirefoxThemeImporter.IMPORT_KEYS.includes(color.key)
-      );
+      const defaultColors = FirefoxThemeImporter.resolveColors({
+        colors: isDarkMode ? DEFAULT_DARK : DEFAULT_LIGHT,
+      });
+      this.importColors(defaultColors.filter(needsColor));
       this.importAccentColors(null, isDarkMode);
       return;
     }
-    this.importColors(
-      colors.filter((color) =>
-        FirefoxThemeImporter.IMPORT_KEYS.includes(color.key)
-      )
-    );
+    this.importColors(colors.filter(needsColor));
     this.importAccentColors(colors, isDarkMode);
   }
 
@@ -97,6 +96,9 @@ export class FirefoxThemeImporter extends HTMLElement {
    * @param {string} prefix - The prefix to use for the CSS variables.
    */
   importColors(colors, prefix = "firefox") {
+    if (!Array.isArray(colors)) {
+      return;
+    }
     /** @type {HTMLHtmlElement} */
     var r = document.querySelector(":root");
     // Remove all previous colors with the prefix
@@ -374,7 +376,7 @@ customElements.define("firefox-theme", FirefoxThemeImporter);
 /**
  * Those variables are exported from the Dark/Light Manifest.
  */
-const DEFAULT_DARK = FirefoxThemeImporter.resolveColors({
+const DEFAULT_DARK = {
   accentcolor: null,
   bookmark_text: null,
   button_background_active: null,
@@ -427,9 +429,9 @@ const DEFAULT_DARK = FirefoxThemeImporter.resolveColors({
   input_background: "#42414D",
   input_color: "rgb(251,251,254)",
   urlbar_popup_separator: "rgb(82,82,94)",
-});
+};
 
-const DEFAULT_LIGHT = FirefoxThemeImporter.resolveColors({
+const DEFAULT_LIGHT = {
   accentcolor: null,
   bookmark_text: null,
   button_background_active: null,
@@ -484,4 +486,4 @@ const DEFAULT_LIGHT = FirefoxThemeImporter.resolveColors({
   input_background: "rgb(255,255,255)",
   urlbar_popup_hover: "rgb(240,240,244)",
   urlbar_popup_separator: "rgb(240,240,244)",
-});
+};
