@@ -1,3 +1,9 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+// @ts-check
+
 /**
  * This Class will
  */
@@ -44,6 +50,7 @@ export class FirefoxThemeImporter extends HTMLElement {
 
   connectedCallback() {
     this.update();
+    // @ts-ignore
     browser.theme.onUpdated.addListener(() => {
       this.update();
     });
@@ -61,13 +68,20 @@ export class FirefoxThemeImporter extends HTMLElement {
 
     if (!colors || !this.isValidTheme(colors)) {
       const defaultColors = FirefoxThemeImporter.resolveColors({
+        //@ts-ignore
         colors: isDarkMode ? DEFAULT_DARK : DEFAULT_LIGHT,
       });
+      if (!defaultColors) {
+        throw new Error("Could not resolve default colors");
+      }
       this.importColors(defaultColors.filter(needsColor));
-      this.importAccentColors(null, isDarkMode);
+      this.importColors(
+        FirefoxThemeImporter.defaultAccentColor(isDarkMode),
+        "mz"
+      );
       return;
     }
-    this.importColors(colors.filter(needsColor));
+    this.importColors(colors);
     this.importAccentColors(colors, isDarkMode);
   }
 
@@ -92,83 +106,136 @@ export class FirefoxThemeImporter extends HTMLElement {
 
   /**
    * Imports the theme colors into the document.
-   * @param {Array<Color>} colors - The theme colors.
+   * @param {Array<{key:String, value:String}>} colors - The theme colors.
    * @param {string} prefix - The prefix to use for the CSS variables.
    */
   importColors(colors, prefix = "firefox") {
     if (!Array.isArray(colors)) {
       return;
     }
-    /** @type {HTMLHtmlElement} */
+    /** @type {HTMLHtmlElement?} */
     var r = document.querySelector(":root");
+    if (!r) {
+      return;
+    }
     // Remove all previous colors with the prefix
     Object.values(r)
       .filter((e) => e.startsWith(`--${prefix}`))
       .forEach((e) => {
-        r.style.removeProperty(e);
+        r?.style.removeProperty(e);
       });
     // Set the new colors
     colors.forEach(({ key, value }) => {
       if (!value) {
         return;
       }
-      r.style.setProperty(`--${prefix}-${key}`, value);
+      r?.style.setProperty(`--${prefix}-${key}`, value);
     });
   }
   /**
-   *
-   * @param {Array<Color>} colors - The theme colors.
-   * @param {boolean} isDarkMode - True if the theme is dark mode, false otherwise.
+   * Returns the default accent color for the theme.
+   * @param {boolean} isDarkMode
    */
-  importAccentColors(colors, isDarkMode) {
-    const fallback = [
+  static defaultAccentColor(isDarkMode) {
+    return [
       { key: "card-background", value: "#321c64" },
       { key: "card-text-color", value: "#ffffff" },
       { key: "accent-color", value: isDarkMode ? "#00ddff" : "#0060df" },
     ];
+  }
+
+  /**
+   * Generator function that yields accent color objects for the theme.
+   * @param {Array<Color>} colors - The theme colors.
+   * @param {boolean} isDarkMode - True if dark mode is enabled.
+   */
+  *generateAccentColors(colors, isDarkMode) {
     if (colors == null) {
-      this.importColors(fallback, "mz");
       return;
     }
+    const background = colors.find(({ key }) => key === "popup");
+    if (!background) {
+      return;
+    }
+    const darken = (variable, intensity = CARD_DARKEN_INTENSITY) => {
+      return `lch(from var(--firefox-${variable}) calc(l - ${intensity})  c h )`;
+    };
 
     // For the Card we will select a subset of colors
     // that are always visible in the browser frame.
     const cardKeyColor = FirefoxThemeImporter.selectKeyColor(
       colors.filter(({ key }) =>
         FirefoxThemeImporter.CARD_ACCENT_KEYS.includes(key)
-      )
+      ),
+      background
     );
-    if (!cardKeyColor) {
-      this.importColors(fallback, "mz");
+    if (cardKeyColor) {
+      console.log(
+        "Selected card key color:",
+        cardKeyColor.key,
+        cardKeyColor.value
+      );
+      yield { key: "card-background", value: darken(cardKeyColor.key) };
       return;
     }
+
     // The Accent Color (for buttons and active state), that can be selected
     // from any color in the theme.
-    const accentKeyColor = FirefoxThemeImporter.selectKeyColor(colors);
+    const accentKeyColor = FirefoxThemeImporter.selectKeyColor(
+      colors,
+      background
+    );
+    if (accentKeyColor) {
+      console.log(
+        "Selected accent key color:",
+        accentKeyColor.key,
+        accentKeyColor.value
+      );
+      yield {
+        key: "accent-color",
+        value: `var(--firefox-${accentKeyColor.key})`,
+      };
+      return;
+    }
+
+    if (cardKeyColor === null) {
+      yield { key: "card-text-color", value: "white" };
+      return;
+    }
+    // @ts-ignore
     const cardCompareColor = cardKeyColor.hslColor;
     cardCompareColor.l = cardCompareColor.l - CARD_DARKEN_INTENSITY;
     const textColor = FirefoxThemeImporter.selectHighestContrastTextColor(
       colors,
       cardCompareColor
     );
-
-    //Check the text contrast to cardCompare, use white dark if the contrast is not enough
-
+    if (!textColor) {
+      yield { key: "card-text-color", value: isDarkMode ? "white" : "black" };
+      return;
+    }
     const textContrast = Math.abs(textColor.hslColor.l - cardCompareColor.l);
-    const cardText = `var(--firefox-${textColor.key})`;
+
+    let cardText = `var(--firefox-${textColor.key})`;
     if (textContrast < 40) {
+      console.warn(
+        `Text color ${textColor.key} has not enough contrast to card color ${cardKeyColor.key}. Using white/black instead.`
+      );
       cardCompareColor.l > 50 ? (cardText = "white") : (cardText = "black");
     }
+    console.log("Selected text color:", textColor.key, textColor.value);
+    yield { key: "card-text-color", value: cardText };
+  }
 
-    const darken = (variable, intensity = CARD_DARKEN_INTENSITY) => {
-      return `lch(from var(--firefox-${variable}) calc(l - ${intensity})  c h )`;
-    };
-
+  /**
+   *
+   * @param {Array<Color>} colors - The theme colors.
+   * @param {boolean} isDarkMode - True if the theme is dark mode, false otherwise.
+   */
+  importAccentColors(colors, isDarkMode) {
     this.importColors(
       [
-        { key: "card-background", value: darken(cardKeyColor.key) },
-        { key: "card-text-color", value: cardText },
-        { key: "accent-color", value: `var(--firefox-${accentKeyColor.key})` },
+        ...FirefoxThemeImporter.defaultAccentColor(isDarkMode),
+        ...Array.from(this.generateAccentColors(colors, isDarkMode)),
       ],
       "mz"
     );
@@ -177,16 +244,25 @@ export class FirefoxThemeImporter extends HTMLElement {
   /**
    * Resolves the theme colors into a more usable format.
    * @param {browser.theme.Theme} theme
-   * @returns {Array<Color>}
+   * @returns {Array<Color>?}
    */
   static resolveColors(theme) {
     if (!theme || !theme.colors) {
       return null;
     }
-    return Object.entries(theme.colors).map(([key, value]) => {
-      const hslColor = FirefoxThemeImporter.parseCssColorToHsl(value);
-      return { key, value, hslColor };
-    });
+    return Object.entries(theme.colors)
+      .filter(([_, value]) => {
+        return value != null;
+      })
+      .map(([key, value]) => {
+        const hslColor = FirefoxThemeImporter.parseCssColorToHsl(
+          value.toString()
+        );
+        if (!hslColor) {
+          throw new Error(`Could not parse color: ${value}`);
+        }
+        return { key, value: value.toString(), hslColor };
+      });
   }
 
   /**
@@ -194,19 +270,25 @@ export class FirefoxThemeImporter extends HTMLElement {
    * The selected color should be a good accent color and have enough contrast with the background.
    *
    * @param {Array<Color>} colors - The theme colors.
-   * @param {Array<string>} allowedKeys - The keys to consider for selection.
+   * @param {Color} background - The background color to consider for selection.
    * @returns {Color | null} The selected color or null if no suitable color is found.
    */
-  static selectKeyColor(colors) {
+  static selectKeyColor(colors, background) {
     // First Check the Background color.
-    const background = FirefoxThemeImporter.parseCssColorToHsl(colors["popup"]);
     if (!background) {
       return null;
     }
+    /**
+     * Checks if the color has enough contrast with the background.
+     * @param {HSLColor} hslColor
+     * @returns {boolean}
+     */
     const hasEnoughContrast = (hslColor) => {
       // Check if the color is sufficiently different from the background
       const contrast = Math.abs(
-        hslColor.l - CARD_DARKEN_INTENSITY - background.l
+        hslColor.l -
+          CARD_DARKEN_INTENSITY -
+          /** @type {HSLColor} */ (background.hslColor).l
       );
       return contrast > 20;
     };
@@ -228,10 +310,6 @@ export class FirefoxThemeImporter extends HTMLElement {
 
     // Return the first element or null
     const selectedColor = mappedColors.length > 0 ? mappedColors[0] : null;
-    if (selectedColor) {
-      console.log("Selected color:", selectedColor.key);
-      console.log(`Other Colors: ${mappedColors.map((c) => c.key).join(", ")}`);
-    }
     return selectedColor;
   }
 
@@ -255,7 +333,7 @@ export class FirefoxThemeImporter extends HTMLElement {
       });
     // Return the first element or null
     const selectedColor = mappedColors.length > 0 ? mappedColors[0] : null;
-    console.log("Selected text color:", selectedColor.key);
+    console.log("Selected text color:", selectedColor?.key);
     return selectedColor;
   }
 
@@ -274,6 +352,9 @@ export class FirefoxThemeImporter extends HTMLElement {
       // Create a proper OffscreenCanvas
       const canvas = new OffscreenCanvas(1, 1);
       const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        return null;
+      }
 
       // Clear canvas
       ctx.clearRect(0, 0, 1, 1);
@@ -296,6 +377,13 @@ export class FirefoxThemeImporter extends HTMLElement {
     }
   }
 
+  /**
+   * Converts RGB values to HSL.
+   * @param {number} r - Red (0-255)
+   * @param {number} g - Green (0-255)
+   * @param {number} b - Blue (0-255)
+   * @returns {HSLColor}
+   */
   static rsbgToHsl(r, g, b) {
     const r_norm = r / 255;
     const g_norm = g / 255;
