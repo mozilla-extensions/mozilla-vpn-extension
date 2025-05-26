@@ -678,7 +678,7 @@ export class BrowserActionPopup extends LitElement {
       background: lch(from var(--action-button-color) l c h / 0);
       padding-left: 48px;
       position: relative;
-      color: var(--grey50);
+      color: var(--text-color-primary);
       outline: none;
       border: 2px solid transparent;
       margin: 0;
