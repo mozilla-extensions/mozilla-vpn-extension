@@ -74,9 +74,11 @@
     --grey80: lch(from var(--panel-bg-color) calc(l + 80) c h);
 
     --border-color: lch(from var(--panel-bg-color) calc(l + 15) c h);
-    --text-secondary-color: rbga(255, 255, 255, 0.6);
-    --text-color-primary: #ffffff;
-    --text-color-headline: #ffffff;
+    --text-color-primary: var(--firefox-popup_text, #ffffff);
+    --text-color-headline: lch(from var(--text-color-primary) calc(l + 60) c h);
+    --text-secondary-color: lch(
+      from var(--text-color-primary) calc(l + 20) c h
+    );
     --text-color-invert: var(--grey50);
     --text-secondary-color: var(#ffffff);
     --button-ghost-bg-color: #ffffff;
@@ -102,14 +104,16 @@
     --action-button-color: var(--mz-accent-color);
     --in-copy-link-text-color: var(--mz-accent-color);
     --color-enabled: var(--mz-accent-color);
-    
-    --text-color-primary: var(--grey50);
-    --text-color-headline: var(--grey60);
+
+    --text-color-primary: var(--firefox-popup_text, black);
+    --text-color-headline: lch(from var(--text-color-primary) calc(l - 10) c h);
+    --text-secondary-color: lch(
+      from var(--text-color-primary) calc(l - 20) c h
+    );
     --text-color-invert: #ffffff;
     --border-color: lch(from var(--panel-bg-color) calc(l - 15) c h / 0.3);
     --button-ghost-bg-color: var(--grey50);
     --input-border: #8f8f9d;
     --secondary-btn-color: var(--action-button-color);
-    --text-secondary-color: var(--grey40);
   }
 }
