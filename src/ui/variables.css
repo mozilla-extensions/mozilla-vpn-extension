@@ -34,22 +34,7 @@
 :root {
   --color-warning: #ffa436;
   --color-fatal-error: #ff6a75;
-  --color-divider: #e7e7e7;
   --green50: hsl(162, 73%, 56%);
-  --grey10: #e7e7e7;
-  --grey30: #9e9e9e;
-  --grey40: #6d6d6e;
-  --grey50: #3d3d3d;
-  --grey60: #0c0c0d;
-  --blue50: #0060df;
-  --blue60: #0250bb;
-  --blue70: #054096;
-  --blue90: #09204d;
-  --cyan-50: #00ddff;
-  --main-card-background: #321c64;
-  --main-card-text-color: #ffffff;
-  --settings-secondary-text-color: #5b5b66;
-  --settings-border-color: #e7e7e7;
 }
 /* Globals */
 :root {
@@ -73,46 +58,62 @@
   );
   --settings-link-color: var(--action-button-color);
 
-  /**
-        Note this color is not from our figma but the 
-        firefox "light" theme, otherwise it looks wierd
-        **/
   --panel-bg-color: var(--firefox-popup);
+  --toolbar-icon-bg-color: var(--firefox-icons, var(--firefox-toolbar_text));
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
+    --grey5: lch(from var(--panel-bg-color) calc(l + 5) c h);
+    --grey10: lch(from var(--panel-bg-color) calc(l + 10) c h);
+    --grey20: lch(from var(--panel-bg-color) calc(l + 20) c h);
+    --grey30: lch(from var(--panel-bg-color) calc(l + 30) c h);
+    --grey40: lch(from var(--panel-bg-color) calc(l + 40) c h);
+    --grey50: lch(from var(--panel-bg-color) calc(l + 50) c h);
+    --grey60: lch(from var(--panel-bg-color) calc(l + 60) c h);
+    --grey80: lch(from var(--panel-bg-color) calc(l + 80) c h);
+
     --border-color: lch(from var(--panel-bg-color) calc(l + 15) c h);
-    --text-secondary-color: rbga(255, 255, 255, 0.6);
-    --text-color-primary: #ffffff;
-    --text-color-headline: #ffffff;
+    --text-color-primary: var(--firefox-popup_text, #ffffff);
+    --text-color-headline: lch(from var(--text-color-primary) calc(l + 60) c h);
+    --text-secondary-color: lch(
+      from var(--text-color-primary) calc(l + 20) c h
+    );
     --text-color-invert: var(--grey50);
     --text-secondary-color: var(#ffffff);
     --button-ghost-bg-color: #ffffff;
-    --divider-color: lch(from var(--color-divider) l c h / 0.2);
     --secondary-btn-color: #ffffff;
-    --settings-secondary-text-color: rgba(255, 255, 255, 0.8);
-    --settings-border-color: #e7e7e74d;
 
-    --action-button-color: var(--cyan-50);
-    --color-enabled: var(--cyan-50);
-    --in-copy-link-text-color: var(--cyan-50);
+    --action-button-color: var(--mz-accent-color);
+    --color-enabled: var(--mz-accent-color);
+    --in-copy-link-text-color: var(--mz-accent-color);
   }
 }
 
 @media (prefers-color-scheme: light) {
   :root {
-    --in-copy-link-text-color: var(--blue50);
-    --color-enabled: var(--green50);
-    --divider-color: var(--color-divider);
-    --action-button-color: var(--blue50);
-    --text-color-primary: var(--grey50);
-    --text-color-headline: var(--grey60);
+    --grey5: lch(from var(--panel-bg-color) calc(l - 5) c h);
+    --grey10: lch(from var(--panel-bg-color) calc(l - 10) c h);
+    --grey20: lch(from var(--panel-bg-color) calc(l - 20) c h);
+    --grey30: lch(from var(--panel-bg-color) calc(l - 30) c h);
+    --grey40: lch(from var(--panel-bg-color) calc(l - 40) c h);
+    --grey50: lch(from var(--panel-bg-color) calc(l - 50) c h);
+    --grey60: lch(from var(--panel-bg-color) calc(l - 60) c h);
+    --grey80: lch(from var(--panel-bg-color) calc(l - 80) c h);
+
+    --action-button-color: var(--mz-accent-color);
+    --in-copy-link-text-color: var(--mz-accent-color);
+    --color-enabled: var(--mz-accent-color);
+
+    --text-color-primary: var(--firefox-popup_text, black);
+    --text-color-headline: lch(from var(--text-color-primary) calc(l - 10) c h);
+    --text-secondary-color: lch(
+      from var(--text-color-primary) calc(l - 20) c h
+    );
     --text-color-invert: #ffffff;
     --border-color: lch(from var(--panel-bg-color) calc(l - 15) c h / 0.3);
     --button-ghost-bg-color: var(--grey50);
     --input-border: #8f8f9d;
     --secondary-btn-color: var(--action-button-color);
-    --text-secondary-color: var(--grey40);
   }
 }

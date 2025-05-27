@@ -79,8 +79,8 @@ export class ContextTable extends LitElement {
     ${settingTypo}
 
     .tableHolder {
-      background: lch(from var(--panel-bg-color) calc(l + 5) c h);
-      border: 1px solid var(--settings-border-color);
+      background: var(--grey5);
+      border: 1px solid var(--grey20);
       border-radius: 8px;
       display: flex;
       flex-direction: column;
@@ -95,11 +95,11 @@ export class ContextTable extends LitElement {
 
     .tableHeader th {
       padding-inline: 32px;
-      // border-bottom: 1px solid var(--settings-border-color);
+      // border-bottom: 1px solid var(--grey20);
     }
 
     tr {
-      border-bottom: 1px solid var(--settings-border-color);
+      border-bottom: 1px solid var(--grey20);
     }
 
     tr:last-of-type {
