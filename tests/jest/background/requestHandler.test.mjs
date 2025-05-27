@@ -71,19 +71,52 @@ describe("RequestHandler", () => {
         extState,
         currentExitRelays
       );
-      expect(res).toBe(currentExitRelays);
+      expect(res).toStrictEqual({ type: "direct" });
 
       const res2 = RequestHandler.toDefaultProxyInfo(
         browserSetting,
         {
           ...extState,
-          useExitRelays: false,
+          useExitRelays: true,
+          enabled: true,
+          state: "Enabled",
         },
         currentExitRelays
       );
-      expect(res2).toStrictEqual({
-        type: "direct",
-      });
+      expect(res2).toBe(currentExitRelays);
+    });
+    test("If VPN is disabled and a Firefox proxy is set, it uses the browser proxy", () => {
+      const browserProxy = {
+        proxyType: "manual",
+        http: "proxy.example.com:8080",
+        ssl: "proxy.example.com:8080",
+      };
+      const disabledState = {
+        ...extState,
+        enabled: false,
+        useExitRelays: false,
+        state: "Disabled",
+      };
+      const res = RequestHandler.toDefaultProxyInfo(
+        browserProxy,
+        disabledState,
+        currentExitRelays
+      );
+      expect(res).toBe(browserProxy);
+    });
+    test("If VPN is disabled and no Firefox proxy is set, it uses direct", () => {
+      const disabledState = {
+        ...extState,
+        enabled: false,
+        useExitRelays: false,
+        state: "Disabled",
+      };
+      const res = RequestHandler.toDefaultProxyInfo(
+        null,
+        disabledState,
+        currentExitRelays
+      );
+      expect(res).toStrictEqual({ type: "direct" });
     });
   });
 });
