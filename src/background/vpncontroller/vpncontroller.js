@@ -181,15 +181,28 @@ export class VPNController extends Component {
     }
     switch (response.t) {
       case "servers":
-        this.#mServers.set(response.servers.countries);
+        if (
+          !Utils.deepEquals(response.servers.countries, this.#mServers.value)
+        ) {
+          this.#mServers.set(response.servers.countries);
+        }
         break;
       case "disabled_apps":
-        this.#mSplitTunnledApps.set(response["disabled_apps"]);
+        if (
+          !Utils.deepEquals(
+            response.disabled_apps,
+            this.#mSplitTunnledApps.value
+          )
+        ) {
+          this.#mSplitTunnledApps.set(response.disabled_apps);
+        }
         break;
       case "status":
         const newStatus = fromVPNStatusResponse(response, this.#mServers.value);
         if (newStatus) {
-          this.#mState.set(newStatus);
+          if (!Utils.deepEquals(newStatus, this.#mState.value)) {
+            this.#mState.set(newStatus);
+          }
           // Let's increase the network key isolation at any vpn status change.
           this.#increaseIsolationKey();
         }
@@ -215,7 +228,9 @@ export class VPNController extends Component {
             settings[k] = response.settings[k];
           }
         });
-        this.#settings.set(settings);
+        if (!Utils.deepEquals(settings, this.#settings.value)) {
+          this.#settings.set(settings);
+        }
         break;
       default:
         console.debug("Unexpected Message type: " + response.t);
