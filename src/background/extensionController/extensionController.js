@@ -28,6 +28,8 @@ export class ExtensionController extends Component {
     state: PropertyType.Bindable,
     toggleConnectivity: PropertyType.Function,
     allowDisconnect: PropertyType.Bindable,
+    toggleAutoConnect: PropertyType.Function,
+    autoConnect: PropertyType.Bindable,
   };
 
   /**
@@ -47,6 +49,27 @@ export class ExtensionController extends Component {
   clientState;
 
   async init() {
+    const blob = await browser.storage.local.get(this.autoStartStorageKey);
+    this.autoConnect.value = blob[this.autoStartStorageKey] || false;
+
+    this.autoConnect.subscribe((newValue) => {
+      const blob = {};
+      blob[this.autoStartStorageKey] = newValue;
+      browser.storage.local.set(blob);
+    });
+
+    // If autoconnect is on but the client is not alive, start it.
+    if (
+      (await this.shouldAutoConnect()) &&
+      !this.vpnController.state.value.alive
+    ) {
+      this.vpnController.postToApp("start", { minimized: true });
+      for await (const vpnstate of this.vpnController.state) {
+        if (vpnstate.alive) {
+          break;
+        }
+      }
+    }
     // First await the inital state.
     this.mState.value = await ExtensionController.getInitalState(
       this.vpnController.state
@@ -55,6 +78,10 @@ export class ExtensionController extends Component {
     this.vpnController.state.subscribe(
       this.handleUnexpectedClientStateChanges.bind(this)
     );
+
+    if (await this.shouldAutoConnect()) {
+      this.toggleConnectivity();
+    }
   }
 
   async toggleConnectivity() {
@@ -205,6 +232,15 @@ export class ExtensionController extends Component {
       }
     }
   }
+  autoStartStorageKey = "autostart";
+  toggleAutoConnect() {
+    this.autoConnect.value = !this.autoConnect.value;
+  }
+
+  async shouldAutoConnect() {
+    return this.autoConnect.value;
+  }
+  autoConnect = property(false);
 
   mState = property(new FirefoxVPNState());
   #mAllowDisconnect = property(false);
