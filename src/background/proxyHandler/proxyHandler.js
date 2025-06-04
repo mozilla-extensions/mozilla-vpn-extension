@@ -64,6 +64,24 @@ export class ProxyHandler extends Component {
         this.#mLocalProxyInfo.value = [];
       }
     });
+
+    const applyValidBrowserProxy = (setting) => {
+      if (ProxyUtils.browserProxySettingIsValid(setting.value)) {
+        this.#browserProxySettings.set(setting.value);
+        return;
+      }
+      this.#browserProxySettings.set(null);
+    };
+    // Listen to browser proxy settings changes
+    browser.proxy.settings.get({}).then(applyValidBrowserProxy);
+    browser.proxy.settings.onChange.addListener(applyValidBrowserProxy);
+    // Every 10 Minutes Check poll the proxy settings
+    // As browser.proxy.settings.onChange does not seem
+    // to notify us if the user Changes the setting,
+    // just another extension would...
+    setInterval(() => {
+      browser.proxy.settings.get().then(applyValidBrowserProxy);
+    }, 600000);
   }
 
   /** @type {VPNState | undefined} */
@@ -76,6 +94,7 @@ export class ProxyHandler extends Component {
   #mProxyMap = property(new Map());
   #mLocalProxyInfo = property([]);
   #mCurrentExitRelays = property([]);
+  #browserProxySettings = property(null);
   #mPlatformOs = "unknown";
 
   /** @type {IBindable<Map<String, SiteContext>>} */
@@ -99,6 +118,16 @@ export class ProxyHandler extends Component {
    * */
   get proxyMap() {
     return this.#mProxyMap.readOnly;
+  }
+
+  /**
+   * Returns an Object containing proxy information
+   *
+   * Is empty if the user has not set a proxy
+   * or the proxy is invalid.
+   */
+  get browserProxySettings() {
+    return this.#browserProxySettings.readOnly;
   }
 
   /**
@@ -171,13 +200,19 @@ export class ProxyHandler extends Component {
     const result = new Map();
     newProxyMap.forEach((ctx, origin) => {
       if (ctx.excluded) {
+        if (this.#browserProxySettings.value) {
+          // If the user has set a proxy, we need to use it
+          // instead of the local proxy.
+          result.set(origin, this.#browserProxySettings.value);
+          return;
+        }
         result.set(origin, [...this.#mLocalProxyInfo.value]);
-      } else {
-        result.set(
-          origin,
-          ProxyUtils.getProxies(ctx.countryCode, ctx.cityCode, servers)
-        );
+        return;
       }
+      result.set(
+        origin,
+        ProxyUtils.getProxies(ctx.countryCode, ctx.cityCode, servers)
+      );
     });
     this.#mProxyMap.value = result;
     return result;

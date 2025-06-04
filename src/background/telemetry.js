@@ -137,7 +137,7 @@ export class Telemetry extends Component {
   static evaluateSiteContexts(contextMap) {
     let v;
     try {
-      v = contextMap.values();
+      v = Array.from(contextMap.values());
     } catch (error) {
       v = Object.values(contextMap);
     }
