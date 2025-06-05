@@ -65,7 +65,7 @@ export class ButterBar extends LitElement {
     ${ghostButtonStyles}
     .butter-bar {
       margin-block-end: 16px;
-      background: var(--grey10);
+      background: lch(from var(--firefox-popup) calc(l - 10) c h);
       border-radius: 4px;
       display: flex;
       flex-direction: row;
@@ -117,10 +117,6 @@ export class ButterBar extends LitElement {
     }
 
     @media (prefers-color-scheme: dark) {
-      .butter-bar {
-        background: rgba(255, 255, 255, 0.02);
-      }
-
       a:hover {
         opacity: 0.7;
         color: #ffffff;
