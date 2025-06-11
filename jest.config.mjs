@@ -12,4 +12,5 @@ export default {
     "!**/vendor/**",
   ],
   collectCoverage: true,
+  reporters: ["<rootDir>/tests/reporter.js"],
 };

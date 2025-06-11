@@ -175,20 +175,18 @@ export class RequestHandler extends Component {
    * @returns {Array<browser.proxy.proxyInfo>} The default proxy information.
    */
   static toDefaultProxyInfo(browserProxySettings, extState, relays) {
-    if (
-      extState?.useExitRelays ||
-      ProxyUtils.browserProxySettingIsValid(browserProxySettings?.value)
-    ) {
-      return relays;
-    } else {
+    if (extState.enabled) {
+      if (extState?.useExitRelays) {
+        return relays;
+      }
       return ProxyUtils.getDirectProxyInfoObject();
     }
-    // The VPN for Firefox is disabled, check if the browser proxy is set
+
+    // If a browser proxy is valid, use it
     if (browserProxySettings) {
-      // If the browser proxy is valid, use it
       return browserProxySettings;
     }
-    // If VPN is disabled (including bypassTunnel=true), use browser proxy if set, otherwise direct
+    // We might need to use the bypass Proxy.
     if (extState.bypassTunnel) {
       return bypassProxy;
     }
