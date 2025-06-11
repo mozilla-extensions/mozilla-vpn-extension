@@ -10,11 +10,22 @@ import {
   FirefoxVPNState,
 } from "./extensionController/index.js";
 import { ProxyHandler, ProxyUtils } from "./proxyHandler/index.js";
-import { propertySum, property } from "../shared/property.js";
+import { propertySum, property, IBindable } from "../shared/property.js";
 
 const log = Logger.logger("RequestHandler");
 /**
- * Handles request interception, inspection, and determines whether a request should be proxied.
+ * Handles request interception, inspection, and determines whether and where a request should be proxied.
+ *
+ * It interacts with the following Objects:
+ * @param {ExtensionController} extController Determines the Default Route
+ * -> i.e if we're off for Firefox and there is no rule -> Local Proxy will be used
+ * -> i.e if we're on for Firefox and there is no rule -> Default Endpoint Proxy will be used.
+ * @param {ProxyHandler} proxyHandler -> Determines the Per-Site Rule:
+ * The Proxy Handler stores a map of Map<eTLD+1 ,(LocationProxy|LocalProxy)>
+ * For every request we will check that.
+ *
+ * @param {webRequest.RequestFilter} filter -> Determines What Requests to handle.
+ * We use this to make sure we can have a split between Private-Browsing and non PBM sessions.
  *
  */
 export class RequestHandler extends Component {
@@ -110,16 +121,38 @@ export class RequestHandler extends Component {
     );
   }
 
-  static selectProxy(requestInfo, proxyMap, defaultProxy) {
+  /**
+   * Handles a web request and determines the appropriate proxy server.
+   *
+   * For every Web-Request: We take the documentUrl, which is the Document the resource
+   * will be loaded into. If that is not available we will consider just the resource URL.
+   *
+   * We then get the eTLD+1 for this and check if there is a matching
+   * site rule and apply it.
+   *
+   * If there is no site rule this will return the proxy
+   * passed into {defaultProxy}
+   *
+   *
+   * @param {proxy.RequestDetails} requestInfo - The details of the web request.
+   * @param {object} extensionState - The extension's state.
+   * @param {Map} proxyMap - The map of proxy information.
+   * @param {Array} bypassProxy - The bypass proxy information.
+   * @param {Array} defaultProxy - The default proxy information.
+   * @returns {browser.proxy.proxyInfo | null} The proxy information to use, or null if no proxy is needed.
+   */
+  static selectProxy(
+    requestInfo,
+    extensionState,
+    proxyMap,
+    bypassProxy,
+    defaultProxy
+  ) {
+    if (extensionState.bypassTunnel) {
+      return bypassProxy;
+    }
+
     let { documentUrl, url } = requestInfo;
-    // If we load an iframe request the top level document.
-    // if (requestInfo.frameId !== 0) {
-    //   let topLevelFrame = await browser.webNavigation.getFrame({
-    //     frameId: requestInfo.parentFrameId,
-    //     tabId: requestInfo.tabId,
-    //   });
-    //   documentUrl = topLevelFrame.url;
-    // }
 
     for (let urlString of [documentUrl, url]) {
       if (urlString) {
@@ -134,26 +167,26 @@ export class RequestHandler extends Component {
     return defaultProxy;
   }
 
-  static toDefaultProxyInfo(
-    browserProxySettings,
-    extState,
-    relays,
-    bypassProxy
-  ) {
-    // If the VPN is enabled for Firefox, either use the exit relays or the direct connection.
-    if (extState?.enabled) {
+  /**
+   * Determines the default proxy information based on extension state and browser settings.
+   * @param {IBindable<browser.proxy.proxyInfo>} browserProxySettings - The browser's proxy settings.
+   * @param {FirefoxVPNState} extState - The extension's state.
+   * @param {Array<browser.proxy.proxyInfo>} relays - The relay proxy information.
+   * @returns {Array<browser.proxy.proxyInfo>} The default proxy information.
+   */
+  static toDefaultProxyInfo(browserProxySettings, extState, relays) {
+    if (extState.enabled) {
       if (extState?.useExitRelays) {
-        // If useExitRelays is enabled, use the relays
         return relays;
       }
       return ProxyUtils.getDirectProxyInfoObject();
     }
-    // The VPN for Firefox is disabled, check if the browser proxy is set
+
+    // If a browser proxy is valid, use it
     if (browserProxySettings) {
-      // If the browser proxy is valid, use it
       return browserProxySettings;
     }
-    // If VPN is disabled (including bypassTunnel=true), use browser proxy if set, otherwise direct
+    // We might need to use the bypass Proxy.
     if (extState.bypassTunnel) {
       return bypassProxy;
     }

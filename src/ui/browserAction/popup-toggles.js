@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import { html, css, LitElement, until } from "../../vendor/lit-all.min.js";
 
-import { extPBMController, telemetry } from "./backend.js";
+import { extPBMController, telemetry, extNormalController } from "./backend.js";
 
 import {
   fontStyling,
@@ -27,6 +27,16 @@ export class PopupToggles extends LitElement {
     {
       prefix: html` <hr />
         <h3 class="headline">${tr("headlineAutoConnectOptions")}</h3>`,
+      checked: extNormalController.autoConnect,
+      canClick: Promise.resolve(true),
+      onClick: () => {
+        extNormalController.toggleAutoConnect();
+      },
+      description: html`
+        <p class="control-checkbox-body">${tr("labelDescribeAutoStart")}</p>
+      `,
+    },
+    {
       canClick: browser.extension.isAllowedIncognitoAccess(),
       checked: extPBMController.autoConnect,
       onClick: () => {
@@ -110,7 +120,7 @@ export class PopupToggles extends LitElement {
       font-family: var(--font-family);
     }
     .control {
-      padding: 15px 8px 5px 1px;
+      padding: 5px 5px 2.5px 0px;
       margin: 0px 24px;
       display: flex;
       flex-direction: row;
