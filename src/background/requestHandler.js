@@ -172,9 +172,15 @@ export class RequestHandler extends Component {
    * @param {IBindable<browser.proxy.proxyInfo>} browserProxySettings - The browser's proxy settings.
    * @param {FirefoxVPNState} extState - The extension's state.
    * @param {Array<browser.proxy.proxyInfo>} relays - The relay proxy information.
+   * @param {Array<browser.proxy.proxyInfo>} bypassProxy - The bypass proxy information.
    * @returns {Array<browser.proxy.proxyInfo>} The default proxy information.
    */
-  static toDefaultProxyInfo(browserProxySettings, extState, relays) {
+  static toDefaultProxyInfo(
+    browserProxySettings,
+    extState,
+    relays,
+    bypassProxy
+  ) {
     if (extState.enabled) {
       if (extState?.useExitRelays) {
         return relays;

@@ -118,5 +118,24 @@ describe("RequestHandler", () => {
       );
       expect(res).toStrictEqual({ type: "direct" });
     });
+    test("If VPN is disabled, no browser proxy is set, and bypassTunnel is true, it uses bypassProxy", () => {
+      const bypassProxyInfo = [
+        { type: "http", host: "bypass.example.com", port: 8080 },
+      ];
+      const disabledStateWithBypass = {
+        ...extState,
+        enabled: false,
+        state: "Disabled",
+        bypassTunnel: true,
+        useExitRelays: false,
+      };
+      const res = RequestHandler.toDefaultProxyInfo(
+        null, // No browser proxy
+        disabledStateWithBypass,
+        currentExitRelays,
+        bypassProxyInfo
+      );
+      expect(res).toBe(bypassProxyInfo);
+    });
   });
 });
