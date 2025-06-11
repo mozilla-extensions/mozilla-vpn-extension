@@ -141,17 +141,7 @@ export class RequestHandler extends Component {
    * @param {Array} defaultProxy - The default proxy information.
    * @returns {browser.proxy.proxyInfo | null} The proxy information to use, or null if no proxy is needed.
    */
-  static selectProxy(
-    requestInfo,
-    extensionState,
-    proxyMap,
-    bypassProxy,
-    defaultProxy
-  ) {
-    if (extensionState.bypassTunnel) {
-      return bypassProxy;
-    }
-
+  static selectProxy(requestInfo, proxyMap, defaultProxy) {
     let { documentUrl, url } = requestInfo;
 
     for (let urlString of [documentUrl, url]) {
