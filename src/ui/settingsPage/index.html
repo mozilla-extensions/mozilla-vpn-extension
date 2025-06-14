@@ -11,6 +11,7 @@
       http-equiv="content-security-policy"
       content="script-src 'self';img-src 'self'; font-src 'self'; connect-src 'none'; media-src 'none'; object-src 'none'; prefetch-src 'none'; child-src 'none'; frame-src 'none'; worker-src 'none';"
     />
+    <meta name="color-scheme" content="light only" />
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" href="../variables.css" />
     <title></title>
@@ -18,16 +19,106 @@
 
     <script src="settingsPage.js" type="module"></script>
     <style>
+      /**
+      * We cannot pull theme data in a content window. 
+      * Even though a theme set's firefoxes dark/light mode
+      * it does not have to set that for content pages. 
+      * So a light theme might be used but if the system is in darkmode
+      * this page will render with darkmode. 
+      * this obviously breaks all color calculation.
+      * So let's pin firefox dark/light theme and base calculation on that.
+      **/
+      @media (prefers-color-scheme: light) {
+        :root {
+          --firefox-frame: rgb(234, 234, 237);
+          --firefox-frame_inactive: rgb(240, 240, 244);
+          --firefox-icons: rgb(91, 91, 102);
+          --firefox-ntp_background: #f9f9fb;
+          --firefox-ntp_text: rgb(21, 20, 26);
+          --firefox-popup: #fff;
+          --firefox-popup_border: rgb(240, 240, 244);
+          --firefox-popup_highlight: #e0e0e6;
+          --firefox-popup_highlight_text: #15141a;
+          --firefox-popup_text: rgb(21, 20, 26);
+          --firefox-sidebar: rgb(255, 255, 255);
+          --firefox-sidebar_border: rgba(21, 20, 26, 0.1);
+          --firefox-sidebar_text: rgb(21, 20, 26);
+          --firefox-tab_background_text: rgb(21, 20, 26);
+          --firefox-tab_line: transparent;
+          --firefox-tab_selected: #fff;
+          --firefox-tab_text: rgb(21, 20, 26);
+          --firefox-toolbar: #f9f9fb;
+          --firefox-toolbar_bottom_separator: rgba(21, 20, 26, 0.1);
+          --firefox-toolbar_field: rgba(0, 0, 0, 0.05);
+          --firefox-toolbar_field_border: transparent;
+          --firefox-toolbar_field_focus: white;
+          --firefox-toolbar_field_text: rgb(21, 20, 26);
+          --firefox-toolbar_text: rgb(21, 20, 26);
+          --firefox-toolbar_top_separator: transparent;
+          --firefox-popup_action_color: rgb(91, 91, 102);
+          --firefox-button: rgba(207, 207, 216, 0.33);
+          --firefox-button_hover: rgba(207, 207, 216, 0.66);
+          --firefox-button_active: rgb(207, 207, 216);
+          --firefox-button_primary: rgb(0, 97, 224);
+          --firefox-button_primary_hover: rgb(2, 80, 187);
+          --firefox-button_primary_active: rgb(5, 62, 148);
+          --firefox-button_primary_color: rgb(251, 251, 254);
+          --firefox-input_color: rgb(21, 20, 26);
+          --firefox-input_background: rgb(255, 255, 255);
+          --firefox-urlbar_popup_hover: rgb(240, 240, 244);
+          --firefox-urlbar_popup_separator: rgb(240, 240, 244);
+        }
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --firefox-frame: rgb(28, 27, 34);
+          --firefox-frame_inactive: rgb(31, 30, 37);
+          --firefox-icons: rgb(251, 251, 254);
+          --firefox-ntp_background: rgb(43, 42, 51);
+          --firefox-ntp_text: rgb(251, 251, 254);
+          --firefox-popup: rgb(66, 65, 77);
+          --firefox-popup_border: rgb(82, 82, 94);
+          --firefox-popup_highlight: rgb(43, 42, 51);
+          --firefox-popup_highlight_text: #15141a;
+          --firefox-popup_text: rgb(251, 251, 254);
+          --firefox-sidebar: rgb(28, 27, 34);
+          --firefox-sidebar_border: rgba(251, 251, 254, 0.1);
+          --firefox-sidebar_text: rgb(249, 249, 250);
+          --firefox-tab_background_text: #fbfbfe;
+          --firefox-tab_line: transparent;
+          --firefox-tab_selected: rgba(106, 106, 120, 0.7);
+          --firefox-tab_text: rgb(255, 255, 255);
+          --firefox-toolbar: rgb(43, 42, 51);
+          --firefox-toolbar_bottom_separator: rgba(251, 251, 254, 0.1);
+          --firefox-toolbar_field: rgba(0, 0, 0, 0.3);
+          --firefox-toolbar_field_border: transparent;
+          --firefox-toolbar_field_focus: rgb(66, 65, 77);
+          --firefox-toolbar_field_text: rgb(251, 251, 254);
+          --firefox-toolbar_text: rgb(251, 251, 254);
+          --firefox-toolbar_top_separator: transparent;
+          --firefox-popup_action_color: rgb(91, 91, 102);
+          --firefox-button: rgba(0, 0, 0, 0.33);
+          --firefox-button_hover: rgba(207, 207, 216, 0.2);
+          --firefox-button_active: rgba(207, 207, 216, 0.4);
+          --firefox-button_primary: rgb(0, 221, 255);
+          --firefox-button_primary_hover: rgb(128, 235, 255);
+          --firefox-button_primary_active: rgb(170, 242, 255);
+          --firefox-button_primary_color: rgb(43, 42, 51);
+          --firefox-input_color: rgb(251, 251, 254);
+          --firefox-input_background: #42414d;
+          --firefox-urlbar_popup_hover: rgb(240, 240, 244);
+          --firefox-urlbar_popup_separator: rgb(82, 82, 94);
+          --firefox-ntp_card_background: rgb(66, 65, 77);
+        }
+      }
       body {
         margin: 0;
         padding: 0;
-        background-color: var(--panel-bg-color);
+        background-color: lch(from var(--panel-bg-color) 50 c h);
       }
     </style>
   </head>
   <body>
-    <firefox-theme></firefox-theme>
-
     <mz-settingspage></mz-settingspage>
   </body>
 </html>
