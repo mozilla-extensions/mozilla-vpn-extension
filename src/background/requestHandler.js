@@ -141,17 +141,7 @@ export class RequestHandler extends Component {
    * @param {Array} defaultProxy - The default proxy information.
    * @returns {browser.proxy.proxyInfo | null} The proxy information to use, or null if no proxy is needed.
    */
-  static selectProxy(
-    requestInfo,
-    extensionState,
-    proxyMap,
-    bypassProxy,
-    defaultProxy
-  ) {
-    if (extensionState.bypassTunnel) {
-      return bypassProxy;
-    }
-
+  static selectProxy(requestInfo, proxyMap, defaultProxy) {
     let { documentUrl, url } = requestInfo;
 
     for (let urlString of [documentUrl, url]) {
@@ -172,9 +162,15 @@ export class RequestHandler extends Component {
    * @param {IBindable<browser.proxy.proxyInfo>} browserProxySettings - The browser's proxy settings.
    * @param {FirefoxVPNState} extState - The extension's state.
    * @param {Array<browser.proxy.proxyInfo>} relays - The relay proxy information.
+   * @param {Array<browser.proxy.proxyInfo>} bypassProxy - The bypass proxy information.
    * @returns {Array<browser.proxy.proxyInfo>} The default proxy information.
    */
-  static toDefaultProxyInfo(browserProxySettings, extState, relays) {
+  static toDefaultProxyInfo(
+    browserProxySettings,
+    extState,
+    relays,
+    bypassProxy
+  ) {
     if (extState.enabled) {
       if (extState?.useExitRelays) {
         return relays;
