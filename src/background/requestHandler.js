@@ -77,7 +77,7 @@ export class RequestHandler extends Component {
       return this.removeRequestListener();
     }
 
-    if (this.proxyMap.value.size > 0) {
+    if (this.proxyMap?.size > 0) {
       return this.addRequestListener();
     }
   }
