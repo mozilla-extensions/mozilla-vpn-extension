@@ -626,6 +626,7 @@ export class BrowserActionPopup extends LitElement {
       height: 20px;
       border: 1px solid var(--border-color);
       background-color: var(--panel-bg-color);
+      accent-color: var(--mz-accent-color);
     }
 
     input + p {
@@ -678,7 +679,7 @@ export class BrowserActionPopup extends LitElement {
       background: lch(from var(--action-button-color) l c h / 0);
       padding-left: 48px;
       position: relative;
-      color: var(--grey50);
+      color: var(--text-color-primary);
       outline: none;
       border: 2px solid transparent;
       margin: 0;

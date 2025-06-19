@@ -75,7 +75,7 @@ export class PopupPlaceHolder extends LitElement {
     }
     .box {
       border-radius: 8px;
-      background: lch(from var(--panel-bg-color) calc(l + 5) c h);
+      background: var(--grey5);
       display: flex;
       align-items: center;
       justify-content: space-between;

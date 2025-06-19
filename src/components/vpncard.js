@@ -254,7 +254,7 @@ export class VPNCard extends LitElement {
       `;
     }
     return html`
-      <svg ${ref(shieldRef)}>
+      <svg ${ref(shieldRef)} class="globe-shield">
         <use xlink:href="../../assets/img/globe-shield-on.svg#globe"></use>
       </svg>
     `;
@@ -270,13 +270,13 @@ export class VPNCard extends LitElement {
     }
     .box {
       border-radius: 8px;
-      background: lch(from var(--panel-bg-color) calc(l + 5) c h);
+      background: var(--grey5);
       box-shadow: var(--box-shadow-off);
     }
 
     .box.on,
     .box.connecting {
-      background: var(--main-card-background);
+      background: var(--mz-card-background);
       box-shadow: var(--box-shadow-on);
     }
 
@@ -287,6 +287,9 @@ export class VPNCard extends LitElement {
     .box.connecting.allowDisconnect mz-pill {
       pointer-events: all;
       opacity: 1;
+    }
+    .globe-shield {
+      mix-blend-mode: screen;
     }
     main,
     footer {
@@ -318,7 +321,7 @@ export class VPNCard extends LitElement {
     }
     .box.on *,
     .box.connecting * {
-      color: var(--main-card-text-color);
+      color: var(--mz-card-text-color);
     }
     .box.unstable {
       --shield-color: var(--color-warning);
@@ -407,7 +410,6 @@ export class VPNCard extends LitElement {
     }
     @media (prefers-color-scheme: dark) {
       .box {
-        background: lch(from var(--panel-bg-color) calc(l - 10) c h);
         --shield-color: var(--color-warning);
       }
     }

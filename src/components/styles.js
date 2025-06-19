@@ -242,20 +242,16 @@ export const inUseLabel = css`
     font-weight: bold;
     margin: 0px 10px;
     padding: 6px 10px;
-    background: var(--main-card--pill-background);
+    background: lch(from var(--toolbar-icon-bg-color) l c h);
+    color: lch(from var(--toolbar-icon-bg-color) calc(mod(l - 60, 100)) c h);
     opacity: 0.9;
     border-radius: 6px;
     line-height: inherit;
   }
-
-  .in-use-light {
-    background-color: #e7e7e7;
-  }
-
   @media (prefers-color-scheme: dark) {
     .in-use {
-      background: var(--action-button-color);
-      color: var(--text-color-invert);
+      background: var(--toolbar-icon-bg-color);
+      color: lch(from var(--toolbar-icon-bg-color) 10 c h);
     }
   }
 `;

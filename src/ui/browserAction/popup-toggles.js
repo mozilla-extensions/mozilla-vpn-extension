@@ -147,7 +147,7 @@ export class PopupToggles extends LitElement {
       margin-inline-start: 18px;
     }
     hr {
-      color: var(--divider-color);
+      color: var(--grey10);
       width: 60%;
       align-self: center;
       margin: 12px 30px;
