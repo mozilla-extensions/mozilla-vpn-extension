@@ -178,6 +178,9 @@ export class RequestHandler extends Component {
       if (extState?.useExitRelays) {
         return relays;
       }
+      if (ProxyUtils.browserProxySettingIsValid(browserProxySettings)) {
+        return relays;
+      }
       return ProxyUtils.getDirectProxyInfoObject();
     }
 
