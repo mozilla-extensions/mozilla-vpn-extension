@@ -98,12 +98,6 @@ export class WritableProperty extends IBindable {
    * @param {T} value
    */
   set(value) {
-    if (value === this.#innerValue) {
-      console.trace("Wasting set() call, value is the same as current value", {
-        current: this.#innerValue,
-        new: value,
-      });
-    }
     this.#innerValue = value;
     Object.freeze(value);
     Object.seal(value);
