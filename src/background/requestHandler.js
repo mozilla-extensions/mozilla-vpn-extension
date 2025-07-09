@@ -88,6 +88,9 @@ export class RequestHandler extends Component {
       return;
     }
     this.#requestListener = (requestInfo) => {
+      if (!this.extState.enabled) {
+        return this.defaultProxyInfo.value;
+      }
       return RequestHandler.selectProxy(
         requestInfo,
         this.proxyMap,
@@ -175,11 +178,14 @@ export class RequestHandler extends Component {
       if (extState?.useExitRelays) {
         return relays;
       }
+      if (ProxyUtils.browserProxySettingIsValid(browserProxySettings)) {
+        return relays;
+      }
       return ProxyUtils.getDirectProxyInfoObject();
     }
 
     // If a browser proxy is valid, use it
-    if (browserProxySettings) {
+    if (ProxyUtils.browserProxySettingIsValid(browserProxySettings)) {
       return browserProxySettings;
     }
     // We might need to use the bypass Proxy.

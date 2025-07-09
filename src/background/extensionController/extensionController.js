@@ -104,7 +104,8 @@ export class ExtensionController extends Component {
       // If we deactivate, they will re-activate and then just create
       // work that is uneeded.
       // this.vpnController.postToApp("deactivate");
-      this.mState.set(new StateFirefoxVPNDisabled(true));
+      const needsLocalProxy = this.clientState.state != "OnPartial";
+      this.mState.set(new StateFirefoxVPNDisabled(needsLocalProxy));
       return;
     }
     // In any case the user wants to activate.

@@ -75,4 +75,52 @@ describe("ProxyUtils", () => {
       expect(result).toBeNull();
     });
   });
+
+  describe("browserProxySettingIsValid", () => {
+    const cases = [
+      [
+        "manual, valid http",
+        { proxyType: "manual", http: "http://example.com:8080" },
+        true,
+      ],
+      [
+        "manual, valid https",
+        { proxyType: "manual", https: "https://example.com:443" },
+        true,
+      ],
+      [
+        "manual, valid socks",
+        { proxyType: "manual", socks: "socks://example.com:1080" },
+        true,
+      ],
+      [
+        "manual, all invalid",
+        { proxyType: "manual", http: "not-a-url", https: "", socks: null },
+        false,
+      ],
+      ["manual, all missing", { proxyType: "manual" }, false],
+      [
+        "autoConfig, valid url",
+        {
+          proxyType: "autoConfig",
+          autoConfigUrl: "http://pac.example.com/proxy.pac",
+        },
+        true,
+      ],
+      [
+        "autoConfig, invalid url",
+        { proxyType: "autoConfig", autoConfigUrl: "not-a-url" },
+        false,
+      ],
+      ["autoConfig, missing url", { proxyType: "autoConfig" }, false],
+      ["none", { proxyType: "none" }, false],
+      ["system", { proxyType: "system" }, false],
+      ["autoDetect", { proxyType: "autoDetect" }, false],
+      ["undefined", undefined, false],
+      ["null", null, false],
+    ];
+    test.each(cases)("%s", (_desc, input, expected) => {
+      expect(ProxyUtils.browserProxySettingIsValid(input)).toBe(expected);
+    });
+  });
 });

@@ -16,20 +16,44 @@ export const ProxyUtils = {
     return { type: "direct" };
   },
 
+  /**
+   * Checks if a given browser proxy setting is valid.
+   *
+   * @param {BrowserSettingValue} settingValue - The proxy settings object as defined by the
+   *   WebExtensions API.
+   * @returns {boolean} True if the setting is valid and contains a usable proxy configuration, false otherwise.
+   */
   browserProxySettingIsValid(settingValue) {
     if (!settingValue) {
       return false;
     }
-    return (
-      settingValue?.proxyType != "none" &&
-      !(
-        settingValue?.autoConfigUrl == undefined &&
-        settingValue?.http == undefined &&
-        settingValue?.socks == undefined
-      )
-    );
+    if (settingValue.proxyType === "none") {
+      return false;
+    }
+    if (settingValue.proxyType === "manual") {
+      // At least one of http, https, or socks must be a valid URL
+      return [settingValue.http, settingValue.https, settingValue.socks].some(
+        (value) => {
+          if (typeof value !== "string" || !value) {
+            return false;
+          }
+          return URL.canParse(value);
+        }
+      );
+    }
+    if (settingValue.proxyType === "autoConfig") {
+      // autoConfigUrl must be a valid URL
+      if (
+        typeof settingValue.autoConfigUrl !== "string" ||
+        !settingValue.autoConfigUrl
+      ) {
+        return false;
+      }
+      return URL.canParse(settingValue.autoConfigUrl);
+    }
+    // For other types (system, autoDetect), treat as not valid for proxy URLs
+    return false;
   },
-
   /**
    * Finds the servers available for provided location, orders them by weight,
    * and returns an array of proxyInfo objects.
@@ -73,3 +97,15 @@ export const ProxyUtils = {
     return { ...matches.groups };
   },
 };
+
+/**
+ * @typedef {Object} BrowserSettingValue
+ * @property {string} proxyType - The type of proxy to use. One of "none", "autoDetect", "system", "manual", or "autoConfig".
+ * @property {string} [autoConfigUrl] - The URL of the proxy auto-configuration (PAC) file to use (if proxyType is "autoConfig").
+ * @property {string} [http] - The HTTP proxy server to use (if proxyType is "manual").
+ * @property {string} [https] - The HTTPS proxy server to use (if proxyType is "manual").
+ * @property {string} [ftp] - The FTP proxy server to use (if proxyType is "manual").
+ * @property {string} [socks] - The SOCKS proxy server to use (if proxyType is "manual").
+ * @property {number} [socksVersion] - The version of the SOCKS protocol to use (4 or 5).
+ * @property {string[]} [passthrough] - A list of hostnames that will bypass the proxy.
+ */
