@@ -157,3 +157,30 @@ describe("propertySum", () => {
     expect(count).toBe(4);
   });
 });
+
+describe("property.propose", () => {
+  test("Does not notify listeners if value is unchanged", () => {
+    const prop = property(1);
+    let notified = false;
+    prop.subscribe(() => (notified = true));
+    prop.propose(1); // same value
+    expect(notified).toBe(false);
+  });
+
+  test("Notifies listeners if value changes", () => {
+    const prop = property(1);
+    let notified = false;
+    prop.subscribe(() => (notified = true));
+    prop.propose(2); // different value
+    expect(notified).toBe(true);
+    expect(prop.value).toBe(2);
+  });
+
+  test("Updates value only if different", () => {
+    const prop = property("a");
+    prop.propose("a");
+    expect(prop.value).toBe("a");
+    prop.propose("b");
+    expect(prop.value).toBe("b");
+  });
+});

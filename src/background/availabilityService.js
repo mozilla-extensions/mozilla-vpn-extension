@@ -44,11 +44,11 @@ export class AvailabilityService extends Component {
         .then((s) => s);
 
       const res = AvailabilityService.checkContent(htmlString);
-      this.isAvailable.set(res.available);
+      this.isAvailable.propose(res.available);
       if (res.waitlistURL) {
-        this.waitlistURL.set(res.waitlistURL);
+        this.waitlistURL.propose(res.waitlistURL);
       } else {
-        this.waitlistURL.set("");
+        this.waitlistURL.propose("");
       }
       return res;
     } catch (error) {

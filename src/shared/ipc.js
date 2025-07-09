@@ -568,7 +568,7 @@ export const createReplicaBindable = async (name, port) => {
       ...event.data,
     };
     if (message.name === name && message.type === ACTION_PUSH) {
-      internalProp.set(message.data);
+      internalProp.propose(message.data);
     }
   });
   return internalProp.readOnly;
