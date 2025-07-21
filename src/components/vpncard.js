@@ -385,7 +385,7 @@ export class VPNCard extends LitElement {
       color: var(--color-fatal-error);
     }
     .stack {
-      display: grid;
+      display: flex;
       grid-template-rows: 1fr;
       grid-template-columns: 1fr;
     }
