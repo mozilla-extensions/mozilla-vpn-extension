@@ -105,6 +105,16 @@ export class WritableProperty extends IBindable {
     this.__subscriptions.forEach((s) => s(value));
   }
   /**
+   * Proposes a new value, only sets the value if it is different from the current value.
+   * @param {T} value
+   */
+  propose(value) {
+    if (value === this.#innerValue) {
+      return;
+    }
+    this.set(value);
+  }
+  /**
    * Returns a bindable for the Property
    * @returns {ReadOnlyProperty<T>}
    */
@@ -193,7 +203,7 @@ export const property = (value) => {
 export const computed = (parent, transform) => {
   const inner = new WritableProperty(transform(parent.value));
   parent.subscribe((value) => {
-    inner.set(transform(value));
+    inner.propose(transform(value));
   });
   return inner.readOnly;
 };
@@ -226,7 +236,7 @@ export const propertySum = (transform, ...parent) => {
   };
   const inner = new WritableProperty(transform(...getValues()));
   const onUpdated = () => {
-    inner.set(transform(...getValues()));
+    inner.propose(transform(...getValues()));
   };
   parent.forEach((p) => {
     p.subscribe(onUpdated);
