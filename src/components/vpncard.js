@@ -385,13 +385,13 @@ export class VPNCard extends LitElement {
       color: var(--color-fatal-error);
     }
     .stack {
-      display: flex;
+      display: grid;
       grid-template-rows: 1fr;
       grid-template-columns: 1fr;
     }
     .stack > * {
       grid-row: 1 / 2;
-      grid-column: 1 / 2;
+      grid-column: 1 / 3;
     }
 
     svg {
