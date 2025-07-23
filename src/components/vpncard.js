@@ -391,7 +391,7 @@ export class VPNCard extends LitElement {
     }
     .stack > * {
       grid-row: 1 / 2;
-      grid-column: 1 / 2;
+      grid-column: 1 / 3;
     }
 
     svg {

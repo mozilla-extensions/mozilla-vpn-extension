@@ -71,7 +71,7 @@ export class ButterBar extends LitElement {
       flex-direction: row;
       justify-content: space-between;
       overflow: clip;
-      width: 320px;
+      width: 100%
       word-wrap: anywhere;
       box-sizing: border-box;
     }
