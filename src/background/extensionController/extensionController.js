@@ -78,9 +78,9 @@ export class ExtensionController extends Component {
     this.vpnController.state.subscribe(
       this.handleUnexpectedClientStateChanges.bind(this)
     );
-    // If we're on due to the fact, the vpn is on. 
+    // If we're on due to the fact, the vpn is on.
     // We don't need to check autoconnect
-    if(this.mState.value.enabled){
+    if (this.mState.value.enabled) {
       return;
     }
 
