@@ -47,17 +47,8 @@ export class Telemetry extends Component {
       if (state.enabled == this.#enabled) {
         return;
       }
-      this.record("fx_protection_mode_changed", {
-        message_state: state.name,
-      });
       this.#enabled = state.enabled;
       this.#enabled ? this.startSession() : this.stopSession();
-    });
-
-    proxyHandler.siteContexts.subscribe((ctxMap) => {
-      const counts = Telemetry.evaluateSiteContexts(ctxMap);
-      this.record("count_excluded", counts.excluded);
-      this.record("count_geoprefed", counts.geoPrefed);
     });
   }
   async init() {

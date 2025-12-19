@@ -154,9 +154,6 @@ export class BrowserActionPopup extends LitElement {
     requestIdleCallback(() => {
       vpnController.postToApp("interventions");
     });
-    requestIdleCallback(() => {
-      telemetry.record("main_screen");
-    });
   }
 
   get currentSiteContext() {
@@ -183,9 +180,6 @@ export class BrowserActionPopup extends LitElement {
     const handleVPNToggle = () => {
       if (!this.enabled) {
         telemetry.record("used_feature_disable_firefox_protection");
-        telemetry.record("fx_protection_disabled");
-      } else {
-        telemetry.record("fx_protection_enabled");
       }
       extController.toggleConnectivity();
     };
