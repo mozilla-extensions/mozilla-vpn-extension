@@ -152,8 +152,6 @@ defineMessageScreen({
 });
 
 // Need to start loop at 1 because of how the strings were added to l10n repo.
-// We need to stop the looop at NUMBER_OF_ONBOARDING_PAGES-1 -> as we want the Telemetry page to
-// be last and it has special logic.
 for (let i = 1; i <= NUMBER_OF_ONBOARDING_PAGES; i++) {
   const lastOnboardingPanel = i == NUMBER_OF_ONBOARDING_PAGES;
   const primaryActionText = lastOnboardingPanel ? tr("done") : tr("next");

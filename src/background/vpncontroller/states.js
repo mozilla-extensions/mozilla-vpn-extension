@@ -16,9 +16,6 @@ export const REQUEST_TYPES = [
   "deactivate",
   "focus",
   "openAuth",
-  "telemetry",
-  "session_start",
-  "session_stop",
   "interventions",
   "settings",
   "start",
@@ -237,9 +234,7 @@ export class vpnStatusResponse {
   };
 }
 
-export class VPNSettings {
-  extensionTelemetryEnabled = true;
-}
+export class VPNSettings {}
 
 export class BridgeResponse {
   /** @type {string|undefined} */

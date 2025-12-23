@@ -49,18 +49,6 @@ export const onboardingController = await getExposedObject(
 );
 export const butterBarService = await getExposedObject("ButterBarService");
 
-/**
- * Manually define the types for convinence, please update if making changes :)
- *
- * @typedef {Object} ipcTelemetry
- * @property {IBindable<bool>} telemetryEnabled - Is telemetry enabled?
- * @property {(bool)=>Promise<>} setTelemetryEnabled - request to set telemetry
- * @property {(string,any)=>Promise<>} record - record telemetry
- *
- */
-/** @type {ipcTelemetry} */
-export const telemetry = await getExposedObject("Telemetry");
-
 export const availabilityService = await getExposedObject(
   "AvailabilityService"
 );
