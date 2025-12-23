@@ -17,7 +17,6 @@ import {
   proxyHandler,
   extController,
   butterBarService,
-  telemetry,
 } from "./backend.js";
 
 import { Utils } from "../../shared/utils.js";
@@ -68,7 +67,6 @@ export class BrowserActionPopup extends LitElement {
     _siteContexts: { type: Array },
     allowDisconnect: { type: Boolean },
     alerts: { type: Array },
-    telemEnabled: { type: Boolean },
   };
 
   constructor() {
@@ -107,9 +105,6 @@ export class BrowserActionPopup extends LitElement {
     this.updatePage();
     extController.allowDisconnect.subscribe((s) => {
       this.allowDisconnect = s;
-    });
-    telemetry.telemetryEnabled.subscribe((s) => {
-      this.telemEnabled = s;
     });
   }
   updatePage() {
@@ -178,9 +173,6 @@ export class BrowserActionPopup extends LitElement {
 
   render() {
     const handleVPNToggle = () => {
-      if (!this.enabled) {
-        telemetry.record("used_feature_disable_firefox_protection");
-      }
       extController.toggleConnectivity();
     };
 
@@ -303,15 +295,8 @@ export class BrowserActionPopup extends LitElement {
     );
   }
 
-  toggleTelemetry(status) {
-    telemetry.setTelemetryEnabled(status);
-  }
-
   async openSettingsPanel() {
-    const settingsPanelElement = BrowserActionPopup.createSettingsPanel(
-      this.telemEnabled,
-      this.toggleTelemetry
-    );
+    const settingsPanelElement = BrowserActionPopup.createSettingsPanel();
     await this.stackView.value?.push(settingsPanelElement);
     this.requestUpdate();
   }

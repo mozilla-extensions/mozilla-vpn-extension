@@ -7,7 +7,6 @@ import { html, css, LitElement } from "../../vendor/lit-all.min.js";
 import {
   vpnController,
   proxyHandler,
-  telemetry,
 } from "../browserAction/backend.js";
 
 import { Utils } from "../../shared/utils.js";
@@ -74,9 +73,6 @@ export class PageActionPopup extends LitElement {
     };
 
     const removeContext = () => {
-      this._siteContext.excluded
-        ? telemetry.record("used_feature_page_action_revoke_exclude")
-        : telemetry.record("used_feature_page_action_revoke_geopref");
       proxyHandler.removeContextForOrigin(this._siteContext.origin);
     };
 

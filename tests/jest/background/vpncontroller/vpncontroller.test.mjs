@@ -226,35 +226,3 @@ describe("handleBridgeResponse", () => {
   });
 });
 
-describe("IPC::Settings", () => {
-  it("can handle a setting response", async () => {
-    const target = new VPNController({ registerObserver: () => {} });
-    // The Value should be the default one.
-    expect(target.settings.value.extensionTelemetryEnabled).toBe(
-      new VPNSettings().extensionTelemetryEnabled
-    );
-    // The VPN Client may at any point push new data
-    const message = {
-      t: "settings",
-      settings: {
-        // Send the inverse
-        extensionTelemetryEnabled: !new VPNSettings().extensionTelemetryEnabled,
-      },
-    };
-    await target.handleResponse(message);
-    expect(target.settings.value.extensionTelemetryEnabled).toBe(
-      message.settings.extensionTelemetryEnabled
-    );
-  });
-  it("ignores unknown settings", async () => {
-    const target = new VPNController({ registerObserver: () => {} });
-    const message = {
-      t: "settings",
-      settings: {
-        thisSettingDoesNotExist: true,
-      },
-    };
-    await target.handleResponse(message);
-    expect(target.settings.value["thisSettingDoesNotExist"]).toBe(undefined);
-  });
-});

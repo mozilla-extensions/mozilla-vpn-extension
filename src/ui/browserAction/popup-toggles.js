@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import { html, css, LitElement, until } from "../../vendor/lit-all.min.js";
 
-import { extPBMController, telemetry, extNormalController } from "./backend.js";
+import { extPBMController, extNormalController } from "./backend.js";
 
 import {
   fontStyling,
@@ -53,24 +53,6 @@ export class PopupToggles extends LitElement {
           })()
         )}
       `,
-    },
-    {
-      prefix: html`<hr></hr>`,
-      checked: telemetry.telemetryEnabled,
-      onClick: () => {
-        telemetry.setTelemetryEnabled(!telemetry.telemetryEnabled.value);
-      },
-      canClick: Promise.resolve(true),
-      headline: tr("telemetry_toggle_text"),
-      description: html`
-                <p class="control-checkbox-body">${tr("telemetrySettingsCheckboxLabel")} 
-                <a href="" @click=${() => {
-                  openInNewTab(
-                    "https://addons.mozilla.org/firefox/addon/mozilla-vpn-extension/privacy/"
-                  );
-                }} class="in-copy-link">${tr("learnMore")}</>
-                </p>
-            `,
     },
   ];
   static async toggleTemplate(

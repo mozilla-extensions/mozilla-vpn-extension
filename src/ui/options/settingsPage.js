@@ -34,9 +34,6 @@ export class SettingsPage extends LitElement {
     this.proxyHandler.then((p) => {
       p.siteContexts.subscribe((context) => (this.contexts = context));
     });
-    getExposedObject("Telemetry").then((t) =>
-      t.record("used_feature_settings_page")
-    );
   }
 
   connectedCallback() {
