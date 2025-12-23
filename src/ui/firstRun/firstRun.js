@@ -36,7 +36,6 @@ export class FirstRunPage extends LitElement {
         <div class="flex-row">
           <img src="firstrun.svg" aria-hidden="true" />
           <div class="copy">
-
             <p class="p1">
               ${tr("privacyPolicyIntro")}
               <a

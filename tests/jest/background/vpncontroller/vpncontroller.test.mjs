@@ -225,4 +225,3 @@ describe("handleBridgeResponse", () => {
     expect(vpnController.postToApp).not.toHaveBeenCalled();
   });
 });
-

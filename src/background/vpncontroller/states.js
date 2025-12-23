@@ -234,8 +234,7 @@ export class vpnStatusResponse {
   };
 }
 
-export class VPNSettings {
-}
+export class VPNSettings {}
 
 export class BridgeResponse {
   /** @type {string|undefined} */

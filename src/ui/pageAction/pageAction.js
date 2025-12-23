@@ -4,10 +4,7 @@
 
 import { html, css, LitElement } from "../../vendor/lit-all.min.js";
 
-import {
-  vpnController,
-  proxyHandler,
-} from "../browserAction/backend.js";
+import { vpnController, proxyHandler } from "../browserAction/backend.js";
 
 import { Utils } from "../../shared/utils.js";
 import { tr } from "../../shared/i18n.js";
