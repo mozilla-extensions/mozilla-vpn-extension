@@ -11,7 +11,6 @@ import {
 } from "../../components/styles.js";
 import { tr } from "../../shared/i18n.js";
 import "../../components/mz-pill.js";
-import { telemetry } from "../../ui/browserAction/backend.js";
 /**
  * This is the Page-Level Component for the SettingsPafe
  *
@@ -20,21 +19,13 @@ export class FirstRunPage extends LitElement {
   static properties = {
     contexts: { type: Object },
     serverList: { type: Object },
-    telemEnabled: { type: Boolean },
   };
   constructor() {
     super();
-
-    telemetry.telemetryEnabled.subscribe((s) => {
-      this.telemEnabled = s;
-    });
   }
 
   connectedCallback() {
     super.connectedCallback();
-
-    // Once on the first run enable telemetry by default.
-    telemetry.setTelemetryEnabled(true);
   }
 
   render() {
@@ -45,15 +36,6 @@ export class FirstRunPage extends LitElement {
         <div class="flex-row">
           <img src="firstrun.svg" aria-hidden="true" />
           <div class="copy">
-            <p class="bold p1">${tr("optionalDataCollection")}</p>
-            <p class="p1">${tr("first-install-body")}</p>
-
-            <p>${tr("telemetryListHeader")}</p>
-            <ul>
-              <li>${tr("technicalData")}</li>
-              <li>${tr("interactionData")}</li>
-            </ul>
-
             <p class="p1">
               ${tr("privacyPolicyIntro")}
               <a
@@ -63,19 +45,6 @@ export class FirstRunPage extends LitElement {
               >
             </p>
 
-            <p class="p1">${tr("telemetryOptOutInstructions")}</p>
-
-            <div class="checkbox-copy-wrapper">
-              <input
-                type="checkbox"
-                .checked=${this.telemEnabled}
-                @click=${(e) => {
-                  telemetry.setTelemetryEnabled(!this.telemEnabled);
-                  e.target.checked = !this.telemEnabled;
-                }}
-              />
-              <label class="pill-copy">${tr("telemetryCheckboxLabel")}</label>
-            </div>
             <div class="footer bold">
               <button
                 class="primarybtn"
