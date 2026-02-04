@@ -168,14 +168,19 @@ export class VPNController extends Component {
 
   // Handle responses from MozillaVPN client
   async handleResponse(response) {
-    console.debug(response);
     if (!response.t) {
       // The VPN Client always sends a ".t : string"
       // to determing the message type.
       // If it's not there it's from the bridge.
+      const oldState = this.#mState.value;
       this.handleBridgeResponse(response, this.#mState);
+      // Only log bridge messages when they actually change state
+      if (oldState !== this.#mState.value) {
+        console.debug("Bridge state changed:", response);
+      }
       return;
     }
+    console.debug(response);
     switch (response.t) {
       case "servers":
         if (
