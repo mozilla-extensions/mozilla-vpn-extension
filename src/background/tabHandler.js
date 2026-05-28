@@ -75,6 +75,16 @@ export class TabHandler extends Component {
     this.maybeShowIcon();
   }
 
+  static getExcludedIconPath() {
+    const darkMode =
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+    return darkMode
+      ? "../assets/logos/logo-light-excluded.svg"
+      : "../assets/logos/logo-dark-excluded.svg";
+  }
+
   async maybeShowIcon() {
     if (!this.siteContexts) {
       return;
@@ -91,11 +101,9 @@ export class TabHandler extends Component {
     this.currentContext = this.siteContexts.get(this.currentHostname);
 
     if (this.currentContext && this.currentContext.excluded) {
-      // PageAction icons are automagically updated by the
-      // browser in response to theme changes so we don't
-      // don't need to specify theme specific icons here.
+      // Update excluded icon based on the active browser theme.
       browser.pageAction.setIcon({
-        path: `../assets/logos/logo-dark-excluded.svg`,
+        path: TabHandler.getExcludedIconPath(),
         tabId: currentTab.id,
       });
       browser.pageAction.setTitle({
